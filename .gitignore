@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# Local data: downloads, layer cache, scan output
+.cache/
+out/
+work/
+
+# Editors and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,24 @@
+# 2026-10-14 @JaiadityaS session 1
+
+- Tasks: bootstrap, T-10, T-11
+- Done:
+  - Repo layout, PRD copy (`docs/PRD.md`), `AGENTS.md`, `.agents/` (STATE, TASKS, DECISIONS, log/).
+  - Hygiene: `scripts/guard.sh`, `scripts/install-hooks.sh`, `scripts/checkpoint.sh`, CI job `.github/workflows/ci.yml` (tests + guard).
+  - Static scanner in `.floor/floor/isa/`: `levels.py` (level map, extras), `allowlist.py`, `decode.py` (linear sweep, one entry per opcode form), `elf.py` (executable regions, GNU ISA note), `scan.py` (file reports, roles, summary). CLI in `.floor/floor/cli.py`.
+  - Tests: `.floor/tests/test_isa.py`, with a minimal ELF builder in `.floor/tests/elfbuild.py`.
+- Verified: `python -m pytest .floor/tests -q`: 44 passed (Windows, Python 3.13.11). `bash scripts/guard.sh tree`: ok.
+- Open:
+  - The scanner has seen synthetic ELF files only. The first real check is T-15 (images) or T-12 (local builds).
+  - T-20 design (OCI client):
+    - Token: `GET https://ghcr.io/token?scope=repository:ggml-org/whisper.cpp:pull&service=ghcr.io` (anonymous).
+    - Tags: `GET /v2/ggml-org/whisper.cpp/tags/list?n=1000`. Follow the `Link` header for more pages.
+    - Manifest index → the linux/amd64 manifest → the config blob. In the config `history`, find the step `COPY /app /app` (runtime stage `COPY --from=build /app /app`). Match it to its layer: skip history entries with `empty_layer: true`.
+    - That layer is about 150 MB (it holds the base.en model). Stream it (`tarfile` mode `r|gz`). Keep only ELF members below `app/`. pyelftools needs a seekable stream, so write each ELF member to disk (or BytesIO) before `scan_file`.
+    - Cache by layer digest in `~/.cache/floor/layers/<digest>/`. Use `requests`: it drops the Authorization header on a redirect to another host (the blob storage).
+  - Then scan with `python -m floor scan <dir> --json out/<tag>.json`. Files below `CMakeFiles/` are build tools and do not count.
+- Gotchas:
+  - iced-x86 constant names can contain lower-case parts (`HLE_or_RTM`). `decode.py` keeps every name that does not start with `_`. Do not filter with `isupper()`.
+  - `scripts/guard.sh` keeps its deny list rot13-encoded. Do not write the decoded names in a tracked file, or the guard fails.
+  - With `GGML_BACKEND_DL=ON`, the ggml loader opens every variant library to read its score. Static constructors in a high variant (for example skylakex) can then run on an old CPU. The static floor (core + `x64` variant) cannot see this. The QEMU run on qemu64 (T-13) is the proof for the all-variants build.
+  - A linear sweep can decode data bytes as instructions. A real v4 build has thousands of EVEX instructions. If a real scan shows a high level with a count of only one or two, check the evidence addresses before you trust it.
+- Branch: main

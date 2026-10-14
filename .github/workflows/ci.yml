@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e "./.floor[dev]"
+      - name: Unit tests
+        run: python -m pytest .floor/tests -q
+      - name: Hygiene guard
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          bash scripts/guard.sh tree
+          if [ -n "${BEFORE:-}" ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            commits="$(git rev-list "${BEFORE}..${GITHUB_SHA}")"
+          else
+            commits="${GITHUB_SHA}"
+          fi
+          for c in $commits; do
+            git log -1 --format=%B "$c" | bash scripts/guard.sh msg - || { echo "bad commit message: $c"; exit 1; }
+          done
