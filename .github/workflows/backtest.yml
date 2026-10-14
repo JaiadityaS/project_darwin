@@ -1,0 +1,44 @@
+name: backtest
+
+# Pulls published images and scans their /app layer (PRD F10.1). Start it by hand:
+#   gh workflow run backtest.yml -f refs="main-<sha> main-<sha>"
+# The JSON reports are in the run's artifact. The table is in the run summary.
+on:
+  workflow_dispatch:
+    inputs:
+      refs:
+        description: "Image tags or digests, separated by spaces"
+        required: true
+      repo:
+        description: "Repository on ghcr.io"
+        default: "ggml-org/whisper.cpp"
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - name: Scan images
+        shell: bash
+        env:
+          REFS: ${{ inputs.refs }}
+          REPO: ${{ inputs.repo }}
+        run: |
+          mkdir -p out/backtest
+          # REFS is split on spaces on purpose.
+          python -m floor image $REFS --repo "$REPO" --out out/backtest --verbose | tee out/backtest/summary.txt
+      - name: Run summary
+        if: always()
+        shell: bash
+        run: |
+          { echo '```'; tail -n 60 out/backtest/summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backtest-${{ github.run_id }}
+          path: out/backtest
