@@ -9,7 +9,7 @@ from elfbuild import build_elf
 from iced_x86 import CpuidFeature, Mnemonic
 
 from floor.cli import main
-from floor.isa.allowlist import ALLOWLIST
+from floor.isa.allowlist import ALLOWLIST, GUARDED, guarded_reason
 from floor.isa.decode import FEATURE_NAMES, decode_region
 from floor.isa.levels import FEATURE_LEVEL, classify, level_name, parse_level
 from floor.isa.scan import FileReport, classify_role, scan_file, scan_path, summarize
@@ -203,3 +203,46 @@ def test_cli_scan_writes_json(tmp_path, capsys):
 def test_cli_scan_without_elf_files_returns_2(tmp_path):
     assert main(["scan", str(tmp_path)]) == 2
     assert main(["scan", str(tmp_path / "missing")]) == 2
+
+
+LZCNT = bytes.fromhex("f30fbdc1")
+
+
+def test_guarded_entries_are_real_mnemonics_with_reasons():
+    for mnemonic, entries in GUARDED.items():
+        assert hasattr(Mnemonic, mnemonic)
+        assert entries and all(len(reason) > 40 for _, reason in entries)
+    assert guarded_reason("LZCNT", "drflac__seek_past_next_set_bit")
+    assert guarded_reason("LZCNT", "whisper_full") is None
+    assert guarded_reason("LZCNT", None) is None
+    assert guarded_reason("ANDN", "drflac__seek_past_next_set_bit") is None
+
+
+def test_lzcnt_inside_a_guarded_function_does_not_raise_the_level(tmp_path):
+    code = LZCNT + RET + bytes.fromhex("0f58c1") + RET
+    path = tmp_path / "whisper-cli"
+    path.write_bytes(build_elf(code, e_type=2, symbols=[("drflac__clz", 0, 5), ("main", 5, 4)]))
+    report = scan_file(path)
+    assert report.error is None
+    assert report.level == 1
+    assert report.allowlisted == {"LZCNT": 1}
+
+
+def test_lzcnt_outside_a_guarded_function_raises_the_level_and_names_it(tmp_path):
+    code = LZCNT + RET + LZCNT + RET
+    path = tmp_path / "libwhisper.so"
+    path.write_bytes(build_elf(code, symbols=[("drflac__clz", 0, 5), ("whisper_encode", 5, 5)]))
+    report = scan_file(path)
+    assert report.level == 3
+    assert report.allowlisted == {"LZCNT": 1}
+    assert report.evidence[0]["mnemonic"] == "LZCNT"
+    assert report.evidence[0]["count"] == 1
+    assert report.evidence[0]["functions"] == ["whisper_encode"]
+
+
+def test_lzcnt_without_symbols_counts(tmp_path):
+    path = tmp_path / "stripped"
+    path.write_bytes(build_elf(LZCNT + RET, e_type=2))
+    report = scan_file(path)
+    assert report.level == 3
+    assert report.evidence[0]["functions"] == []

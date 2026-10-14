@@ -17,7 +17,7 @@ from pathlib import Path
 from elftools.elf.elffile import ELFFile
 
 from .decode import DecodeStats, OpcodeStat, decode_region
-from .elf import exec_regions, isa_needed
+from .elf import Symbols, exec_regions, func_symbols, isa_needed
 from .levels import level_name
 
 ELF_MAGIC = b"\x7fELF"
@@ -94,17 +94,18 @@ def scan_stream(fh, relpath: str, size: int, sha256: str, role: str | None = Non
             return None
         report.elf_type = elf["e_type"]
         stats = DecodeStats()
+        symbols = func_symbols(elf)
         for name, address, data in exec_regions(elf):
-            decode_region(data, address, name, stats)
+            decode_region(data, address, name, stats, symbols if len(symbols) else None)
         report.isa_needed = isa_needed(elf)
     except Exception as exc:  # a damaged file must not stop the scan; the summary lists it
         report.error = f"{type(exc).__name__}: {exc}"
         return report
-    _fill(report, stats)
+    _fill(report, stats, symbols)
     return report
 
 
-def _fill(report: FileReport, stats: DecodeStats) -> None:
+def _fill(report: FileReport, stats: DecodeStats, symbols: Symbols | None = None) -> None:
     report.instructions = stats.instructions
     report.invalid = stats.invalid
     counted = [st for st in stats.opcodes.values() if st.allow_reason is None]
@@ -136,10 +137,11 @@ def _fill(report: FileReport, stats: DecodeStats) -> None:
         if set(st.extras) - seen:
             chosen.append(st)
             seen.update(st.extras)
-    report.evidence = [_evidence(st) for st in chosen]
+    report.evidence = [_evidence(st, symbols) for st in chosen]
 
 
-def _evidence(st: OpcodeStat) -> dict:
+def _evidence(st: OpcodeStat, symbols: Symbols | None = None) -> dict:
+    functions = sorted({symbols.lookup(ip) or "?" for ip in st.sample_ips}) if symbols else []
     return {
         "instr": st.example,
         "mnemonic": st.mnemonic,
@@ -148,6 +150,7 @@ def _evidence(st: OpcodeStat) -> dict:
         "count": st.count,
         "first_addr": hex(st.first_ip),
         "region": st.region,
+        "functions": functions,
     }
 
 

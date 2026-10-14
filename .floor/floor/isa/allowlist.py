@@ -4,6 +4,8 @@ Every entry needs a reason and a unit test (tests/test_isa.py). The QEMU runs (F
 corroborate the list. Keys are iced-x86 mnemonic names.
 """
 
+import re
+
 _CET_NOP = (
     "CET instruction in the hint-NOP opcode space. CPUs without CET run it as a NOP, "
     "so it cannot cause an illegal-instruction fault."
@@ -23,3 +25,24 @@ ALLOWLIST = {
         "It decides which code to run; it is never on the compute path."
     ),
 }
+
+# Function-scoped entries: the mnemonic is allowed only inside functions whose symbol
+# matches the pattern. The scan needs symbols (.symtab or .dynsym) to apply them.
+GUARDED = {
+    "LZCNT": (
+        (re.compile(r"^drflac_"), (
+            "dr_flac (in miniaudio) runs LZCNT only after its own CPUID check for ABM/LZCNT, "
+            "and uses a portable count-leading-zeros path on other CPUs."
+        )),
+    ),
+}
+
+
+def guarded_reason(mnemonic: str, function: str | None) -> str | None:
+    """Returns the reason when a function-scoped entry allows ``mnemonic`` in ``function``."""
+    if function is None:
+        return None
+    for pattern, reason in GUARDED.get(mnemonic, ()):
+        if pattern.match(function):
+            return reason
+    return None

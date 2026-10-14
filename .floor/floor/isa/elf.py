@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import bisect
 import struct
 
 SHF_EXECINSTR = 0x4
@@ -55,3 +56,37 @@ def isa_needed(elf) -> list[str] | None:
                 bits = struct.unpack_from("<I", value)[0]
                 found.update(name for bit, name in _ISA_BITS if bits & bit)
     return sorted(found) or None
+
+
+class Symbols:
+    """Function symbols of one file (.symtab and .dynsym), for address lookups."""
+
+    def __init__(self, entries: list[tuple[int, int, str]]):
+        entries = sorted(set(entries))
+        self._starts = [start for start, _, _ in entries]
+        self._entries = entries
+
+    def __len__(self) -> int:
+        return len(self._entries)
+
+    def lookup(self, address: int) -> str | None:
+        """Returns the name of the function that contains ``address``, or None."""
+        index = bisect.bisect_right(self._starts, address) - 1
+        for i in range(index, max(index - 8, -1), -1):  # a few back, for nested or aliased symbols
+            start, size, name = self._entries[i]
+            if start <= address < start + size:
+                return name
+        return None
+
+
+def func_symbols(elf) -> Symbols:
+    """Reads the STT_FUNC symbols with an address and a size."""
+    entries = []
+    for name in (".symtab", ".dynsym"):
+        section = elf.get_section_by_name(name)
+        if section is None or not hasattr(section, "iter_symbols"):
+            continue
+        for sym in section.iter_symbols():
+            if sym["st_info"]["type"] == "STT_FUNC" and sym["st_value"] and sym["st_size"] and sym.name:
+                entries.append((sym["st_value"], sym["st_size"], sym.name))
+    return Symbols(entries)
