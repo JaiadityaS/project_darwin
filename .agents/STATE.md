@@ -1,28 +1,30 @@
 # STATE: the baton
 
-Last update: 2026-10-14 08:40 UTC · @JaiadityaS · session 1 (bootstrap)
+Last update: 2026-10-14 09:10 UTC · @JaiadityaS · session 1 (bootstrap)
 
 ## Where we are
 
 - PRD v3.1 is the go decision (`docs/PRD.md`). Today is build day 2 (PRD §17.2).
 - Done: repo, team-sync system, hooks, CI for tests and hygiene.
-- Done: the static scanner (T-10) and its tests (T-11). `python -m floor scan <path>` works on synthetic ELF files. It has not yet seen a real whisper.cpp binary.
+- Done: the static scanner (T-10, T-11) and the ghcr.io client (T-20). `python -m floor scan <path>` and `python -m floor image <ref>` work.
+- Done: T-15 static part, the first H-1 signal (see "Facts learned"). In progress: T-24, run https://github.com/JaiadityaS/project_darwin/actions/runs/38538051321
 
 ## Gates (PRD §17.1)
 
 | Gate | Due | Status |
 |---|---|---|
 | G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
-| G-1 CPU proof | Oct 15 | scanner done; needs real binaries (T-12, T-15) and QEMU (T-13) |
-| G-2 Backtest and H-1 | Oct 16 | not started |
+| G-1 CPU proof | Oct 15 | scanner done; T-15 static part done; T-16 false positive open; T-12 and T-13 not started |
+| G-2 Backtest and H-1 | Oct 16 | client done (T-20); sampler (T-21) not started |
 | G-3 Gate integrity | Oct 18 | not started |
 | G-4 Release loop | Oct 22 | not started |
 
 ## Next agent: start here
 
-1. T-20: the OCI client for ghcr.io (design notes in log 2026-10-14-jaiadityas-1). Then T-15: scan `main-a1867e0` and `main-c62adfbd`.
-2. T-24: scan `main-cuda` and `main` at the same commit.
-3. T-12: Linux builds of whisper.cpp (native, folk fix, all-variants) and scans. T-13 in parallel if you have Linux.
+1. T-24: if it is still `doing`, read run 38538051321 (`gh run download 38538051321 -D out/t24`) and record both floors below.
+2. T-16: fix the LZCNT false positive. Pull one image locally once (`python -m floor image <ref> --verbose`, about 23 minutes on a home link), map the LZCNT addresses to symbols (`.symtab`), then write the rule and its tests.
+3. T-21: sampler that picks ≥ 30 `main-<sha>` tags across time (use the config `created` date), plus every image within two weeks of #3510 (opened 2025-11-10) and #3814 (2026-05-18). Run batches of about 10 refs per job.
+4. T-12 and T-13 need Linux (WSL Ubuntu, or a GitHub Actions job like `backtest.yml`).
 
 ## Needs a human (agents cannot do these)
 
@@ -34,8 +36,16 @@ Last update: 2026-10-14 08:40 UTC · @JaiadityaS · session 1 (bootstrap)
 
 - iced-x86 reports TZCNT as BMI1 and XGETBV as XSAVE (both level 3). Both are on the allowlist, so they do not raise a floor.
 - iced-x86 reports ENDBR64/ENDBR32 as CET_IBT and RDSSPD/RDSSPQ as CET_SS. These are extras, and they are on the allowlist.
+- **T-15 (run 38537736704), first H-1 signal.** Both images come from the same `main.Dockerfile` (GGML_NATIVE default ON):
+  - `main-a1867e0…` (built 2025-11-09T21:41Z, crashes in #3510): floor **x86-64-v4 + AVX512_VNNI**. `app/build/ggml/src/libggml-cpu.so` has EVEX code (VPSHUFD ×560, VPMADDUBSW ×384, VMOVDQA32 ×379). A machine with AVX-512 and VNNI built it.
+  - `main-c62adfbd…` (built 2025-10-28T20:48Z, works): floor **x86-64-v3**. `libggml-cpu.so` is AVX2 code.
+  - Both: 19 ELF files below `app/` (13 core, 6 CMake build tools); the `/app` layer is about 152 MB; no OCI revision label.
+- **False positive (T-16).** whisper-cli, whisper-server, test-vad, test-vad-full and vad-speech-segments show v3 only because of LZCNT ×24. bench, main, quantize and libggml-base are v1. The LZCNT is probably the CPUID-guarded path of the FLAC decoder in miniaudio. It does not change T-15, but it breaks AC-F2 for the all-variants build until T-16 is fixed.
+- ghcr.io `ggml-org/whisper.cpp` has 1174 tags (2026-10-14). Tags use the full commit hash: `main-<40 hex>`, `main-cuda-<40 hex>`, `main-intel-<40 hex>`.
+- A home link pulls ghcr.io blobs at about 108 KB/s. Pull images in GitHub Actions.
 
 ## Environment notes
 
-- Windows (Git Bash, Python 3.13 venv) is enough for the scanner, the backtest and the tests.
+- Windows (Git Bash, Python 3.13 venv) is enough for the scanner, the tests and small pulls.
 - Builds, QEMU, memory and offline tests need Linux: WSL Ubuntu, a Linux machine, or a CI job.
+- Private repo: GitHub Actions has 2000 free minutes per month. A backtest job of 2 images takes a few minutes.

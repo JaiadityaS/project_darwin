@@ -1,22 +1,21 @@
 # 2026-10-14 @JaiadityaS session 1
 
-- Tasks: bootstrap, T-10, T-11
+- Tasks: bootstrap, T-10, T-11, T-20, T-15 (started)
 - Done:
   - Repo layout, PRD copy (`docs/PRD.md`), `AGENTS.md`, `.agents/` (STATE, TASKS, DECISIONS, log/).
   - Hygiene: `scripts/guard.sh`, `scripts/install-hooks.sh`, `scripts/checkpoint.sh`, CI job `.github/workflows/ci.yml` (tests + guard).
   - Static scanner in `.floor/floor/isa/`: `levels.py` (level map, extras), `allowlist.py`, `decode.py` (linear sweep, one entry per opcode form), `elf.py` (executable regions, GNU ISA note), `scan.py` (file reports, roles, summary). CLI in `.floor/floor/cli.py`.
   - Tests: `.floor/tests/test_isa.py`, with a minimal ELF builder in `.floor/tests/elfbuild.py`.
-- Verified: `python -m pytest .floor/tests -q`: 44 passed (Windows, Python 3.13.11). `bash scripts/guard.sh tree`: ok.
+  - T-20: `.floor/floor/oci.py` (anonymous token, tags with Link pages, index → linux/amd64 manifest, config history → `COPY /app /app` layer, streamed gzip tar, only ELF files below `app/` written, layer digest verified, cache in `~/.cache/floor/layers/<digest>/`). Command: `python -m floor image <ref>... [--out DIR] [--verbose]`. Tests: `.floor/tests/test_oci.py` (no network).
+  - Manual job `.github/workflows/backtest.yml`: `gh workflow run backtest.yml -f refs="<ref> <ref>"`. JSON reports go to the run artifact; the table goes to the run summary.
+- Verified: `python -m pytest .floor/tests -q`: 49 passed (Windows, Python 3.13.11). `bash scripts/guard.sh tree`: ok. Live registry: `Registry().tags()` returns 1174 tags.
 - Open:
-  - The scanner has seen synthetic ELF files only. The first real check is T-15 (images) or T-12 (local builds).
-  - T-20 design (OCI client):
-    - Token: `GET https://ghcr.io/token?scope=repository:ggml-org/whisper.cpp:pull&service=ghcr.io` (anonymous).
-    - Tags: `GET /v2/ggml-org/whisper.cpp/tags/list?n=1000`. Follow the `Link` header for more pages.
-    - Manifest index → the linux/amd64 manifest → the config blob. In the config `history`, find the step `COPY /app /app` (runtime stage `COPY --from=build /app /app`). Match it to its layer: skip history entries with `empty_layer: true`.
-    - That layer is about 150 MB (it holds the base.en model). Stream it (`tarfile` mode `r|gz`). Keep only ELF members below `app/`. pyelftools needs a seekable stream, so write each ELF member to disk (or BytesIO) before `scan_file`.
-    - Cache by layer digest in `~/.cache/floor/layers/<digest>/`. Use `requests`: it drops the Authorization header on a redirect to another host (the blob storage).
-  - Then scan with `python -m floor scan <dir> --json out/<tag>.json`. Files below `CMakeFiles/` are build tools and do not count.
+  - T-15: backtest run started for `main-a1867e0dad0b21b35afa43fc815dae60c9a139d6` and `main-c62adfbd1ecdaea9e295c72d672992514a2d887c`. See STATE.md for the result or the run link. Next: record floor, highest level and extras of each image in STATE.md "Facts learned".
+  - Then T-24 (`main-cuda-<sha>` vs `main-<sha>`, same commit) and T-21 (sampler: choose ≥ 30 `main-<sha>` tags across time; run them through the backtest job in batches of about 10).
+  - The scanner has seen synthetic ELF files only until the T-15 run ends.
 - Gotchas:
+  - Image tags use the full 40-character commit hash: `main-<sha>`, `main-cuda-<sha>`, `main-intel-<sha>`. The short hashes in the PRD (`main-a1867e0`) are not tags.
+  - Downloads from ghcr.io blob storage run at about 108 KB/s on this home link, so one `/app` layer (about 150 MB, it holds the base.en model) takes about 23 minutes. Run image pulls in the backtest job, not on a laptop.
   - iced-x86 constant names can contain lower-case parts (`HLE_or_RTM`). `decode.py` keeps every name that does not start with `_`. Do not filter with `isupper()`.
   - `scripts/guard.sh` keeps its deny list rot13-encoded. Do not write the decoded names in a tracked file, or the guard fails.
   - With `GGML_BACKEND_DL=ON`, the ggml loader opens every variant library to read its score. Static constructors in a high variant (for example skylakex) can then run on an old CPU. The static floor (core + `x64` variant) cannot see this. The QEMU run on qemu64 (T-13) is the proof for the all-variants build.

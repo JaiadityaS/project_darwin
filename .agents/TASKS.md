@@ -25,17 +25,18 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-12 | Linux builds of whisper.cpp: native, folk fix (`GGML_NATIVE=OFF`), all-variants; scan each; check AC-F2 | AC-F2 | ready | - | WSL Ubuntu or a GitHub Actions dev job |
 | T-13 | QEMU user-mode harness with negative and positive controls on qemu64, Nehalem, SandyBridge, EPYC-Milan | F3.1, F3.2 | ready | - | Linux only. Also proves that loading every variant at start-up is safe (see log 2026-10-14-jaiadityas-1) |
 | T-14 | Dispatch map from ggml's load log | F3.3 | later | - | |
-| T-15 | Scan the #3510 images (`main-a1867e0` vs `main-c62adfbd`): first H-1 signal | F10.2, §3.6 | doing | @JaiadityaS | Needs T-20 |
+| T-16 | False positive: LZCNT x24 in whisper-cli, whisper-server, test-vad and vad-speech-segments raises them to v3. Probably the audio decoder (dr_flac in miniaudio) behind a CPUID check. Confirm with symbols, then choose a rule (function-scoped allowlist from .symtab, or a rule for LZCNT alone) with tests | F2.2, AC-F2 | ready | - | Blocks AC-F2 for the all-variants build. See STATE.md "Facts learned" |
+| T-15 | Scan the #3510 images (`main-a1867e0` vs `main-c62adfbd`): first H-1 signal | F10.2, §3.6 | done | @JaiadityaS | Static part done (run 38537736704): a1867e0 = v4 + AVX512_VNNI, c62adfbd = v3. The QEMU part is in T-13 |
 
 ## G-2 Backtest and H-1 (due Oct 16)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-20 | OCI client for ghcr.io: tags, manifests, config history, `/app` layer pull, cache by layer digest | F10.1 | doing | @JaiadityaS | `.floor/floor/oci.py` |
+| T-20 | OCI client for ghcr.io: tags, manifests, config history, `/app` layer pull, cache by layer digest | F10.1 | done | @JaiadityaS | `.floor/floor/oci.py`, `python -m floor image`. Pull images in `.github/workflows/backtest.yml` (a home link is too slow) |
 | T-21 | Backtest sampler: ≥ 30 images across the `main-<sha>` tags, plus every image within two weeks of #3510 and #3814; timeline JSON | F10.1 | ready | - | |
 | T-22 | H-1 analysis: level per image vs changes to `.devops/` and ggml CPU code; verdict with evidence | F10.3 | ready | - | Needs a local whisper.cpp clone for `git log` |
 | T-23 | Backtest footprint (bytes downloaded, CPU time) | F14.4 | later | - | |
-| T-24 | #3814: scan `main-cuda` and `main` at the same commit (a strong H-1 test) | F10.2 | ready | - | |
+| T-24 | #3814: scan `main-cuda` and `main` at the same commit (a strong H-1 test) | F10.2 | doing | @JaiadityaS | Run 38538051321: commit 47b9eb37 (2026-05-18) |
 
 ## G-3 Gate integrity (due Oct 18)
 
