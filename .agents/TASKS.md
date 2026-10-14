@@ -36,7 +36,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-21 | Backtest sampler: ≥ 30 images across the `main-<sha>` tags, plus every image within two weeks of #3510 and #3814; timeline JSON | F10.1 | ready | - | |
 | T-22 | H-1 analysis: level per image vs changes to `.devops/` and ggml CPU code; verdict with evidence | F10.3 | ready | - | Needs a local whisper.cpp clone for `git log` |
 | T-23 | Backtest footprint (bytes downloaded, CPU time) | F14.4 | later | - | |
-| T-24 | #3814: scan `main-cuda` and `main` at the same commit (a strong H-1 test) | F10.2 | doing | @JaiadityaS | Run 38538051321: commit 47b9eb37 (2026-05-18) |
+| T-24 | #3814: scan `main-cuda` and `main` at the same commit (a strong H-1 test) | F10.2 | done | @JaiadityaS | Run 38538051321: commit 47b9eb37, both v3. #3814 not reproduced at this commit; follow-up in STATE.md |
 
 ## G-3 Gate integrity (due Oct 18)
 
