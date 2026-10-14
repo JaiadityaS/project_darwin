@@ -25,13 +25,13 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-12 | Linux builds of whisper.cpp: native, folk fix (`GGML_NATIVE=OFF`), all-variants; scan each; check AC-F2 | AC-F2 | ready | - | WSL Ubuntu or a GitHub Actions dev job |
 | T-13 | QEMU user-mode harness with negative and positive controls on qemu64, Nehalem, SandyBridge, EPYC-Milan | F3.1, F3.2 | ready | - | Linux only. Also proves that loading every variant at start-up is safe (see log 2026-10-14-jaiadityas-1) |
 | T-14 | Dispatch map from ggml's load log | F3.3 | later | - | |
-| T-15 | Scan the #3510 images (`main-a1867e0` vs `main-c62adfbd`): first H-1 signal | F10.2, §3.6 | ready | - | Needs T-20 |
+| T-15 | Scan the #3510 images (`main-a1867e0` vs `main-c62adfbd`): first H-1 signal | F10.2, §3.6 | doing | @JaiadityaS | Needs T-20 |
 
 ## G-2 Backtest and H-1 (due Oct 16)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-20 | OCI client for ghcr.io: tags, manifests, config history, `/app` layer pull, cache by layer digest | F10.1 | ready | - | |
+| T-20 | OCI client for ghcr.io: tags, manifests, config history, `/app` layer pull, cache by layer digest | F10.1 | doing | @JaiadityaS | `.floor/floor/oci.py` |
 | T-21 | Backtest sampler: ≥ 30 images across the `main-<sha>` tags, plus every image within two weeks of #3510 and #3814; timeline JSON | F10.1 | ready | - | |
 | T-22 | H-1 analysis: level per image vs changes to `.devops/` and ggml CPU code; verdict with evidence | F10.3 | ready | - | Needs a local whisper.cpp clone for `git log` |
 | T-23 | Backtest footprint (bytes downloaded, CPU time) | F14.4 | later | - | |
