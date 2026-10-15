@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, fallback, h1, judge, manifest, memory, notice, offline, paths, policy, qemu, ratchet
+from . import backtest, fallback, h1, judge, manifest, memory, notice, offline, page, paths, policy, qemu, ratchet
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -238,6 +238,11 @@ def _cmd_fallback(args: argparse.Namespace) -> int:
     for path in changed:
         print(f"changed {path}")
     print(f"canned config: {fallback.flags_text()}" if changed else "canned config already applied")
+    return 0
+
+
+def _cmd_page(args: argparse.Namespace) -> int:
+    print(f"wrote {page.build(args.evidence, args.out, args.notices)}")
     return 0
 
 
@@ -481,6 +486,12 @@ def main(argv: list[str] | None = None) -> int:
     fb.add_argument("--dockerfile", action="append", help="Dockerfile path relative to root (default: .devops/*.Dockerfile)")
     fb.add_argument("--artifact", default="main", help="override file name in .floor/overrides/")
     fb.set_defaults(func=_cmd_fallback)
+
+    pg = sub.add_parser("page", help="build the Floor page from the evidence files (PRD F12.2)")
+    pg.add_argument("--evidence", default=".floor/evidence", help="evidence folder")
+    pg.add_argument("--notices", default=".floor/notices", help="notices folder")
+    pg.add_argument("--out", default="site", help="output folder (index.html)")
+    pg.set_defaults(func=_cmd_page)
 
     mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")

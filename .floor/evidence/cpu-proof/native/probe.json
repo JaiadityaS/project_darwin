@@ -1,0 +1,121 @@
+{
+  "tool": "floor 0.1.0",
+  "command": [
+    "w/build/bin/whisper-cli",
+    "-m",
+    "w/models/ggml-tiny.en.bin",
+    "-f",
+    "w/samples/jfk.wav",
+    "-t",
+    "4",
+    "-nt"
+  ],
+  "expect": "ask not what your country can do for you",
+  "runs": [
+    {
+      "cpu": "qemu64",
+      "cpu_level": "x86-64-v1",
+      "result": "fail",
+      "raw_result": "fail",
+      "exit": -4,
+      "signal": "SIGILL",
+      "timeout": false,
+      "loaded_variant": null,
+      "controls": {
+        "positive": {
+          "level": 1,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 2,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "",
+      "stderr_tail": "qemu: uncaught target signal 4 (Illegal instruction) - core dumped"
+    },
+    {
+      "cpu": "Nehalem",
+      "cpu_level": "x86-64-v2",
+      "result": "fail",
+      "raw_result": "fail",
+      "exit": -4,
+      "signal": "SIGILL",
+      "timeout": false,
+      "loaded_variant": null,
+      "controls": {
+        "positive": {
+          "level": 2,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 3,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "",
+      "stderr_tail": "qemu: uncaught target signal 4 (Illegal instruction) - core dumped"
+    },
+    {
+      "cpu": "SandyBridge",
+      "cpu_level": "x86-64-v2",
+      "result": "fail",
+      "raw_result": "fail",
+      "exit": -4,
+      "signal": "SIGILL",
+      "timeout": false,
+      "loaded_variant": null,
+      "controls": {
+        "positive": {
+          "level": 2,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 3,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "",
+      "stderr_tail": "qemu: uncaught target signal 4 (Illegal instruction) - core dumped"
+    },
+    {
+      "cpu": "EPYC-Milan",
+      "cpu_level": "x86-64-v3",
+      "result": "pass",
+      "raw_result": "pass",
+      "exit": 0,
+      "signal": null,
+      "timeout": false,
+      "loaded_variant": null,
+      "controls": {
+        "positive": {
+          "level": 3,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 4,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "\n And so my fellow Americans ask not what your country can do for you, ask what you can do for your country.",
+      "stderr_tail": "qemu-x86_64: warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit 1]\nqemu-x86_64: warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsaves [bit 3]\n\nwhisper_print_timings:     load time =   305.65 ms\nwhisper_print_timings:     fallbacks =   0 p /   0 h\nwhisper_print_timings:      mel time =  1607.35 ms\nwhisper_print_timings:   sample time =  1922.03 ms /   125 runs (    15.38 ms per run)\nwhisper_print_timings:   encode time = 404103.44 ms /     1 runs ( 404103.44 ms per run)\nwhisper_print_timings:   decode time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:   batchd time = 108601.17 ms /   122 runs (   890.17 ms per run)\nwhisper_print_timings:   prompt time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:    total time = 516771.84 ms"
+    }
+  ],
+  "label": "native"
+}

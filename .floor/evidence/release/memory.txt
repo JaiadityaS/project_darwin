@@ -1,0 +1,27 @@
+LIMIT_MB  RESULT  EXIT  PEAK_RSS_MB
+512       pass    0     179
+768       pass    0     179
+1024      pass    0     179
+1536      pass    0     179
+2048      pass    0     179
+3072      pass    0     179
+4096      pass    0     179
+tiny: smallest passing limit 512 MB, peak RSS 179 MB
+LIMIT_MB  RESULT  EXIT  PEAK_RSS_MB
+512       pass    0     290
+768       pass    0     290
+1024      pass    0     286
+1536      pass    0     288
+2048      pass    0     287
+3072      pass    0     289
+4096      pass    0     288
+base: smallest passing limit 512 MB, peak RSS 290 MB
+LIMIT_MB  RESULT  EXIT  PEAK_RSS_MB
+512       oom     -9    517
+768       pass    0     756
+1024      pass    0     756
+1536      pass    0     755
+2048      pass    0     754
+3072      pass    0     758
+4096      pass    0     757
+small: smallest passing limit 768 MB, peak RSS 758 MB

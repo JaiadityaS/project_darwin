@@ -30,6 +30,7 @@ def test_statement_shape():
     assert pred["build"]["highest_level_found"] == "x86-64-v4"
     assert {"arm64", "memory", "connectivity", "language"} <= set(pred["unmeasured"])
     assert pred["diff_from"] is None
+    assert pred["changes"] == []
     assert pred["delta_m_kgco2e"]["high"] == 0
 
 

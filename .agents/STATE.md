@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-15 · @JaiadityaS · session 2
+Last update: 2026-10-15 · @JaiadityaS · session 3
 
 ## Where we are
 
@@ -9,22 +9,24 @@ Last update: 2026-10-15 · @JaiadityaS · session 2
 - Done: the static scanner (T-10, T-11) and the ghcr.io client (T-20). `python -m floor scan <path>` and `python -m floor image <ref>` work.
 - Done: T-15 static part (the first H-1 signal) and T-24 for one commit. See "Facts learned".
 - Done in session 2: the #3814 follow-up (H-1 signal 2), function symbols in scan evidence, the T-16 rule, the sampler and timeline (`floor sample`, `floor timeline`) and the sweep workflow (`sweep.yml`).
+- Done in session 3: G-1 (T-12, T-13), the policy and its ratchet (T-30, T-31), the Judge (T-32), the manifest and diff (T-33), memory and offline floors (T-44, T-45). Partly done, the parts that need no GitLab: T-35 notices, T-36 CODEOWNERS and path allowlist, T-41 fallback script, T-60 Floor page.
+- CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | notice | paths | fallback | page | manifest | diff`. Run `python -m floor <command> -h`.
 
 ## Gates (PRD §17.1)
 
 | Gate | Due | Status |
 |---|---|---|
 | G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
-| G-1 CPU proof | Oct 15 | scanner done; T-15 static part done; T-16 done (run 38700683985: the audio tools are v1); T-12 and T-13 not started |
+| G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
-| G-3 Gate integrity | Oct 18 | not started |
+| G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`); the GitLab settings and the proof MRs wait on T-01 |
 | G-4 Release loop | Oct 22 | not started |
 
 ## Next agent: start here
 
-1. T-12 and T-13 need Linux: write a GitHub Actions job like `backtest.yml`. T-12 builds whisper.cpp three ways (native, `GGML_NATIVE=OFF`, all-variants) and scans each. T-13 runs the builds under `qemu-x86_64 -cpu qemu64|Nehalem|SandyBridge|EPYC-Milan`.
-2. Pure Python work that needs no access: T-30 (policy file and schema), T-32 (judge), T-33 (manifest writer and diff).
-3. T-60 (Floor page) can start now: the data is in `.floor/evidence/backtest/`.
+1. When T-01 is done: T-02 (assemble the GitLab project), then T-47 (`.gitlab-ci.yml`). Every gate step exists as a `floor` command; `floors.yml` and `cpu-proof.yml` show the order and the flags. T-47 also wires the open parts of T-35, T-36 and T-41.
+2. No access needed: T-56 (ΔM calculator), T-54 (SCI manifests), T-55 (energy per audio-minute for the three builds), the SCI and language sections of the Floor page.
+3. T-90 README: the measured claims are in "Facts learned" below.
 
 ## Needs a human (agents cannot do these)
 
@@ -33,6 +35,12 @@ Last update: 2026-10-15 · @JaiadityaS · session 2
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
 ## Facts learned (measured)
+
+- **G-1 met (cpu-proof run 38702242235, whisper.cpp 0c7be696).** Runner: AMD EPYC 9V74 (Zen 4), but the VM hides AVX-512, so `-march=native` gives v3 here.
+  - Static (AC-F2): native v3; folk fix (`GGML_NATIVE=OFF`) v3, because ggml then turns on AVX, AVX2, FMA, F16C and BMI2 by default; all-variants v1 (highest level found v4, only in variants).
+  - QEMU (AC-F3): native and folk fix crash with SIGILL on qemu64, Nehalem and SandyBridge, and pass on EPYC-Milan. All-variants passes on all four and loads x64, sse42, sandybridge and haswell. Every positive control passed and every negative control crashed.
+  - So the folk fix does not fix #3510-type crashes on pre-AVX2 CPUs. Only the all-variants build holds the v1 floor.
+- **Floors run 38704136185 (all-variants build).** Smallest passing cgroup limit: tiny 512 MB (peak RSS 179), base 512 (290), small 768 (758; out of memory at 512). Offline proven: 0 network attempts in a new network namespace under strace. Download 99.4 MB (tiny.en model + binary + libraries). Judge: all held, decision pass. `.floor/evidence/release/` has the manifest and the diff.
 
 - iced-x86 reports TZCNT as BMI1 and XGETBV as XSAVE (both level 3). Both are on the allowlist, so they do not raise a floor.
 - iced-x86 reports ENDBR64/ENDBR32 as CET_IBT and RDSSPD/RDSSPQ as CET_SS. These are extras, and they are on the allowlist.

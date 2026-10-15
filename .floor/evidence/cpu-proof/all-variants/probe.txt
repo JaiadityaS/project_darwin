@@ -1,0 +1,5 @@
+CPU          LEVEL      RESULT  EXIT  SIGNAL  VARIANT      CONTROLS
+qemu64       x86-64-v1  pass    0     -       x64          +v1:pass -v2:fail
+Nehalem      x86-64-v2  pass    0     -       sse42        +v2:pass -v3:fail
+SandyBridge  x86-64-v2  pass    0     -       sandybridge  +v2:pass -v3:fail
+EPYC-Milan   x86-64-v3  pass    0     -       haswell      +v3:pass -v4:fail

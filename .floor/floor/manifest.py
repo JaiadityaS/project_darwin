@@ -43,7 +43,8 @@ def _value(dimension: str, floor: dict | None):
 
 def changes(previous: dict | None, floors: dict, fixed_by: str | None = None) -> list[dict]:
     """One entry per dimension whose value moved. ``previous`` is the "floors" of the previous manifest."""
-    previous = previous or {}
+    if not previous:
+        return []  # the first release: nothing to compare with
     rows = []
     for dimension in sorted(set(previous) | set(floors)):
         old, new = _value(dimension, previous.get(dimension)), _value(dimension, floors.get(dimension))

@@ -1,0 +1,3731 @@
+{
+  "tool": "floor 0.1.0",
+  "summary": {
+    "floor": {
+      "level": "x86-64-v1",
+      "extras": [],
+      "sources": []
+    },
+    "baseline_variant": "x64",
+    "variants": {
+      "alderlake": "x86-64-v3",
+      "cannonlake": "x86-64-v4",
+      "cascadelake": "x86-64-v4",
+      "cooperlake": "x86-64-v4",
+      "haswell": "x86-64-v3",
+      "icelake": "x86-64-v4",
+      "ivybridge": "x86-64-v3",
+      "piledriver": "x86-64-v3",
+      "sandybridge": "x86-64-v3",
+      "sapphirerapids": "x86-64-v4",
+      "skylakex": "x86-64-v4",
+      "sse42": "x86-64-v2",
+      "x64": "x86-64-v1",
+      "zen4": "x86-64-v4"
+    },
+    "highest_level_found": "x86-64-v4",
+    "files": {
+      "scanned": 43,
+      "core": 23,
+      "variant": 14,
+      "build-tool": 6,
+      "distro": 0,
+      "errors": []
+    }
+  },
+  "files": [
+    {
+      "path": "CMakeFiles/3.31.6/CMakeDetermineCompilerABI_C.bin",
+      "sha256": "ba6646aa78bf3dd0a7997f89bcc1154630fcb86d28103e0bfcd5200b21f54c7c",
+      "size": 15968,
+      "elf_type": "ET_DYN",
+      "role": "build-tool",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 7,
+        "INTEL386": 22,
+        "INTEL8086": 3,
+        "MULTIBYTENOP": 9,
+        "X64": 71
+      },
+      "allowlisted": {
+        "ENDBR64": 7
+      },
+      "evidence": [],
+      "instructions": 112,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "CMakeFiles/3.31.6/CMakeDetermineCompilerABI_CXX.bin",
+      "sha256": "879b5d31eac14d7b0ca6cd3b96320041ad8d87b538fea24a17e8707f0656bc96",
+      "size": 15992,
+      "elf_type": "ET_DYN",
+      "role": "build-tool",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 7,
+        "INTEL386": 22,
+        "INTEL8086": 3,
+        "MULTIBYTENOP": 9,
+        "X64": 71
+      },
+      "allowlisted": {
+        "ENDBR64": 7
+      },
+      "evidence": [],
+      "instructions": 112,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "CMakeFiles/3.31.6/CompilerIdC/a.out",
+      "sha256": "88aa2744b35746a2f6464f0d7f31c3991c8fdb255d08727ecfbf676478e051b8",
+      "size": 16088,
+      "elf_type": "ET_DYN",
+      "role": "build-tool",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 7,
+        "INTEL386": 30,
+        "INTEL8086": 3,
+        "MULTIBYTENOP": 9,
+        "X64": 78
+      },
+      "allowlisted": {
+        "ENDBR64": 7
+      },
+      "evidence": [],
+      "instructions": 127,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "CMakeFiles/3.31.6/CompilerIdCXX/a.out",
+      "sha256": "a3d366f5f634a9cc0d9340115704a2d978e930f75ce0aceac02d7177849a8a1a",
+      "size": 16096,
+      "elf_type": "ET_DYN",
+      "role": "build-tool",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 7,
+        "INTEL386": 30,
+        "INTEL8086": 3,
+        "MULTIBYTENOP": 9,
+        "X64": 78
+      },
+      "allowlisted": {
+        "ENDBR64": 7
+      },
+      "evidence": [],
+      "instructions": 127,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "CMakeFiles/FindOpenMP/ompver_C.bin",
+      "sha256": "99fea6f8df550fdccd37e8c8aaa3c4daed812ce1928b9f3ba5c031ccc4ec1281",
+      "size": 16240,
+      "elf_type": "ET_DYN",
+      "role": "build-tool",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 9,
+        "INTEL386": 4,
+        "INTEL8086": 4,
+        "MULTIBYTENOP": 10,
+        "X64": 66
+      },
+      "allowlisted": {
+        "ENDBR64": 9
+      },
+      "evidence": [],
+      "instructions": 93,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "CMakeFiles/FindOpenMP/ompver_CXX.bin",
+      "sha256": "a5e305512b36338082ccf9c8477ead0959bfbeb4d1dbaea1dbc6041916ab2671",
+      "size": 16248,
+      "elf_type": "ET_DYN",
+      "role": "build-tool",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 9,
+        "INTEL386": 4,
+        "INTEL8086": 4,
+        "MULTIBYTENOP": 10,
+        "X64": 66
+      },
+      "allowlisted": {
+        "ENDBR64": 9
+      },
+      "evidence": [],
+      "instructions": 93,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/bench",
+      "sha256": "935c1c5096075bab0a585943795209bf383e2c843d2e1b49c60592d9ec489bfe",
+      "size": 17480,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 41,
+        "INTEL386": 24,
+        "INTEL8086": 26,
+        "MULTIBYTENOP": 28,
+        "SSE": 3,
+        "SSE2": 1,
+        "X64": 301
+      },
+      "allowlisted": {
+        "ENDBR64": 41
+      },
+      "evidence": [],
+      "instructions": 424,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/libggml-base.so.0.26.0",
+      "sha256": "1c391961f7f74499f8d1993f0c70c2bda92770ac833cc831af8667827177818a",
+      "size": 955456,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 2372,
+        "CMOV": 924,
+        "INTEL186": 155,
+        "INTEL286": 1,
+        "INTEL386": 23003,
+        "INTEL8086": 4254,
+        "MULTIBYTENOP": 3296,
+        "SSE": 16962,
+        "SSE2": 10923,
+        "X64": 78386
+      },
+      "allowlisted": {
+        "ENDBR64": 2372
+      },
+      "evidence": [],
+      "instructions": 140276,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-alderlake.so",
+      "sha256": "26e8b08c6db91b0c669ebf624ae46b8866c0b2a424467dde70be2b881ba66c4d",
+      "size": 1295064,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "alderlake",
+      "level": "x86-64-v3",
+      "extras": {
+        "AVX_VNNI": 149
+      },
+      "features": {
+        "AVX": 21191,
+        "AVX2": 8628,
+        "AVX_VNNI": 149,
+        "BMI2": 208,
+        "CET_IBT": 1457,
+        "CMOV": 1167,
+        "CPUID": 5,
+        "F16C": 71,
+        "FMA": 776,
+        "INTEL186": 591,
+        "INTEL386": 41120,
+        "INTEL486": 3,
+        "INTEL8086": 3045,
+        "MULTIBYTENOP": 3082,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 122340
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vmovss xmm0,[rdi+rax*4]",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1750,
+          "first_addr": "0x17a46",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_set_f32"
+          ]
+        },
+        {
+          "instr": "vmovdqa [rbp-210h],ymm0",
+          "mnemonic": "VMOVDQA",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1424,
+          "first_addr": "0x17d99",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "_ZL31ggml_backend_cpu_reg_get_deviceP16ggml_backend_regm",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_i32_1d",
+            "ggml_numa_init",
+            "ggml_set_f32_1d",
+            "ggml_set_i32_1d"
+          ]
+        },
+        {
+          "instr": "vmovdqa ymm1,[rbp-210h]",
+          "mnemonic": "VMOVDQA",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1408,
+          "first_addr": "0x17dcb",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_init",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovd xmm7,r8d",
+          "mnemonic": "VMOVD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1316,
+          "first_addr": "0x17169",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_set_f32",
+            "ggml_set_i32"
+          ]
+        },
+        {
+          "instr": "vmovss [rdi],xmm0",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1271,
+          "first_addr": "0x1833b",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_init",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpshufd ymm0,ymm0,0D8h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX2"
+          ],
+          "level": "x86-64-v3",
+          "count": 777,
+          "first_addr": "0xc7d49",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x",
+            "ggml_compute_forward_argsort",
+            "ggml_compute_forward_im2col",
+            "ggml_compute_forward_im2col_3d",
+            "ggml_compute_forward_top_k"
+          ]
+        },
+        {
+          "instr": "vpand ymm1,ymm7,ymm12",
+          "mnemonic": "VPAND",
+          "features": [
+            "AVX2"
+          ],
+          "level": "x86-64-v3",
+          "count": 760,
+          "first_addr": "0x171eb",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_cpu_init",
+            "ggml_gemm_q2_K_8x8_q8_K_generic",
+            "ggml_gemv_q2_K_8x8_q8_K_generic",
+            "ggml_vec_dot_q3_K_q8_K_generic",
+            "ggml_vec_dot_tq2_0_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vmulss xmm0,xmm0,[1005D0h]",
+          "mnemonic": "VMULSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 733,
+          "first_addr": "0x17ad5",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_gemv_q2_K_8x8_q8_K_generic",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpdpbusd ymm2,ymm4,ymm0",
+          "mnemonic": "VPDPBUSD",
+          "features": [
+            "AVX_VNNI"
+          ],
+          "level": "x86-64-v3",
+          "count": 149,
+          "first_addr": "0xe8551",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x",
+            "ggml_vec_dot_q4_0_q8_0",
+            "ggml_vec_dot_q4_1_q8_1",
+            "ggml_vec_dot_q5_0_q8_0",
+            "ggml_vec_dot_q5_1_q8_1",
+            "ggml_vec_dot_q8_0_q8_0"
+          ]
+        }
+      ],
+      "instructions": 203871,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-cannonlake.so",
+      "sha256": "74598eb61824e0ba8231fbf0a187741f83f6e08f06b8e0264e47945fd0ae88d3",
+      "size": 1471304,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "cannonlake",
+      "level": "x86-64-v4",
+      "extras": {
+        "AVX512_VBMI": 2
+      },
+      "features": {
+        "AVX": 24818,
+        "AVX2": 5816,
+        "AVX512BW": 4078,
+        "AVX512DQ": 1908,
+        "AVX512F": 14757,
+        "AVX512VL": 6356,
+        "AVX512_VBMI": 2,
+        "BMI2": 219,
+        "CET_IBT": 1457,
+        "CMOV": 1246,
+        "CPUID": 5,
+        "F16C": 19,
+        "FMA": 585,
+        "INTEL186": 535,
+        "INTEL386": 43904,
+        "INTEL486": 3,
+        "INTEL8086": 3033,
+        "MULTIBYTENOP": 3241,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 126696
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vpaddq zmm8,zmm6,[12AEC0h]",
+          "mnemonic": "VPADDQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 958,
+          "first_addr": "0x27708",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_0_to_q4_0_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0"
+          ]
+        },
+        {
+          "instr": "vpmullq zmm4,zmm4,zmm3",
+          "mnemonic": "VPMULLQ",
+          "features": [
+            "AVX512DQ"
+          ],
+          "level": "x86-64-v4",
+          "count": 888,
+          "first_addr": "0x608cf",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 [rbp-230h],zmm0",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 769,
+          "first_addr": "0x17fd9",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovq rax,xmm25",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 741,
+          "first_addr": "0x21b12",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 zmm8,[12A3C0h]",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 680,
+          "first_addr": "0x17158",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vpshufd zmm11,zmm4,88h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 632,
+          "first_addr": "0x10bc70",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        },
+        {
+          "instr": "vmovq xmm26,r11",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 619,
+          "first_addr": "0x21625",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K"
+          ]
+        },
+        {
+          "instr": "vpmaddubsw zmm2,zmm14,zmm2",
+          "mnemonic": "VPMADDUBSW",
+          "features": [
+            "AVX512BW"
+          ],
+          "level": "x86-64-v4",
+          "count": 512,
+          "first_addr": "0x10bec2",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        },
+        {
+          "instr": "vpermt2b xmm0,xmm5,xmm19",
+          "mnemonic": "VPERMT2B",
+          "features": [
+            "AVX512VL",
+            "AVX512_VBMI"
+          ],
+          "level": "x86-64-v4",
+          "count": 2,
+          "first_addr": "0x52e66",
+          "region": ".text",
+          "functions": [
+            "ggml_vec_dot_q5_0_q8_0_generic"
+          ]
+        }
+      ],
+      "instructions": 232360,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-cascadelake.so",
+      "sha256": "d878659c5466b563b138b52931f228147e7c7bfe3df7bc2ebccec15cd894d4e2",
+      "size": 1479200,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "cascadelake",
+      "level": "x86-64-v4",
+      "extras": {
+        "AVX512_VNNI": 789
+      },
+      "features": {
+        "AVX": 23911,
+        "AVX2": 5348,
+        "AVX512BW": 3515,
+        "AVX512DQ": 1795,
+        "AVX512F": 16258,
+        "AVX512VL": 5854,
+        "AVX512_VNNI": 789,
+        "BMI2": 219,
+        "CET_IBT": 1457,
+        "CMOV": 1256,
+        "CPUID": 5,
+        "F16C": 19,
+        "FMA": 571,
+        "INTEL186": 535,
+        "INTEL386": 45027,
+        "INTEL486": 3,
+        "INTEL8086": 3038,
+        "MULTIBYTENOP": 3239,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 126812
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vpaddq zmm8,zmm6,[12CEC0h]",
+          "mnemonic": "VPADDQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 958,
+          "first_addr": "0x27708",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_0_to_q4_0_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 zmm8,[12C3C0h]",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 914,
+          "first_addr": "0x17158",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vpmullq zmm4,zmm4,zmm3",
+          "mnemonic": "VPMULLQ",
+          "features": [
+            "AVX512DQ"
+          ],
+          "level": "x86-64-v4",
+          "count": 888,
+          "first_addr": "0x608ef",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 [rbp-230h],zmm0",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 769,
+          "first_addr": "0x17fd9",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovq rax,xmm25",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 751,
+          "first_addr": "0x21b12",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vpdpbusd zmm4,zmm1,zmm0",
+          "mnemonic": "VPDPBUSD",
+          "features": [
+            "AVX512_VNNI"
+          ],
+          "level": "x86-64-v4",
+          "count": 640,
+          "first_addr": "0x81d6f",
+          "region": ".text",
+          "functions": [
+            "_Z25tiled_run_micro_vnni_8x16ILi32ELb0ELi128ELi0EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi"
+          ]
+        },
+        {
+          "instr": "vpshufd zmm18,zmm4,88h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 632,
+          "first_addr": "0x10ea4d",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        },
+        {
+          "instr": "vmovq xmm26,r11",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 576,
+          "first_addr": "0x21625",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K"
+          ]
+        }
+      ],
+      "instructions": 233835,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-cooperlake.so",
+      "sha256": "3f75e2b0d1f6898c49b732be6354759973ce0644da5429656fa76f36878639db",
+      "size": 1479200,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "cooperlake",
+      "level": "x86-64-v4",
+      "extras": {
+        "AVX512_BF16": 2,
+        "AVX512_VNNI": 789
+      },
+      "features": {
+        "AVX": 23911,
+        "AVX2": 5348,
+        "AVX512BW": 3517,
+        "AVX512DQ": 1795,
+        "AVX512F": 16250,
+        "AVX512VL": 5854,
+        "AVX512_BF16": 2,
+        "AVX512_VNNI": 789,
+        "BMI2": 219,
+        "CET_IBT": 1457,
+        "CMOV": 1256,
+        "CPUID": 5,
+        "F16C": 19,
+        "FMA": 571,
+        "INTEL186": 535,
+        "INTEL386": 45027,
+        "INTEL486": 3,
+        "INTEL8086": 3039,
+        "MULTIBYTENOP": 3240,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 126813
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vpaddq zmm8,zmm6,[12CEC0h]",
+          "mnemonic": "VPADDQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 958,
+          "first_addr": "0x27708",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_0_to_q4_0_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 zmm8,[12C3C0h]",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 914,
+          "first_addr": "0x17158",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vpmullq zmm4,zmm4,zmm3",
+          "mnemonic": "VPMULLQ",
+          "features": [
+            "AVX512DQ"
+          ],
+          "level": "x86-64-v4",
+          "count": 888,
+          "first_addr": "0x608ef",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 [rbp-230h],zmm0",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 769,
+          "first_addr": "0x17fd9",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovq rax,xmm25",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 751,
+          "first_addr": "0x21b12",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vpdpbusd zmm4,zmm1,zmm0",
+          "mnemonic": "VPDPBUSD",
+          "features": [
+            "AVX512_VNNI"
+          ],
+          "level": "x86-64-v4",
+          "count": 640,
+          "first_addr": "0x81d6f",
+          "region": ".text",
+          "functions": [
+            "_Z25tiled_run_micro_vnni_8x16ILi32ELb0ELi128ELi0EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi"
+          ]
+        },
+        {
+          "instr": "vpshufd zmm18,zmm4,88h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 632,
+          "first_addr": "0x10ea2d",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        },
+        {
+          "instr": "vmovq xmm26,r11",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 576,
+          "first_addr": "0x21625",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K"
+          ]
+        },
+        {
+          "instr": "vdpbf16ps zmm1,zmm3,[r9+rax]",
+          "mnemonic": "VDPBF16PS",
+          "features": [
+            "AVX512F",
+            "AVX512_BF16"
+          ],
+          "level": "x86-64-v4",
+          "count": 2,
+          "first_addr": "0xb134f",
+          "region": ".text",
+          "functions": [
+            "ggml_vec_dot_bf16"
+          ]
+        }
+      ],
+      "instructions": 233832,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-haswell.so",
+      "sha256": "5544e2d363ee19a96f7487ad4a34e0aee7414efcd86c0a3cb55f95c7e4b4a15e",
+      "size": 1295064,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "haswell",
+      "level": "x86-64-v3",
+      "extras": {},
+      "features": {
+        "AVX": 21228,
+        "AVX2": 9047,
+        "BMI2": 208,
+        "CET_IBT": 1457,
+        "CMOV": 1167,
+        "CPUID": 5,
+        "F16C": 71,
+        "FMA": 776,
+        "INTEL186": 591,
+        "INTEL386": 41133,
+        "INTEL486": 3,
+        "INTEL8086": 3044,
+        "MULTIBYTENOP": 3080,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 122343
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vmovss xmm0,[rdi+rax*4]",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1750,
+          "first_addr": "0x17a46",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_set_f32"
+          ]
+        },
+        {
+          "instr": "vmovdqa [rbp-210h],ymm0",
+          "mnemonic": "VMOVDQA",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1468,
+          "first_addr": "0x17d99",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "_ZL31ggml_backend_cpu_reg_get_deviceP16ggml_backend_regm",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_i32_1d",
+            "ggml_numa_init",
+            "ggml_set_f32_1d",
+            "ggml_set_i32_1d"
+          ]
+        },
+        {
+          "instr": "vmovdqa ymm1,[rbp-210h]",
+          "mnemonic": "VMOVDQA",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1400,
+          "first_addr": "0x17dcb",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_init",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovd xmm7,r8d",
+          "mnemonic": "VMOVD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1327,
+          "first_addr": "0x17169",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_set_f32",
+            "ggml_set_i32"
+          ]
+        },
+        {
+          "instr": "vmovss [rdi],xmm0",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1271,
+          "first_addr": "0x1833b",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_init",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpmaddubsw ymm8,ymm1,[rcx+rax*8]",
+          "mnemonic": "VPMADDUBSW",
+          "features": [
+            "AVX2"
+          ],
+          "level": "x86-64-v3",
+          "count": 849,
+          "first_addr": "0x7aec4",
+          "region": ".text",
+          "functions": [
+            "_Z24tiled_run_microtile_avx2ILi16ELb0ELi128ELi0ELb1EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi",
+            "_Z24tiled_run_microtile_avx2ILi32ELb0ELi128ELi0ELb0EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi",
+            "_Z24tiled_run_microtile_avx2ILi32ELb0ELi128ELi0ELb1EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi",
+            "_Z24tiled_run_microtile_avx2ILi32ELb1ELi0ELi0ELb0EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi"
+          ]
+        },
+        {
+          "instr": "vpshufd ymm0,ymm0,0D8h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX2"
+          ],
+          "level": "x86-64-v3",
+          "count": 777,
+          "first_addr": "0xc7d49",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x",
+            "ggml_compute_forward_argsort",
+            "ggml_compute_forward_im2col",
+            "ggml_compute_forward_im2col_3d",
+            "ggml_compute_forward_top_k"
+          ]
+        },
+        {
+          "instr": "vpand ymm1,ymm7,ymm12",
+          "mnemonic": "VPAND",
+          "features": [
+            "AVX2"
+          ],
+          "level": "x86-64-v3",
+          "count": 760,
+          "first_addr": "0x171eb",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_cpu_init",
+            "ggml_gemm_q2_K_8x8_q8_K_generic",
+            "ggml_gemv_q2_K_8x8_q8_K_generic",
+            "ggml_vec_dot_q3_K_q8_K_generic",
+            "ggml_vec_dot_tq2_0_q8_K_generic"
+          ]
+        }
+      ],
+      "instructions": 204191,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-icelake.so",
+      "sha256": "ba17888887b57e14ed31b1b78ea02d69389aa2610cff4cee8ec6156bec01af4d",
+      "size": 1479200,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "icelake",
+      "level": "x86-64-v4",
+      "extras": {
+        "AVX512_VBMI": 2,
+        "AVX512_VNNI": 789
+      },
+      "features": {
+        "AVX": 23910,
+        "AVX2": 5347,
+        "AVX512BW": 3512,
+        "AVX512DQ": 1795,
+        "AVX512F": 16257,
+        "AVX512VL": 5852,
+        "AVX512_VBMI": 2,
+        "AVX512_VNNI": 789,
+        "BMI2": 219,
+        "CET_IBT": 1457,
+        "CMOV": 1257,
+        "CPUID": 5,
+        "F16C": 19,
+        "FMA": 571,
+        "INTEL186": 535,
+        "INTEL386": 45025,
+        "INTEL486": 3,
+        "INTEL8086": 3039,
+        "MULTIBYTENOP": 3238,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 126812
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vpaddq zmm8,zmm6,[12CEC0h]",
+          "mnemonic": "VPADDQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 958,
+          "first_addr": "0x27708",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_0_to_q4_0_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 zmm8,[12C3C0h]",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 914,
+          "first_addr": "0x17158",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vpmullq zmm4,zmm4,zmm3",
+          "mnemonic": "VPMULLQ",
+          "features": [
+            "AVX512DQ"
+          ],
+          "level": "x86-64-v4",
+          "count": 888,
+          "first_addr": "0x608cf",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 [rbp-230h],zmm0",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 769,
+          "first_addr": "0x17fd9",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovq rax,xmm25",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 751,
+          "first_addr": "0x21b12",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vpdpbusd zmm4,zmm1,zmm0",
+          "mnemonic": "VPDPBUSD",
+          "features": [
+            "AVX512_VNNI"
+          ],
+          "level": "x86-64-v4",
+          "count": 640,
+          "first_addr": "0x81d4f",
+          "region": ".text",
+          "functions": [
+            "_Z25tiled_run_micro_vnni_8x16ILi32ELb0ELi128ELi0EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi"
+          ]
+        },
+        {
+          "instr": "vpshufd zmm18,zmm4,88h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 632,
+          "first_addr": "0x10ea2d",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        },
+        {
+          "instr": "vmovq xmm26,r11",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 576,
+          "first_addr": "0x21625",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K"
+          ]
+        },
+        {
+          "instr": "vpermt2b xmm0,xmm5,xmm19",
+          "mnemonic": "VPERMT2B",
+          "features": [
+            "AVX512VL",
+            "AVX512_VBMI"
+          ],
+          "level": "x86-64-v4",
+          "count": 2,
+          "first_addr": "0x52e66",
+          "region": ".text",
+          "functions": [
+            "ggml_vec_dot_q5_0_q8_0_generic"
+          ]
+        }
+      ],
+      "instructions": 233830,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-ivybridge.so",
+      "sha256": "4a705bdc0f9a62427336eef3775e80fad570ba358a135041f4486531c7dd884a",
+      "size": 1219664,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "ivybridge",
+      "level": "x86-64-v3",
+      "extras": {},
+      "features": {
+        "AVX": 22899,
+        "CET_IBT": 1481,
+        "CMOV": 1144,
+        "CPUID": 5,
+        "F16C": 52,
+        "INTEL186": 701,
+        "INTEL386": 41505,
+        "INTEL486": 3,
+        "INTEL8086": 3413,
+        "MULTIBYTENOP": 3065,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 120059
+      },
+      "allowlisted": {
+        "ENDBR64": 1481
+      },
+      "evidence": [
+        {
+          "instr": "vmovss xmm0,[rdi+rax*4]",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1702,
+          "first_addr": "0x17a56",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_set_f32"
+          ]
+        },
+        {
+          "instr": "vmovss [rdi],xmm1",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1262,
+          "first_addr": "0x18343",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_init",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vmulss xmm0,xmm0,[0EE9B0h]",
+          "mnemonic": "VMULSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1240,
+          "first_addr": "0x17ae9",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vmovd xmm8,ebx",
+          "mnemonic": "VMOVD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1023,
+          "first_addr": "0x17321",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_get_i32_1d",
+            "ggml_get_i32_nd",
+            "ggml_new_f32",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpand xmm2,xmm8,xmm12",
+          "mnemonic": "VPAND",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1017,
+          "first_addr": "0x1738b",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_vec_dot_tq2_0_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vaddss xmm5,xmm0,xmm6",
+          "mnemonic": "VADDSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 939,
+          "first_addr": "0x17b0a",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_gemv_iq4_nl_8x8_q8_0_generic",
+            "ggml_gemv_q2_K_8x8_q8_K_generic",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic",
+            "ggml_gemv_q5_K_8x4_q8_K",
+            "ggml_gemv_q5_K_8x8_q8_K",
+            "ggml_gemv_q6_K_8x4_q8_K",
+            "ggml_gemv_q6_K_8x8_q8_K",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vxorps xmm0,xmm0,xmm0",
+          "mnemonic": "VXORPS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 685,
+          "first_addr": "0x18250",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_init",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpaddd xmm12,xmm6,xmm12",
+          "mnemonic": "VPADDD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 611,
+          "first_addr": "0x173b5",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_gemm_q4_0_4x4_q8_0",
+            "ggml_gemm_q8_0_4x4_q8_0",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_vec_dot_q8_0_q8_0_generic",
+            "ggml_vec_dot_tq1_0_q8_K_generic"
+          ]
+        }
+      ],
+      "instructions": 194365,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-piledriver.so",
+      "sha256": "e2c0ff1010ab29ea672c1f991ac92fbd72c7d83110c06336410eacabb8c8f246",
+      "size": 1219664,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "piledriver",
+      "level": "x86-64-v3",
+      "extras": {},
+      "features": {
+        "AVX": 21651,
+        "CET_IBT": 1481,
+        "CMOV": 1145,
+        "CPUID": 5,
+        "F16C": 52,
+        "FMA": 749,
+        "INTEL186": 701,
+        "INTEL386": 41502,
+        "INTEL486": 3,
+        "INTEL8086": 3437,
+        "MULTIBYTENOP": 3037,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 120041
+      },
+      "allowlisted": {
+        "ENDBR64": 1481
+      },
+      "evidence": [
+        {
+          "instr": "vmovss xmm0,[rdi+rax*4]",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1805,
+          "first_addr": "0x17a56",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_set_f32"
+          ]
+        },
+        {
+          "instr": "vmovss [rdi],xmm0",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1262,
+          "first_addr": "0x18353",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_init",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vmovd xmm8,ebx",
+          "mnemonic": "VMOVD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1023,
+          "first_addr": "0x17321",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_get_i32_1d",
+            "ggml_get_i32_nd",
+            "ggml_new_f32",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpand xmm2,xmm8,xmm12",
+          "mnemonic": "VPAND",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1017,
+          "first_addr": "0x1738b",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_vec_dot_tq2_0_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vmulss xmm0,xmm0,[0EE990h]",
+          "mnemonic": "VMULSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 777,
+          "first_addr": "0x17ae5",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_gemv_q2_K_8x8_q8_K_generic",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vxorps xmm0,xmm0,xmm0",
+          "mnemonic": "VXORPS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 685,
+          "first_addr": "0x18260",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_init",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpaddd xmm12,xmm6,xmm12",
+          "mnemonic": "VPADDD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 611,
+          "first_addr": "0x173b5",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_gemm_q4_0_4x4_q8_0",
+            "ggml_gemm_q8_0_4x4_q8_0",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_vec_dot_q8_0_q8_0_generic",
+            "ggml_vec_dot_tq1_0_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vmovdqu xmm3,[r12+54h]",
+          "mnemonic": "VMOVDQU",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 537,
+          "first_addr": "0x1a298",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZNSt6vectorI20ggml_backend_featureSaIS0_EE17_M_realloc_insertIJS0_EEEvN9__gnu_cxx17__normal_iteratorIPS0_S2_EEDpOT_",
+            "ggml_cpu_bf16_to_fp32",
+            "ggml_graph_plan"
+          ]
+        }
+      ],
+      "instructions": 193842,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-sandybridge.so",
+      "sha256": "4b4a104ea94a56f6f3b5e6d644008e8183248e38424e3ce519bc32e678329a2f",
+      "size": 1227856,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "sandybridge",
+      "level": "x86-64-v3",
+      "extras": {},
+      "features": {
+        "AVX": 23236,
+        "CET_IBT": 1481,
+        "CMOV": 1176,
+        "CPUID": 5,
+        "INTEL186": 701,
+        "INTEL386": 42036,
+        "INTEL486": 3,
+        "INTEL8086": 3454,
+        "MULTIBYTENOP": 3064,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 120136
+      },
+      "allowlisted": {
+        "ENDBR64": 1481
+      },
+      "evidence": [
+        {
+          "instr": "vmovss xmm2,[0F09B0h]",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1752,
+          "first_addr": "0x179f2",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_set_f32"
+          ]
+        },
+        {
+          "instr": "vmulss xmm0,xmm0,xmm2",
+          "mnemonic": "VMULSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1306,
+          "first_addr": "0x17a3b",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vmovss [rdi],xmm1",
+          "mnemonic": "VMOVSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1272,
+          "first_addr": "0x18123",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_init",
+            "ggml_gemv_q2_K_8x8_q8_K_generic",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic",
+            "ggml_gemv_q5_K_8x4_q8_K",
+            "ggml_gemv_q5_K_8x8_q8_K",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vmovd xmm8,ebx",
+          "mnemonic": "VMOVD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1052,
+          "first_addr": "0x17321",
+          "region": ".text",
+          "functions": [
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_get_i32_1d",
+            "ggml_get_i32_nd",
+            "ggml_new_f32",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpand xmm2,xmm8,xmm12",
+          "mnemonic": "VPAND",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 1017,
+          "first_addr": "0x1738b",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_vec_dot_tq2_0_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vaddss xmm4,xmm0,xmm5",
+          "mnemonic": "VADDSS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 971,
+          "first_addr": "0x17a55",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_cpu_fp32_to_fp16",
+            "ggml_cpu_init",
+            "ggml_gemv_iq4_nl_8x8_q8_0_generic",
+            "ggml_gemv_mxfp4_8x8_q8_0_generic",
+            "ggml_gemv_q1_0_4x4_q8_0",
+            "ggml_gemv_q2_K_8x8_q8_K_generic",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic",
+            "ggml_gemv_q5_K_8x4_q8_K",
+            "ggml_gemv_q5_K_8x8_q8_K",
+            "ggml_gemv_q6_K_8x4_q8_K",
+            "ggml_gemv_q6_K_8x8_q8_K",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_f32",
+            "ggml_set_f32_1d",
+            "ggml_set_f32_nd",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vxorps xmm0,xmm0,xmm0",
+          "mnemonic": "VXORPS",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 684,
+          "first_addr": "0x18030",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL35ggml_backend_cpu_device_supports_opP19ggml_backend_devicePK11ggml_tensor",
+            "ggml_cpu_init",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_get_f32_1d",
+            "ggml_get_f32_nd",
+            "ggml_quantize_mat_q8_0_4x4",
+            "ggml_quantize_mat_q8_0_4x8_generic",
+            "ggml_quantize_mat_q8_K_4x4",
+            "ggml_quantize_mat_q8_K_4x8_generic",
+            "ggml_set_i32",
+            "ggml_set_i32_1d",
+            "ggml_set_i32_nd"
+          ]
+        },
+        {
+          "instr": "vpaddd xmm12,xmm6,xmm12",
+          "mnemonic": "VPADDD",
+          "features": [
+            "AVX"
+          ],
+          "level": "x86-64-v3",
+          "count": 611,
+          "first_addr": "0x173b5",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_gemm_q4_0_4x4_q8_0",
+            "ggml_gemm_q8_0_4x4_q8_0",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_vec_dot_q8_0_q8_0_generic",
+            "ggml_vec_dot_tq1_0_q8_K_generic"
+          ]
+        }
+      ],
+      "instructions": 195330,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-sapphirerapids.so",
+      "sha256": "30e49da59b7ce72f4d5b55f612e6e96c5b168a61e68296ef28a0b8755b9180a1",
+      "size": 1720920,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "sapphirerapids",
+      "level": "x86-64-v4",
+      "extras": {
+        "AMX_INT8": 94,
+        "AMX_TILE": 279,
+        "AVX512_BF16": 2,
+        "AVX512_VBMI": 2,
+        "AVX512_VNNI": 2093
+      },
+      "features": {
+        "AMX_INT8": 94,
+        "AMX_TILE": 279,
+        "AVX": 26822,
+        "AVX2": 5644,
+        "AVX512BW": 5549,
+        "AVX512DQ": 1840,
+        "AVX512F": 28443,
+        "AVX512VL": 6194,
+        "AVX512_BF16": 2,
+        "AVX512_VBMI": 2,
+        "AVX512_VNNI": 2093,
+        "BMI2": 220,
+        "CET_IBT": 1508,
+        "CMOV": 1330,
+        "CPUID": 5,
+        "F16C": 19,
+        "FMA": 571,
+        "INTEL186": 542,
+        "INTEL386": 50491,
+        "INTEL486": 3,
+        "INTEL8086": 3250,
+        "MULTIBYTENOP": 3594,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 140372
+      },
+      "allowlisted": {
+        "ENDBR64": 1508
+      },
+      "evidence": [
+        {
+          "instr": "vpandd zmm2,zmm7,[rcx+rax*2]",
+          "mnemonic": "VPANDD",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 1731,
+          "first_addr": "0x182f0",
+          "region": ".text",
+          "functions": [
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_010block_q4_0fLi32ELi0EEEviiiPKvS4_PT1_iENKUlvE_clEvENKUlvE0_clEv",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q4_KfLi256ELi0EEEviiiPKvS4_PfiENKUlvE_clEvENKUlvE_clEv",
+            "ggml_cpu_fp32_to_bf16"
+          ]
+        },
+        {
+          "instr": "vpdpbusd zmm2,zmm19,zmm20",
+          "mnemonic": "VPDPBUSD",
+          "features": [
+            "AVX512_VNNI"
+          ],
+          "level": "x86-64-v4",
+          "count": 1720,
+          "first_addr": "0x5c65a",
+          "region": ".text",
+          "functions": [
+            "_ZN12_GLOBAL__N_120tinygemm_kernel_vnniI10block_q8_K12block_iq4_xsfLi1ELi96ELi256EE5applyEiPKvS5_Pfi"
+          ]
+        },
+        {
+          "instr": "vmulps zmm2,zmm2,zmm9",
+          "mnemonic": "VMULPS",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 1647,
+          "first_addr": "0x22fab",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_010block_q4_0fLi32ELi0EEEviiiPKvS4_PT1_iENKUlvE_clEvENKUlvE0_clEv",
+            "ggml_gemm_q4_K_8x4_q8_K",
+            "ggml_gemm_q4_K_8x8_q8_K_generic",
+            "ggml_gemm_q8_0_4x4_q8_0"
+          ]
+        },
+        {
+          "instr": "vmovups [r9],zmm1",
+          "mnemonic": "VMOVUPS",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 1634,
+          "first_addr": "0x1964b",
+          "region": ".text",
+          "functions": [
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_010block_q4_0fLi32ELi0EEEviiiPKvS4_PT1_iENKUlvE_clEvENKUlvE0_clEv",
+            "ggml_cpu_bf16_to_fp32",
+            "ggml_cpu_fp16_to_fp32",
+            "ggml_cpu_init",
+            "ggml_set_f32",
+            "ggml_set_i32"
+          ]
+        },
+        {
+          "instr": "vcvtdq2ps zmm2,zmm2",
+          "mnemonic": "VCVTDQ2PS",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 1432,
+          "first_addr": "0x22fa5",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_010block_q4_0fLi32ELi0EEEviiiPKvS4_PT1_iENKUlvE_clEvENKUlvE0_clEv",
+            "ggml_gemm_q4_K_8x4_q8_K",
+            "ggml_gemm_q4_K_8x8_q8_K_generic",
+            "ggml_gemm_q8_0_4x4_q8_0"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 zmm8,[1625C0h]",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 1102,
+          "first_addr": "0x182a8",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 [rbp-230h],zmm0",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 981,
+          "first_addr": "0x19129",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "_ZN12_GLOBAL__N_18unpack_BI12block_iq4_xsEEvPaPKvi",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_010block_q4_0fLi32ELi0EEEviiiPKvS4_PT1_iENKUlvE_clEvENKUlvE0_clEv",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q4_KfLi256ELi0EEEviiiPKvS4_PfiENKUlvE_clEvENKUlvE_clEv",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vpaddq zmm8,zmm6,[1630C0h]",
+          "mnemonic": "VPADDQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 958,
+          "first_addr": "0x28898",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_0_to_q4_0_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0"
+          ]
+        },
+        {
+          "instr": "tileloadd tmm0,[rcx+rax]",
+          "mnemonic": "TILELOADD",
+          "features": [
+            "AMX_TILE"
+          ],
+          "level": "x86-64-v4",
+          "count": 96,
+          "first_addr": "0x5a343",
+          "region": ".text",
+          "functions": [
+            "_ZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q5_KfLi256ELi0EEEviiiPKvS4_Pfi.constprop.0",
+            "_ZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q6_KfLi256ELi0EEEviiiPKvS4_Pfi.constprop.0",
+            "_ZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K12block_iq4_xsfLi256ELi0EEEviiiPKvS4_Pfi.constprop.0",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_010block_q4_0fLi32ELi0EEEviiiPKvS4_PT1_iENKUlvE_clEvENKUlvE0_clEv",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q4_KfLi256ELi0EEEviiiPKvS4_PfiENKUlvE_clEvENKUlvE_clEv"
+          ]
+        },
+        {
+          "instr": "tdpbssd tmm4,tmm2,tmm0",
+          "mnemonic": "TDPBSSD",
+          "features": [
+            "AMX_INT8"
+          ],
+          "level": "x86-64-v4",
+          "count": 94,
+          "first_addr": "0x5a63a",
+          "region": ".text",
+          "functions": [
+            "_ZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q5_KfLi256ELi0EEEviiiPKvS4_Pfi.constprop.0",
+            "_ZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q6_KfLi256ELi0EEEviiiPKvS4_Pfi.constprop.0",
+            "_ZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K12block_iq4_xsfLi256ELi0EEEviiiPKvS4_Pfi.constprop.0",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_010block_q4_0fLi32ELi0EEEviiiPKvS4_PT1_iENKUlvE_clEvENKUlvE0_clEv",
+            "_ZZZN12_GLOBAL__N_119tinygemm_kernel_amxI10block_q8_K10block_q4_KfLi256ELi0EEEviiiPKvS4_PfiENKUlvE_clEvENKUlvE_clEv"
+          ]
+        },
+        {
+          "instr": "vpermt2b xmm0,xmm5,xmm19",
+          "mnemonic": "VPERMT2B",
+          "features": [
+            "AVX512VL",
+            "AVX512_VBMI"
+          ],
+          "level": "x86-64-v4",
+          "count": 2,
+          "first_addr": "0x53ff6",
+          "region": ".text",
+          "functions": [
+            "ggml_vec_dot_q5_0_q8_0_generic"
+          ]
+        },
+        {
+          "instr": "vdpbf16ps zmm1,zmm3,[r9+rax]",
+          "mnemonic": "VDPBF16PS",
+          "features": [
+            "AVX512F",
+            "AVX512_BF16"
+          ],
+          "level": "x86-64-v4",
+          "count": 2,
+          "first_addr": "0xe6e5f",
+          "region": ".text",
+          "functions": [
+            "ggml_vec_dot_bf16"
+          ]
+        }
+      ],
+      "instructions": 272709,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-skylakex.so",
+      "sha256": "f8490116bf6594be4959e19e8dc752bd0530ed0c429eefce0a75c6fecae49614",
+      "size": 1471304,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "skylakex",
+      "level": "x86-64-v4",
+      "extras": {},
+      "features": {
+        "AVX": 24819,
+        "AVX2": 5817,
+        "AVX512BW": 4081,
+        "AVX512DQ": 1908,
+        "AVX512F": 14758,
+        "AVX512VL": 6358,
+        "BMI2": 219,
+        "CET_IBT": 1457,
+        "CMOV": 1247,
+        "CPUID": 5,
+        "F16C": 19,
+        "FMA": 585,
+        "INTEL186": 535,
+        "INTEL386": 43903,
+        "INTEL486": 3,
+        "INTEL8086": 3031,
+        "MULTIBYTENOP": 3243,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 126693
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vpaddq zmm8,zmm6,[12AEC0h]",
+          "mnemonic": "VPADDQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 958,
+          "first_addr": "0x27708",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_0_to_q4_0_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0"
+          ]
+        },
+        {
+          "instr": "vpmullq zmm4,zmm4,zmm3",
+          "mnemonic": "VPMULLQ",
+          "features": [
+            "AVX512DQ"
+          ],
+          "level": "x86-64-v4",
+          "count": 888,
+          "first_addr": "0x608ef",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 [rbp-230h],zmm0",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 769,
+          "first_addr": "0x17fd9",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovq rax,xmm25",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 741,
+          "first_addr": "0x21b12",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 zmm8,[12A3C0h]",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 680,
+          "first_addr": "0x17158",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vpshufd zmm11,zmm4,88h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 632,
+          "first_addr": "0x10bc90",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        },
+        {
+          "instr": "vmovq xmm26,r11",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 619,
+          "first_addr": "0x21625",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K"
+          ]
+        },
+        {
+          "instr": "vpmaddubsw zmm2,zmm14,zmm2",
+          "mnemonic": "VPMADDUBSW",
+          "features": [
+            "AVX512BW"
+          ],
+          "level": "x86-64-v4",
+          "count": 512,
+          "first_addr": "0x10bee2",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        }
+      ],
+      "instructions": 232361,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-sse42.so",
+      "sha256": "cb687c425f8ee57ba0e8c15f4646fd787a67263ebc33e5fd620a7f65ac61f383",
+      "size": 989512,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "sse42",
+      "level": "x86-64-v2",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1455,
+        "CMOV": 931,
+        "CPUID": 5,
+        "INTEL186": 529,
+        "INTEL386": 33714,
+        "INTEL486": 3,
+        "INTEL8086": 2878,
+        "MULTIBYTENOP": 2720,
+        "SSE": 15395,
+        "SSE2": 6946,
+        "SSE3": 102,
+        "SSE4_1": 2477,
+        "SSSE3": 83,
+        "X64": 96595
+      },
+      "allowlisted": {
+        "ENDBR64": 1455
+      },
+      "evidence": [
+        {
+          "instr": "insertps xmm1,[r14+rax*4],10h",
+          "mnemonic": "INSERTPS",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 633,
+          "first_addr": "0x20494",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_gemv_q4_0_4x8_q8_0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K"
+          ]
+        },
+        {
+          "instr": "extractps [rdx],xmm15,1",
+          "mnemonic": "EXTRACTPS",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 586,
+          "first_addr": "0x58a53",
+          "region": ".text",
+          "functions": [
+            "_Z26tiled_run_microtile_scalarILi32ELb0ELi128ELi0EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi"
+          ]
+        },
+        {
+          "instr": "pmovsxwd xmm15,xmm9",
+          "mnemonic": "PMOVSXWD",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 200,
+          "first_addr": "0x2061e",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii"
+          ]
+        },
+        {
+          "instr": "pmovzxwd xmm1,xmm0",
+          "mnemonic": "PMOVZXWD",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 172,
+          "first_addr": "0x19d15",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_compute_forward_add_non_quantized",
+            "ggml_cpu_bf16_to_fp32",
+            "ggml_gemm_q2_K_8x8_q8_K_generic",
+            "ggml_gemm_q4_K_8x4_q8_K",
+            "ggml_gemm_q4_K_8x8_q8_K_generic",
+            "ggml_gemv_q2_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "packusdw xmm0,xmm3",
+          "mnemonic": "PACKUSDW",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 136,
+          "first_addr": "0x16b52",
+          "region": ".text",
+          "functions": [
+            "ggml_compute_forward_add_non_quantized",
+            "ggml_compute_forward_mul",
+            "ggml_compute_forward_sub",
+            "ggml_cpu_fp32_to_bf16"
+          ]
+        },
+        {
+          "instr": "pinsrd xmm0,eax,1",
+          "mnemonic": "PINSRD",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 132,
+          "first_addr": "0x20094",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "ggml_gemv_q4_0_4x4_q8_0",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "pmovsxbw xmm6,xmm1",
+          "mnemonic": "PMOVSXBW",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 126,
+          "first_addr": "0x35911",
+          "region": ".text",
+          "functions": [
+            "ggml_gemm_q8_0_4x4_q8_0",
+            "ggml_vec_dot_q8_0_q8_0_generic",
+            "ggml_vec_dot_tq1_0_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "pinsrb xmm0,[rsp+4],1",
+          "mnemonic": "PINSRB",
+          "features": [
+            "SSE4_1"
+          ],
+          "level": "x86-64-v2",
+          "count": 112,
+          "first_addr": "0x2059e",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm"
+          ]
+        }
+      ],
+      "instructions": 163833,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-x64.so",
+      "sha256": "80d333934622bfa65deb62794fc4cb3b498e96ea1861edde18177599ac57e8d2",
+      "size": 985528,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "x64",
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1461,
+        "CMOV": 916,
+        "CPUID": 5,
+        "INTEL186": 529,
+        "INTEL386": 33596,
+        "INTEL486": 3,
+        "INTEL8086": 2956,
+        "MULTIBYTENOP": 2750,
+        "SSE": 16953,
+        "SSE2": 8921,
+        "X64": 96677
+      },
+      "allowlisted": {
+        "ENDBR64": 1461
+      },
+      "evidence": [],
+      "instructions": 164767,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml-cpu-zen4.so",
+      "sha256": "1b3acf45c3459515a75cd9dc77b5cac571b880e7e8ef6b2efacc20d26efea98a",
+      "size": 1479200,
+      "elf_type": "ET_DYN",
+      "role": "variant",
+      "variant": "zen4",
+      "level": "x86-64-v4",
+      "extras": {
+        "AVX512_BF16": 2,
+        "AVX512_VBMI": 2,
+        "AVX512_VNNI": 789
+      },
+      "features": {
+        "AVX": 23910,
+        "AVX2": 5347,
+        "AVX512BW": 3514,
+        "AVX512DQ": 1795,
+        "AVX512F": 16249,
+        "AVX512VL": 5852,
+        "AVX512_BF16": 2,
+        "AVX512_VBMI": 2,
+        "AVX512_VNNI": 789,
+        "BMI2": 219,
+        "CET_IBT": 1457,
+        "CMOV": 1256,
+        "CPUID": 5,
+        "F16C": 19,
+        "FMA": 571,
+        "INTEL186": 535,
+        "INTEL386": 45026,
+        "INTEL486": 3,
+        "INTEL8086": 3042,
+        "MULTIBYTENOP": 3238,
+        "SSE": 26,
+        "SSE2": 12,
+        "X64": 126814
+      },
+      "allowlisted": {
+        "ENDBR64": 1457
+      },
+      "evidence": [
+        {
+          "instr": "vpaddq zmm8,zmm6,[12CEC0h]",
+          "mnemonic": "VPADDQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 958,
+          "first_addr": "0x27708",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL24repack_q4_0_to_q4_0_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 zmm8,[12C3C0h]",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 914,
+          "first_addr": "0x17158",
+          "region": ".text",
+          "functions": [
+            "_ZL24repack_q1_0_to_q1_0_4_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL26repack_mxfp4_to_mxfp4_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZL28repack_iq4_nl_to_iq4_nl_8_blP11ggml_tensoriPKvm.constprop.0",
+            "_ZZL29ggml_backend_cpu_get_featuresP16ggml_backend_regENKUlvE_clEv.isra.0",
+            "ggml_cpu_fp32_to_bf16",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vpmullq zmm4,zmm4,zmm3",
+          "mnemonic": "VPMULLQ",
+          "features": [
+            "AVX512DQ"
+          ],
+          "level": "x86-64-v4",
+          "count": 888,
+          "first_addr": "0x608cf",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws"
+          ]
+        },
+        {
+          "instr": "vmovdqa64 [rbp-230h],zmm0",
+          "mnemonic": "VMOVDQA64",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 769,
+          "first_addr": "0x17fd9",
+          "region": ".text",
+          "functions": [
+            "_Z44ggml_compute_forward_mul_mat_tiled_one_chunkI11block_iq2_sLi16ELb0ELi128ELb1EEvPK19ggml_compute_paramsP11ggml_tensorllllP8tiled_ws",
+            "_ZL24repack_q4_K_to_q4_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q5_K_to_q5_K_8_blP11ggml_tensoriPKvm",
+            "_ZL24repack_q6_K_to_q6_K_8_blP11ggml_tensoriPKvm",
+            "ggml_numa_init"
+          ]
+        },
+        {
+          "instr": "vmovq rax,xmm25",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 751,
+          "first_addr": "0x21b12",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K",
+            "ggml_gemv_q4_K_8x8_q8_K_generic"
+          ]
+        },
+        {
+          "instr": "vpdpbusd zmm4,zmm1,zmm0",
+          "mnemonic": "VPDPBUSD",
+          "features": [
+            "AVX512_VNNI"
+          ],
+          "level": "x86-64-v4",
+          "count": 640,
+          "first_addr": "0x81d4f",
+          "region": ".text",
+          "functions": [
+            "_Z25tiled_run_micro_vnni_8x16ILi32ELb0ELi128ELi0EEvRK15tiled_tile_src0RK15tiled_tile_src1iiiiPfi"
+          ]
+        },
+        {
+          "instr": "vpshufd zmm18,zmm4,88h",
+          "mnemonic": "VPSHUFD",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 632,
+          "first_addr": "0x10ea0d",
+          "region": ".text",
+          "functions": [
+            "_Z28gemm_q4_b32_8x8_q8_0_lut_avxI5blockILi4ELi8EEEviPfmPKvS4_iiDv4_x"
+          ]
+        },
+        {
+          "instr": "vmovq xmm26,r11",
+          "mnemonic": "VMOVQ",
+          "features": [
+            "AVX512F"
+          ],
+          "level": "x86-64-v4",
+          "count": 576,
+          "first_addr": "0x21625",
+          "region": ".text",
+          "functions": [
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi4ELi8EEviPfmPKvS2_ii",
+            "_Z36ggml_gemm_q5_K_NxM_q8_K_generic_implILi8ELi8EEviPfmPKvS2_ii",
+            "_ZL24repack_q2_K_to_q2_K_8_blP11ggml_tensoriPKvm.constprop.0",
+            "ggml_gemv_q4_0_8x8_q8_0_generic",
+            "ggml_gemv_q4_K_8x4_q8_K"
+          ]
+        },
+        {
+          "instr": "vpermt2b xmm0,xmm5,xmm19",
+          "mnemonic": "VPERMT2B",
+          "features": [
+            "AVX512VL",
+            "AVX512_VBMI"
+          ],
+          "level": "x86-64-v4",
+          "count": 2,
+          "first_addr": "0x52e66",
+          "region": ".text",
+          "functions": [
+            "ggml_vec_dot_q5_0_q8_0_generic"
+          ]
+        },
+        {
+          "instr": "vdpbf16ps zmm1,zmm3,[r9+rax]",
+          "mnemonic": "VDPBF16PS",
+          "features": [
+            "AVX512F",
+            "AVX512_BF16"
+          ],
+          "level": "x86-64-v4",
+          "count": 2,
+          "first_addr": "0xb132f",
+          "region": ".text",
+          "functions": [
+            "ggml_vec_dot_bf16"
+          ]
+        }
+      ],
+      "instructions": 233829,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libggml.so.0.26.0",
+      "sha256": "f9863a4970aaa935f93afe168bc0cb2fcade0fd3151dd7be1616d802f43704c9",
+      "size": 60112,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 257,
+        "CMOV": 12,
+        "INTEL386": 416,
+        "INTEL486": 3,
+        "INTEL8086": 258,
+        "MULTIBYTENOP": 233,
+        "SSE": 36,
+        "SSE2": 13,
+        "X64": 4321
+      },
+      "allowlisted": {
+        "ENDBR64": 257
+      },
+      "evidence": [],
+      "instructions": 5549,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libparakeet.so.1.9.5",
+      "sha256": "91839d351e92624251c04baadf2d99ffd04ccaa08c513dc802ad521aa68b2425",
+      "size": 188888,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 624,
+        "CMOV": 123,
+        "INTEL386": 3182,
+        "INTEL8086": 538,
+        "MULTIBYTENOP": 758,
+        "SSE": 771,
+        "SSE2": 541,
+        "X64": 16941
+      },
+      "allowlisted": {
+        "ENDBR64": 624
+      },
+      "evidence": [],
+      "instructions": 23478,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/libwhisper.so.1.9.5",
+      "sha256": "b3b9f04c334a18105035b7c1427d2f4fc7afe5781061bdd545e980877dadfedd",
+      "size": 636488,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 2007,
+        "CMOV": 269,
+        "INTEL186": 6,
+        "INTEL286": 1,
+        "INTEL386": 9090,
+        "INTEL486": 10,
+        "INTEL8086": 2380,
+        "MULTIBYTENOP": 2713,
+        "SSE": 3408,
+        "SSE2": 3035,
+        "X64": 61872
+      },
+      "allowlisted": {
+        "ENDBR64": 2007
+      },
+      "evidence": [],
+      "instructions": 84791,
+      "invalid": 0,
+      "isa_needed": null,
+      "error": null
+    },
+    {
+      "path": "bin/main",
+      "sha256": "935c1c5096075bab0a585943795209bf383e2c843d2e1b49c60592d9ec489bfe",
+      "size": 17480,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 41,
+        "INTEL386": 24,
+        "INTEL8086": 26,
+        "MULTIBYTENOP": 28,
+        "SSE": 3,
+        "SSE2": 1,
+        "X64": 301
+      },
+      "allowlisted": {
+        "ENDBR64": 41
+      },
+      "evidence": [],
+      "instructions": 424,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/parakeet-cli",
+      "sha256": "483c5d0e91dd50d71610fa25226c478545be9ea238f72b61e7d0b8818d61f022",
+      "size": 648072,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1226,
+        "CMOV": 513,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 1,
+        "INTEL386": 27460,
+        "INTEL486": 39,
+        "INTEL8086": 3965,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3595,
+        "PAUSE": 2,
+        "SSE": 8510,
+        "SSE2": 9565,
+        "X64": 57435
+      },
+      "allowlisted": {
+        "ENDBR64": 1226,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 112442,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/parakeet-quantize",
+      "sha256": "e0a5378b2ba80ec5e1e6a562de92d6df62d2f0490b24aba11601133b3aea6db3",
+      "size": 198224,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 532,
+        "CMOV": 52,
+        "INTEL186": 1,
+        "INTEL386": 2380,
+        "INTEL486": 9,
+        "INTEL8086": 1059,
+        "MULTIBYTENOP": 922,
+        "SSE": 500,
+        "SSE2": 474,
+        "X64": 18515
+      },
+      "allowlisted": {
+        "ENDBR64": 532
+      },
+      "evidence": [],
+      "instructions": 24444,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-common-utf8",
+      "sha256": "a055f8a5f8aec77864ffe04743f380ce6eb6996d72ce5657cff6a3b1e888ac6c",
+      "size": 633288,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1162,
+        "CMOV": 503,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 1,
+        "INTEL386": 27206,
+        "INTEL486": 39,
+        "INTEL8086": 3846,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3518,
+        "PAUSE": 2,
+        "SSE": 8499,
+        "SSE2": 9551,
+        "X64": 55925
+      },
+      "allowlisted": {
+        "ENDBR64": 1162,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 110383,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-parakeet",
+      "sha256": "b8e8682f3d07def7c6abbe9103fa61856dc0ebbdbe787441aa04612851f75a0d",
+      "size": 638680,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1196,
+        "CMOV": 503,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 1,
+        "INTEL386": 27238,
+        "INTEL486": 39,
+        "INTEL8086": 3867,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3546,
+        "PAUSE": 2,
+        "SSE": 8507,
+        "SSE2": 9562,
+        "X64": 56045
+      },
+      "allowlisted": {
+        "ENDBR64": 1196,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 110637,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-parakeet-full-diffusion",
+      "sha256": "35a49f400346f0edded0c3c95757efe0a44651f4ceb2a180f8baf60bb0da46d1",
+      "size": 643336,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1203,
+        "CMOV": 507,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 3,
+        "INTEL386": 27309,
+        "INTEL486": 39,
+        "INTEL8086": 3903,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3571,
+        "PAUSE": 2,
+        "SSE": 8519,
+        "SSE2": 9590,
+        "X64": 56781
+      },
+      "allowlisted": {
+        "ENDBR64": 1203,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 111558,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-parakeet-full-gb1",
+      "sha256": "6bf025b315e463e41d65461b74b8936721d0082b2a8b73fd64001af34b634227",
+      "size": 634336,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1188,
+        "CMOV": 503,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 3,
+        "INTEL386": 27221,
+        "INTEL486": 39,
+        "INTEL8086": 3880,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3544,
+        "PAUSE": 2,
+        "SSE": 8507,
+        "SSE2": 9558,
+        "X64": 56172
+      },
+      "allowlisted": {
+        "ENDBR64": 1188,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 110748,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-parakeet-full-jfk",
+      "sha256": "655d91fb4a7a76b97a4c34c519fa27fb858f4a30e10f76ce67b6c82d2a8838d2",
+      "size": 634336,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1188,
+        "CMOV": 503,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 3,
+        "INTEL386": 27221,
+        "INTEL486": 39,
+        "INTEL8086": 3880,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3544,
+        "PAUSE": 2,
+        "SSE": 8507,
+        "SSE2": 9558,
+        "X64": 56172
+      },
+      "allowlisted": {
+        "ENDBR64": 1188,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 110748,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-vad",
+      "sha256": "9ab7a65dd3333af81bfd9b5a5742f374b1fd3bc9ffe5156e72e80465f3865913",
+      "size": 634272,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1186,
+        "CMOV": 503,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 1,
+        "INTEL386": 27210,
+        "INTEL486": 39,
+        "INTEL8086": 3861,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3542,
+        "PAUSE": 2,
+        "SSE": 8508,
+        "SSE2": 9560,
+        "X64": 56016
+      },
+      "allowlisted": {
+        "ENDBR64": 1186,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 110559,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-vad-full",
+      "sha256": "7378b5cc14e583b2d5308f1a5b3e2ee56e2a19b342bda34fb05a837aa6e058a0",
+      "size": 634104,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1191,
+        "CMOV": 503,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 1,
+        "INTEL386": 27224,
+        "INTEL486": 39,
+        "INTEL8086": 3865,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3541,
+        "PAUSE": 2,
+        "SSE": 8504,
+        "SSE2": 9555,
+        "X64": 56025
+      },
+      "allowlisted": {
+        "ENDBR64": 1191,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 110581,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-whisper-buffer-loader",
+      "sha256": "0d9eb17b357895784246c54ffd9c6ebe165e324cb9ec2714228281f9a24f1d06",
+      "size": 16200,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 17,
+        "INTEL386": 10,
+        "INTEL8086": 9,
+        "MULTIBYTENOP": 15,
+        "SSE": 6,
+        "SSE2": 6,
+        "X64": 104
+      },
+      "allowlisted": {
+        "ENDBR64": 17
+      },
+      "evidence": [],
+      "instructions": 167,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-whisper-lang-detect-abort",
+      "sha256": "46226ef01b9e1e95664d3dd24b6d9ee8fa4c9e7e3764ca76fed5c0db9af9e44b",
+      "size": 17048,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 37,
+        "INTEL386": 20,
+        "INTEL8086": 19,
+        "MULTIBYTENOP": 29,
+        "SSE": 3,
+        "SSE2": 3,
+        "X64": 188
+      },
+      "allowlisted": {
+        "ENDBR64": 37
+      },
+      "evidence": [],
+      "instructions": 299,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/test-whisper-zero-samples",
+      "sha256": "0b414657d0074ab62de5a91fef81dd5cd29e88cbbe4d485d0d7b6292daf9d669",
+      "size": 16416,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 27,
+        "INTEL386": 15,
+        "INTEL8086": 16,
+        "MULTIBYTENOP": 20,
+        "SSE": 3,
+        "SSE2": 3,
+        "X64": 139
+      },
+      "allowlisted": {
+        "ENDBR64": 27
+      },
+      "evidence": [],
+      "instructions": 223,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/whisper-bench",
+      "sha256": "25e29839070000d9c991c94f3c10fd00a5f3249153e9ad3275b49ffce88bb5c7",
+      "size": 26376,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 76,
+        "CMOV": 4,
+        "INTEL386": 183,
+        "INTEL8086": 64,
+        "MULTIBYTENOP": 60,
+        "SSE": 4,
+        "SSE2": 4,
+        "X64": 657
+      },
+      "allowlisted": {
+        "ENDBR64": 76
+      },
+      "evidence": [],
+      "instructions": 1052,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/whisper-cli",
+      "sha256": "9023193a1b3aa22458899b221c8dd5781a4bffbe21255e03f422d2586d162039",
+      "size": 998368,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 2023,
+        "CMOV": 684,
+        "CPUID": 1,
+        "INTEL186": 106,
+        "INTEL286": 5,
+        "INTEL386": 32653,
+        "INTEL486": 45,
+        "INTEL8086": 5841,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 5083,
+        "PAUSE": 2,
+        "SSE": 9433,
+        "SSE2": 10637,
+        "X64": 93118
+      },
+      "allowlisted": {
+        "ENDBR64": 2023,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 159657,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/whisper-quantize",
+      "sha256": "d86451c21d7fef23a8ff241f4eae9d204a37f1fd8cff638b478ab446a88cee6b",
+      "size": 207928,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 555,
+        "CMOV": 68,
+        "INTEL186": 1,
+        "INTEL386": 2531,
+        "INTEL486": 9,
+        "INTEL8086": 1070,
+        "MULTIBYTENOP": 948,
+        "SSE": 506,
+        "SSE2": 495,
+        "X64": 19516
+      },
+      "allowlisted": {
+        "ENDBR64": 555
+      },
+      "evidence": [],
+      "instructions": 25699,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/whisper-server",
+      "sha256": "1e96e8c5417ce7a4ec5c025402e02d30275f5c24237ac27ea02683a839e0d123",
+      "size": 1309576,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 2981,
+        "CMOV": 702,
+        "CPUID": 1,
+        "INTEL186": 114,
+        "INTEL286": 3,
+        "INTEL386": 35893,
+        "INTEL486": 46,
+        "INTEL8086": 7116,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 6151,
+        "PAUSE": 2,
+        "SSE": 10022,
+        "SSE2": 11317,
+        "X64": 120933
+      },
+      "allowlisted": {
+        "ENDBR64": 2981,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 195307,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    },
+    {
+      "path": "bin/whisper-vad-speech-segments",
+      "sha256": "379fa08d697c0581055b99728adbf2ad51554584c565723927736ba5a6114985",
+      "size": 647608,
+      "elf_type": "ET_DYN",
+      "role": "core",
+      "variant": null,
+      "level": "x86-64-v1",
+      "extras": {},
+      "features": {
+        "CET_IBT": 1225,
+        "CMOV": 506,
+        "CPUID": 1,
+        "INTEL186": 104,
+        "INTEL286": 1,
+        "INTEL386": 27461,
+        "INTEL486": 39,
+        "INTEL8086": 3921,
+        "LZCNT": 26,
+        "MULTIBYTENOP": 3575,
+        "PAUSE": 2,
+        "SSE": 8515,
+        "SSE2": 9576,
+        "X64": 57065
+      },
+      "allowlisted": {
+        "ENDBR64": 1225,
+        "LZCNT": 26
+      },
+      "evidence": [],
+      "instructions": 112017,
+      "invalid": 0,
+      "isa_needed": [
+        "x86-64-v1"
+      ],
+      "error": null
+    }
+  ]
+}

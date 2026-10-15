@@ -1,0 +1,121 @@
+{
+  "tool": "floor 0.1.0",
+  "command": [
+    "w/build/bin/whisper-cli",
+    "-m",
+    "w/models/ggml-tiny.en.bin",
+    "-f",
+    "w/samples/jfk.wav",
+    "-t",
+    "4",
+    "-nt"
+  ],
+  "expect": "ask not what your country can do for you",
+  "runs": [
+    {
+      "cpu": "qemu64",
+      "cpu_level": "x86-64-v1",
+      "result": "pass",
+      "raw_result": "pass",
+      "exit": 0,
+      "signal": null,
+      "timeout": false,
+      "loaded_variant": "x64",
+      "controls": {
+        "positive": {
+          "level": 1,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 2,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "\n And so my fellow Americans ask not what your country can do for you, ask what you can do for your country.",
+      "stderr_tail": "main: processing 'w/samples/jfk.wav' (176000 samples, 11.0 sec), 4 threads, 1 processors, 5 beams + best of 5, lang = en, task = transcribe, timestamps = 0 ...\n\n\nwhisper_print_timings:     load time =   343.03 ms\nwhisper_print_timings:     fallbacks =   0 p /   0 h\nwhisper_print_timings:      mel time =  1937.79 ms\nwhisper_print_timings:   sample time =  1801.74 ms /   125 runs (    14.41 ms per run)\nwhisper_print_timings:   encode time = 289287.81 ms /     1 runs ( 289287.81 ms per run)\nwhisper_print_timings:   decode time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:   batchd time = 64915.97 ms /   122 runs (   532.10 ms per run)\nwhisper_print_timings:   prompt time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:    total time = 358386.31 ms"
+    },
+    {
+      "cpu": "Nehalem",
+      "cpu_level": "x86-64-v2",
+      "result": "pass",
+      "raw_result": "pass",
+      "exit": 0,
+      "signal": null,
+      "timeout": false,
+      "loaded_variant": "sse42",
+      "controls": {
+        "positive": {
+          "level": 2,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 3,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "\n And so my fellow Americans ask not what your country can do for you, ask what you can do for your country.",
+      "stderr_tail": "main: processing 'w/samples/jfk.wav' (176000 samples, 11.0 sec), 4 threads, 1 processors, 5 beams + best of 5, lang = en, task = transcribe, timestamps = 0 ...\n\n\nwhisper_print_timings:     load time =   204.76 ms\nwhisper_print_timings:     fallbacks =   0 p /   0 h\nwhisper_print_timings:      mel time =   787.11 ms\nwhisper_print_timings:   sample time =  1808.18 ms /   125 runs (    14.47 ms per run)\nwhisper_print_timings:   encode time = 173758.16 ms /     1 runs ( 173758.16 ms per run)\nwhisper_print_timings:   decode time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:   batchd time = 41665.83 ms /   122 runs (   341.52 ms per run)\nwhisper_print_timings:   prompt time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:    total time = 218296.92 ms"
+    },
+    {
+      "cpu": "SandyBridge",
+      "cpu_level": "x86-64-v2",
+      "result": "pass",
+      "raw_result": "pass",
+      "exit": 0,
+      "signal": null,
+      "timeout": false,
+      "loaded_variant": "sandybridge",
+      "controls": {
+        "positive": {
+          "level": 2,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 3,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "\n And so my fellow Americans ask not what your country can do for you, ask what you can do for your country.",
+      "stderr_tail": "main: processing 'w/samples/jfk.wav' (176000 samples, 11.0 sec), 4 threads, 1 processors, 5 beams + best of 5, lang = en, task = transcribe, timestamps = 0 ...\n\n\nwhisper_print_timings:     load time =   206.86 ms\nwhisper_print_timings:     fallbacks =   0 p /   0 h\nwhisper_print_timings:      mel time =   787.35 ms\nwhisper_print_timings:   sample time =  1811.40 ms /   125 runs (    14.49 ms per run)\nwhisper_print_timings:   encode time = 221142.08 ms /     1 runs ( 221142.08 ms per run)\nwhisper_print_timings:   decode time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:   batchd time = 51306.22 ms /   122 runs (   420.54 ms per run)\nwhisper_print_timings:   prompt time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:    total time = 275326.78 ms"
+    },
+    {
+      "cpu": "EPYC-Milan",
+      "cpu_level": "x86-64-v3",
+      "result": "pass",
+      "raw_result": "pass",
+      "exit": 0,
+      "signal": null,
+      "timeout": false,
+      "loaded_variant": "haswell",
+      "controls": {
+        "positive": {
+          "level": 3,
+          "result": "pass",
+          "signal": null,
+          "ok": true
+        },
+        "negative": {
+          "level": 4,
+          "result": "fail",
+          "signal": "SIGILL",
+          "ok": true
+        }
+      },
+      "stdout_tail": "\n And so my fellow Americans ask not what your country can do for you, ask what you can do for your country.",
+      "stderr_tail": "qemu-x86_64: warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit 1]\nqemu-x86_64: warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsaves [bit 3]\n\nwhisper_print_timings:     load time =   217.54 ms\nwhisper_print_timings:     fallbacks =   0 p /   0 h\nwhisper_print_timings:      mel time =   796.72 ms\nwhisper_print_timings:   sample time =  2142.21 ms /   125 runs (    17.14 ms per run)\nwhisper_print_timings:   encode time = 450634.38 ms /     1 runs ( 450634.38 ms per run)\nwhisper_print_timings:   decode time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:   batchd time = 108322.99 ms /   122 runs (   887.89 ms per run)\nwhisper_print_timings:   prompt time =     0.00 ms /     1 runs (     0.00 ms per run)\nwhisper_print_timings:    total time = 562306.06 ms"
+    }
+  ],
+  "label": "all-variants"
+}

@@ -22,8 +22,8 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 |---|---|---|---|---|---|
 | T-10 | Static scanner: ELF regions, iced-x86 decode, level map, allowlist, JSON report, CLI | F2.1, F2.2 | done | @JaiadityaS | `.floor/floor/isa/`, `python -m floor scan`. Checked on synthetic ELF files only; T-12 and T-15 give real binaries |
 | T-11 | Scanner unit tests: synthetic ELF files and instruction encodings | F2.2 | done | @JaiadityaS | `.floor/tests/test_isa.py` (44 tests) |
-| T-12 | Linux builds of whisper.cpp: native, folk fix (`GGML_NATIVE=OFF`), all-variants; scan each; check AC-F2 | AC-F2 | doing | @JaiadityaS | `.github/workflows/cpu-proof.yml` (build + scan) |
-| T-13 | QEMU user-mode harness with negative and positive controls on qemu64, Nehalem, SandyBridge, EPYC-Milan | F3.1, F3.2 | doing | @JaiadityaS | `floor probe` (`qemu.py`, `controls.py`) in `cpu-proof.yml`. Linux only. Also proves that loading every variant at start-up is safe (see log 2026-10-14-jaiadityas-1) |
+| T-12 | Linux builds of whisper.cpp: native, folk fix (`GGML_NATIVE=OFF`), all-variants; scan each; check AC-F2 | AC-F2 | done | @JaiadityaS | cpu-proof run 38702242235: native v3, folk fix v3, all-variants v1. Evidence in `.floor/evidence/cpu-proof/` |
+| T-13 | QEMU user-mode harness with negative and positive controls on qemu64, Nehalem, SandyBridge, EPYC-Milan | F3.1, F3.2 | done | @JaiadityaS | AC-F3 met in run 38702242235. | `floor probe` (`qemu.py`, `controls.py`) in `cpu-proof.yml`. Linux only. Also proves that loading every variant at start-up is safe (see log 2026-10-14-jaiadityas-1) |
 | T-14 | Dispatch map from ggml's load log | F3.3 | later | - | |
 | T-16 | False positive: LZCNT x24 in whisper-cli, whisper-server, test-vad and vad-speech-segments raises them to v3. Probably the audio decoder (dr_flac in miniaudio) behind a CPUID check. Confirm with symbols, then choose a rule (function-scoped allowlist from .symtab, or a rule for LZCNT alone) with tests | F2.2, AC-F2 | done | @JaiadityaS | `allowlist.GUARDED` (LZCNT inside `ma_dr_flac_*`). Run 38700683985: all five audio tools are now v1; only libggml-cpu.so sets the floor (v3). Blocks AC-F2 for the all-variants build. See STATE.md "Facts learned" |
 | T-15 | Scan the #3510 images (`main-a1867e0` vs `main-c62adfbd`): first H-1 signal | F10.2, §3.6 | done | @JaiadityaS | Static part done (run 38537736704): a1867e0 = v4 + AVX512_VNNI, c62adfbd = v3. The QEMU part is in T-13 |
@@ -58,8 +58,8 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-41 | Fallback script applies the canned inclusive config; the gate re-verifies | F4.3 | doing | @JaiadityaS | Done: `floor fallback` (`fallback.py`): adds CMAKE_ARGS to `make` lines in `.devops/*.Dockerfile` (upstream Makefile reads it) and writes `.floor/overrides/main.flags`; changes only allowlist paths. Open: the CI job that runs it on the agent branch and re-runs the gate (T-47) |
 | T-42 | Merge-bot merge job and `-floor.N` tag job | F4.4 | blocked | - | Needs T-05 |
 | T-43 | Draft notice when the fallback also fails | F4.5 | ready | - | |
-| T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | doing | @JaiadityaS | `floor memory` (`memory.py`), `.github/workflows/floors.yml`. Then set `memory_mb` in the policy from the result |
-| T-45 | Connectivity tripwire: `--network none` + syscall trace; download sizes | F8 | doing | @JaiadityaS | `floor offline` (`offline.py`): `unshare --net` + strace, in `floors.yml` |
+| T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | done | @JaiadityaS | `floor memory`, `floors.yml`. Run 38704136185: tiny 512, base 512, small 768 MB; set in the policy. Evidence in `.floor/evidence/release/` |
+| T-45 | Connectivity tripwire: `--network none` + syscall trace; download sizes | F8 | done | @JaiadityaS | `floor offline`: `unshare --net` + strace. Run 38704136185: offline proven, 0 attempts, 99.4 MB download (tiny.en) |
 | T-46 | Herald CI job (Duo CLI) with a deterministic template fallback | F12.1 | blocked | - | Needs T-04 |
 | T-47 | `.gitlab-ci.yml`: build → static gate → QEMU → judge → attest → herald → release → deploy | §7.1 | ready | - | |
 
@@ -79,7 +79,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-60 | Floor page: backtest timeline, side-by-side runs, SCI, notices | F12.2 | ready | - | GitLab Pages |
+| T-60 | Floor page: backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: SCI and language sections (no data yet), publish on GitLab Pages (T-47) |
 | T-61 | Pinned issue summary | F12.3 | later | - | |
 | T-62 | Language served / not-served table | F9 | later | - | |
 | T-63 | Field triage flow | F11 | later | - | |

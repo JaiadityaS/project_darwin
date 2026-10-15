@@ -1,0 +1,39 @@
+{
+  "tool": "floor 0.1.0",
+  "floors": {
+    "cpu": {
+      "status": "held",
+      "x86_64": "x86-64-v1",
+      "proof": "static",
+      "coverage_limited": false,
+      "meets_policy": true,
+      "policy": "x86-64-v1",
+      "dispatch": {},
+      "notes": []
+    },
+    "memory": {
+      "status": "held",
+      "smallest_passing_mb": {
+        "base": 512,
+        "small": 768,
+        "tiny": 512
+      },
+      "meets_policy": true,
+      "notes": []
+    },
+    "connectivity": {
+      "status": "held",
+      "offline": "proven",
+      "network_attempts": 0,
+      "meets_policy": true,
+      "notes": []
+    }
+  },
+  "unmeasured": [],
+  "decision": "pass",
+  "pareto": "held",
+  "needs_notice": [],
+  "missing_notice": [],
+  "reasons": [],
+  "artifact": null
+}

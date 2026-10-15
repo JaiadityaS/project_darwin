@@ -1,0 +1,5 @@
+FLOOR         STATUS  VALUE                                     PROOF   POLICY
+cpu           held    x86-64-v1                                 static  met
+memory        held    {"base": 512, "small": 768, "tiny": 512}  -       met
+connectivity  held    proven                                    -       met
+Pareto: held. Decision: pass.

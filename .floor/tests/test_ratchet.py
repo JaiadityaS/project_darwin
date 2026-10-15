@@ -25,7 +25,7 @@ def test_no_change(old):
 
 def test_stricter_needs_no_notice(old):
     new = copy.deepcopy(old)
-    new["memory_mb"]["tiny"] = 512
+    new["memory_mb"]["tiny"] = 256
     result = ratchet.check(old, new, {})
     assert result["ok"]
     assert {r["direction"] for r in result["changes"]} == {"stricter"}
@@ -45,8 +45,7 @@ def test_looser_artifact_and_other_dimensions(old):
     new["artifacts"]["server"]["cpu"]["x86_64_min_level"] = "x86-64-v2"
     new["connectivity"]["offline_required"] = False
     new["cpu"]["emulate"] = ["qemu64"]
-    old = copy.deepcopy(old)
-    old["memory_mb"]["base"] = 1024
+    new["memory_mb"]["base"] = 2048
     result = ratchet.check(old, new, {"0001.md": NOTICE})
     blocked = {(r["artifact"], r["field"]) for r in result["blocked"]}
     assert ("server", "offline_required") in blocked and (None, "memory_mb.base") in blocked

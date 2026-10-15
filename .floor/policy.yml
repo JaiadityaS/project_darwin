@@ -7,10 +7,10 @@ cpu:
   x86_64_min_level: x86-64-v1        # README: AVX support is optional
   emulate: [qemu64, Nehalem, SandyBridge, EPYC-Milan]
 
-memory_mb:                           # set from measurement (T-44); null = not measured yet
-  tiny: null
-  base: null
-  small: null
+memory_mb:                           # smallest passing cgroup limit, floors run 38704136185 (T-44)
+  tiny: 512                          # peak RSS 179 MB; 512 is the lowest limit tried
+  base: 512                          # peak RSS 290 MB
+  small: 768                         # peak RSS 758 MB; out of memory at 512
 
 connectivity:
   offline_required: true             # README: runs fully offline, on-device

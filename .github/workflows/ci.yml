@@ -37,6 +37,8 @@ jobs:
             echo "no earlier policy to compare with"; exit 0
           fi
           python -m floor ratchet --base "$base"
+      - name: Floor page builds
+        run: python -m floor page --out site
       - name: Unit tests
         run: python -m pytest .floor/tests -q
       - name: Hygiene guard

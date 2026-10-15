@@ -1,0 +1,75 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "github.com/JaiadityaS/project_darwin/whisper-cli",
+      "digest": {
+        "sha256": "9023193a1b3aa22458899b221c8dd5781a4bffbe21255e03f422d2586d162039"
+      }
+    }
+  ],
+  "predicateType": "https://github.com/JaiadityaS/project_darwin/floor-manifest/v0.3",
+  "predicate": {
+    "release": "dry-run-38704136185",
+    "commit": "0c7be696371069e0baa2515ed7aa08d5a5473aa6",
+    "build": {
+      "cmake_flags": "-DGGML_NATIVE=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DBUILD_SHARED_LIBS=ON",
+      "base_image": null,
+      "source_date_epoch": false,
+      "highest_level_found": "x86-64-v4",
+      "baseline_variant": "x64"
+    },
+    "floors": {
+      "cpu": {
+        "status": "held",
+        "x86_64": "x86-64-v1",
+        "proof": "static",
+        "coverage_limited": false,
+        "meets_policy": true,
+        "policy": "x86-64-v1",
+        "dispatch": {},
+        "notes": [],
+        "evidence": "https://github.com/JaiadityaS/project_darwin/actions/runs/38704136185"
+      },
+      "memory": {
+        "status": "held",
+        "smallest_passing_mb": {
+          "base": 512,
+          "small": 768,
+          "tiny": 512
+        },
+        "meets_policy": true,
+        "notes": [],
+        "evidence": "https://github.com/JaiadityaS/project_darwin/actions/runs/38704136185"
+      },
+      "connectivity": {
+        "status": "held",
+        "offline": "proven",
+        "network_attempts": 0,
+        "meets_policy": true,
+        "notes": [],
+        "evidence": "https://github.com/JaiadityaS/project_darwin/actions/runs/38704136185"
+      }
+    },
+    "decision": "pass",
+    "pareto": "held",
+    "unmeasured": [
+      "arm64",
+      "gpu-backends",
+      "language"
+    ],
+    "diff_from": null,
+    "changes": [],
+    "leave_behind_notices": [],
+    "footprint": {
+      "sci_gco2e_per_audio_minute": null,
+      "sci_gco2e_per_release_check": null,
+      "method": "GSF Impact Framework"
+    },
+    "delta_m_kgco2e": {
+      "low": 0,
+      "high": 0,
+      "note": "0 when every floor holds"
+    }
+  }
+}

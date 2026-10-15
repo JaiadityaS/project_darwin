@@ -1,0 +1,20 @@
+# 2026-10-15 @JaiadityaS session 3
+- Tasks: T-12, T-13, T-30, T-31, T-32, T-33, T-35, T-36, T-41, T-44, T-45, T-60
+- Done:
+  - T-30: `.floor/policy.yml`, `.floor/policy.schema.json`, `policy.py`, `floor policy`; CI step.
+  - T-31: `ratchet.py`, `floor ratchet --base <ref>`; CI step (PR: target branch; push: the commit before).
+  - T-32: `judge.py`, `floor judge`. T-33: `manifest.py`, `floor manifest`, `floor diff`.
+  - T-35 (part): MR template, `.floor/notices/`, `notice.py`, `floor notice`; CI step.
+  - T-36 (part): `.gitlab/CODEOWNERS`, `paths.py`, `floor paths`. A test keeps the two lists the same.
+  - T-41 (part): `fallback.py`, `floor fallback`.
+  - T-44, T-45: `memory.py`, `offline.py`, `floor memory`, `floor offline`, `.github/workflows/floors.yml`.
+  - T-60 (part): `page.py`, `floor page --out site` (`site/` is in .gitignore; CI builds it).
+- Verified: cpu-proof run 38702242235 (G-1 met), floors run 38704136185, `python -m pytest .floor/tests -q`: 129 passed, 5 skipped (the QEMU and strace tests run in CI).
+- Open:
+  - GitLab parts of T-35, T-36, T-41 and T-60 wait on T-01 and T-47.
+  - `.gitlab/CODEOWNERS` uses `@JaiadityaS`. Check the GitLab handle at T-01.
+- Gotchas:
+  - In this shell, heredocs halve backslashes in some cases. Write files with backslashes through the Write tool or a script file.
+  - `floor memory` and `floor offline` need root (systemd-run, unshare). In CI, run `sudo $(command -v python) -m floor ... --no-sudo`.
+  - strace `-qq` writes nothing for a clean run; `offline.py` uses `-q` and looks for the `+++ exited with` line.
+- Branch: main
