@@ -11,7 +11,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, h1
+from . import backtest, h1, qemu
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -19,7 +19,7 @@ from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
 
 def _write_json(path: Path, doc: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def _print_rows(rows: list[tuple[str, ...]]) -> None:
@@ -141,6 +141,31 @@ def _cmd_h1(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_probe(args: argparse.Namespace) -> int:
+    cmd = args.cmd[1:] if args.cmd[:1] == ["--"] else args.cmd
+    if not cmd:
+        print("floor: give the command after --", file=sys.stderr)
+        return 2
+    env = dict(item.split("=", 1) for item in args.env or [])
+    try:
+        result = qemu.probe(cmd, tuple(args.cpu or qemu.DEFAULT_MODELS), expect=args.expect,
+                            sysroot=args.sysroot, timeout=args.timeout, env=env)
+    except FileNotFoundError as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    result["label"] = args.label
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+    rows = [("CPU", "LEVEL", "RESULT", "EXIT", "SIGNAL", "VARIANT", "CONTROLS")]
+    for run in result["runs"]:
+        ctl = run["controls"]
+        rows.append((run["cpu"], run["cpu_level"], run["result"], str(run["exit"]), run["signal"] or "-",
+                     run["loaded_variant"] or "-",
+                     f"+v{ctl['positive']['level']}:{ctl['positive']['result']} -v{ctl['negative']['level']}:{ctl['negative']['result']}"))
+    _print_rows(rows)
+    return 0
+
+
 def _print_table(reports: list[FileReport], summary: dict) -> None:
     rows = [("FILE", "ROLE", "LEVEL", "EXTRAS")]
     for r in reports:
@@ -201,6 +226,17 @@ def main(argv: list[str] | None = None) -> int:
     hyp.add_argument("--pair", metavar="TIMELINE", help="a second timeline (for example main-cuda-) to join on the commit")
     hyp.add_argument("--out", metavar="FILE", help="write the analysis as JSON")
     hyp.set_defaults(func=_cmd_h1)
+
+    pr = sub.add_parser("probe", help="run a command under QEMU on old CPU models, with controls (PRD F3)")
+    pr.add_argument("--cpu", action="append", choices=list(qemu.CPU_MODELS), help="CPU model (repeat; default: all)")
+    pr.add_argument("--expect", help="text that the output must contain (the reference transcript)")
+    pr.add_argument("--sysroot", help="root of an extracted image filesystem (qemu -L)")
+    pr.add_argument("--env", action="append", metavar="KEY=VALUE", help="environment for the command (repeat)")
+    pr.add_argument("--timeout", type=float, default=900, help="seconds per run (default 900)")
+    pr.add_argument("--label", help="a name for this build, written to the JSON")
+    pr.add_argument("--out", metavar="FILE", help="write the result as JSON")
+    pr.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
+    pr.set_defaults(func=_cmd_probe)
 
     args = parser.parse_args(argv)
     return args.func(args)

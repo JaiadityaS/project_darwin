@@ -1,0 +1,87 @@
+name: cpu-proof
+
+# G-1 CPU proof (PRD AC-F2, AC-F3; tasks T-12 and T-13). Builds whisper.cpp three ways,
+# scans each build, then runs whisper-cli under QEMU on four old CPU models, with controls.
+#   gh workflow run cpu-proof.yml
+#   gh workflow run cpu-proof.yml -f commit=<40 hex>
+# Results: the run summary and the artifacts "cpu-proof-<config>-<run_id>".
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "whisper.cpp commit to build"
+        default: "0c7be696371069e0baa2515ed7aa08d5a5473aa6"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - config: native
+            flags: ""
+          - config: folk-fix
+            flags: "-DGGML_NATIVE=OFF"
+          - config: all-variants
+            flags: "-DGGML_NATIVE=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DBUILD_SHARED_LIBS=ON"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/whisper.cpp
+          ref: ${{ inputs.commit }}
+          path: w
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - name: Install QEMU user mode
+        run: sudo apt-get update -q && sudo apt-get install -y -q qemu-user
+      - name: Record the runner CPU
+        shell: bash
+        run: |
+          mkdir -p out
+          { lscpu; echo; qemu-x86_64 --version; } > out/runner.txt
+          grep -m1 "Model name" out/runner.txt
+      - name: Build
+        shell: bash
+        run: |
+          cmake -S w -B w/build -DCMAKE_BUILD_TYPE=Release ${{ matrix.flags }} 2>&1 | tee out/cmake.txt
+          cmake --build w/build -j "$(nproc)" --config Release 2>&1 | tail -n 20
+      - name: Static scan (AC-F2)
+        shell: bash
+        run: python -m floor scan w/build --json out/scan.json | tee out/scan.txt
+      - name: Controls under QEMU
+        run: python -m pytest .floor/tests/test_qemu.py -q
+      - name: Model and sample
+        shell: bash
+        run: bash w/models/download-ggml-model.sh tiny.en
+      - name: QEMU runs (AC-F3)
+        shell: bash
+        run: |
+          python -m floor probe --label "${{ matrix.config }}" \
+            --expect "ask not what your country can do for you" --out out/probe.json -- \
+            w/build/bin/whisper-cli -m w/models/ggml-tiny.en.bin -f w/samples/jfk.wav -t 4 -nt \
+            | tee out/probe.txt
+      - name: Run summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### ${{ matrix.config }} (whisper.cpp ${{ inputs.commit }})"
+            echo
+            echo "Runner: $(grep -m1 'Model name' out/runner.txt | sed 's/.*: *//')"
+            echo
+            echo '```'
+            grep -A4 '^Floor:' out/scan.txt || true
+            echo
+            cat out/probe.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cpu-proof-${{ matrix.config }}-${{ github.run_id }}
+          path: out
