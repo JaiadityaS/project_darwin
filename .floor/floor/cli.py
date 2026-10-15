@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, h1, judge, manifest, memory, notice, offline, policy, qemu, ratchet
+from . import backtest, h1, judge, manifest, memory, notice, offline, paths, policy, qemu, ratchet
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -218,6 +218,19 @@ def _cmd_notice(args: argparse.Namespace) -> int:
         print(f"{path}: {'complete' if not found else '; '.join(found)}")
         failed += bool(found)
     return 1 if failed else 0
+
+
+def _cmd_paths(args: argparse.Namespace) -> int:
+    try:
+        changed = args.files or paths.changed_files(args.base)
+    except subprocess.CalledProcessError as exc:
+        print(f"floor: git failed: {exc.stderr.strip()}", file=sys.stderr)
+        return 2
+    found = paths.check(changed, args.actor)
+    for line in found:
+        print(line)
+    print(f"{len(changed)} changed path(s); {args.actor}: {'allowed' if not found else 'NOT allowed'}")
+    return 1 if found else 0
 
 
 def _read_json(path: str | None) -> dict | None:
@@ -448,6 +461,12 @@ def main(argv: list[str] | None = None) -> int:
     off.add_argument("--out", metavar="FILE", help="write the result as JSON")
     off.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     off.set_defaults(func=_cmd_offline)
+
+    pa = sub.add_parser("paths", help="path allowlist for agent MRs and merge-bot merges (PRD F4.2, §10.1)")
+    pa.add_argument("--actor", required=True, choices=["agent", "merge-bot"], help="who will change or merge")
+    pa.add_argument("--base", default="origin/main", metavar="REF", help="target branch (default origin/main)")
+    pa.add_argument("files", nargs="*", help="changed paths (default: git diff BASE...HEAD)")
+    pa.set_defaults(func=_cmd_paths)
 
     mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")

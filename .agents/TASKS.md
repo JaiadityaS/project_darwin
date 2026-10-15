@@ -48,7 +48,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-33 | Manifest writer + diff against the previous release | F5.3, §11.1 | done | @JaiadityaS | `floor manifest`, `floor diff` (`manifest.py`). In-toto Statement only; signing is T-34 (F5.4). Footprint values stay null until measured |
 | T-34 | `cosign attest` (keyless, GitLab OIDC) and `verify-attestation` | F5.4 | blocked | - | Needs GitLab |
 | T-35 | Leave-Behind Notice template and MR check (agents cannot approve) | F6, §11.2 | doing | @JaiadityaS | Done: MR template `.gitlab/merge_request_templates/Leave-Behind-Notice.md`, `.floor/notices/`, `floor notice`, `notice.approval_problems` (tested on fixed data). Open: the GitLab job that reads the MR approvals API and calls it (needs T-01) |
-| T-36 | CODEOWNERS, protected branch and tag settings, path-allowlist job | F1.2, §10.1 | ready | - | |
+| T-36 | CODEOWNERS, protected branch and tag settings, path-allowlist job | F1.2, §10.1 | doing | @JaiadityaS | Done: `.gitlab/CODEOWNERS` (owner handle to confirm on GitLab), `floor paths` (`paths.py`, kept in sync with CODEOWNERS by a test). Open: protected branch and tag settings and the CI job in `.gitlab-ci.yml` (need T-01) |
 
 ## Release loop (Oct 19–22)
 

@@ -1,0 +1,14 @@
+# Floor gate integrity (PRD F1.2, §10.1). Changes here need a code-owner approval.
+# Keep this list the same as CODE_OWNED in .floor/floor/paths.py.
+# Agent allowlist paths (deploy/, .devops/*.Dockerfile, .floor/overrides/) have no owner on purpose.
+
+[Floor gate]
+/.floor/policy.yml @JaiadityaS
+/.floor/policy.schema.json @JaiadityaS
+/.floor/floor/ @JaiadityaS
+/.floor/pyproject.toml @JaiadityaS
+/.floor/notices/ @JaiadityaS
+/CODEOWNERS @JaiadityaS
+/.gitlab/CODEOWNERS @JaiadityaS
+/.gitlab-ci.yml @JaiadityaS
+/.gitlab/ci/ @JaiadityaS
