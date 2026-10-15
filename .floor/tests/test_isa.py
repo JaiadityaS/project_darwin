@@ -9,7 +9,7 @@ from elfbuild import build_elf
 from iced_x86 import CpuidFeature, Mnemonic
 
 from floor.cli import main
-from floor.isa.allowlist import ALLOWLIST, GUARDED, guarded_reason
+from floor.isa.allowlist import ALLOWLIST, GUARDED, base_name, guarded_reason
 from floor.isa.decode import FEATURE_NAMES, decode_region
 from floor.isa.levels import FEATURE_LEVEL, classify, level_name, parse_level
 from floor.isa.scan import FileReport, classify_role, scan_file, scan_path, summarize
@@ -213,6 +213,9 @@ def test_guarded_entries_are_real_mnemonics_with_reasons():
         assert hasattr(Mnemonic, mnemonic)
         assert entries and all(len(reason) > 40 for _, reason in entries)
     assert guarded_reason("LZCNT", "drflac__seek_past_next_set_bit")
+    assert guarded_reason("LZCNT", "_ZL29ma_dr_flac__decode_flac_frameP10ma_dr_flac")
+    assert guarded_reason("LZCNT", "_ZL9whisper_xP10ma_dr_flac") is None
+    assert base_name("_ZL27ma_dr_flac__seek_flac_frameP10ma_dr_flac") == "ma_dr_flac__seek_flac_frame"
     assert guarded_reason("LZCNT", "whisper_full") is None
     assert guarded_reason("LZCNT", None) is None
     assert guarded_reason("ANDN", "drflac__seek_past_next_set_bit") is None
@@ -221,7 +224,7 @@ def test_guarded_entries_are_real_mnemonics_with_reasons():
 def test_lzcnt_inside_a_guarded_function_does_not_raise_the_level(tmp_path):
     code = LZCNT + RET + bytes.fromhex("0f58c1") + RET
     path = tmp_path / "whisper-cli"
-    path.write_bytes(build_elf(code, e_type=2, symbols=[("drflac__clz", 0, 5), ("main", 5, 4)]))
+    path.write_bytes(build_elf(code, e_type=2, symbols=[("_ZL27ma_dr_flac__seek_flac_frameP10ma_dr_flac", 0, 5), ("main", 5, 4)]))
     report = scan_file(path)
     assert report.error is None
     assert report.level == 1

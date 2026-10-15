@@ -30,19 +30,32 @@ ALLOWLIST = {
 # matches the pattern. The scan needs symbols (.symtab or .dynsym) to apply them.
 GUARDED = {
     "LZCNT": (
-        (re.compile(r"^drflac_"), (
-            "dr_flac (in miniaudio) runs LZCNT only after its own CPUID check for ABM/LZCNT, "
-            "and uses a portable count-leading-zeros path on other CPUs."
+        (re.compile(r"^(?:ma_)?dr_?flac_"), (
+            "dr_flac (also inside miniaudio as ma_dr_flac) runs LZCNT only after its own CPUID "
+            "check for ABM/LZCNT, and uses a portable count-leading-zeros path on other CPUs."
         )),
     ),
 }
+
+
+_MANGLED_FREE_FUNCTION = re.compile(r"_ZL?(\d+)")
+
+
+def base_name(symbol: str) -> str:
+    """Returns the plain name of a C++ free function (`_ZL27ma_dr_flac__seek_flac_frame...`),
+    or the symbol itself."""
+    match = _MANGLED_FREE_FUNCTION.match(symbol)
+    if match:
+        return symbol[match.end():match.end() + int(match.group(1))]
+    return symbol
 
 
 def guarded_reason(mnemonic: str, function: str | None) -> str | None:
     """Returns the reason when a function-scoped entry allows ``mnemonic`` in ``function``."""
     if function is None:
         return None
+    name = base_name(function)
     for pattern, reason in GUARDED.get(mnemonic, ()):
-        if pattern.match(function):
+        if pattern.match(name):
             return reason
     return None

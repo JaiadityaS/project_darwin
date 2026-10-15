@@ -1,0 +1,97 @@
+name: sweep
+
+# The full backtest (PRD F10.1): choose images, scan them in parallel batches, join one timeline.
+#   gh workflow run sweep.yml
+#   gh workflow run sweep.yml -f count=40 -f batch=8
+# The timeline is in the run summary and in the artifact "timeline-<run_id>".
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "Images spread evenly in time"
+        default: "30"
+      batch:
+        description: "Images per scan job"
+        default: "10"
+      repo:
+        description: "Repository on ghcr.io"
+        default: "ggml-org/whisper.cpp"
+
+jobs:
+  sample:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      batches: ${{ steps.sample.outputs.batches }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - id: sample
+        shell: bash
+        run: |
+          mkdir -p out
+          python -m floor sample --repo "${{ inputs.repo }}" --count "${{ inputs.count }}" --batch "${{ inputs.batch }}" --out out/sample.json > out/batches.txt
+          echo "batches=$(python -c 'import json; print(json.dumps([" ".join(b) for b in json.load(open("out/sample.json"))["batches"]]))')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sample-${{ github.run_id }}
+          path: out
+
+  scan:
+    needs: sample
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        refs: ${{ fromJSON(needs.sample.outputs.batches) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - name: Scan images
+        shell: bash
+        env:
+          REFS: ${{ matrix.refs }}
+        run: |
+          mkdir -p out/reports
+          # REFS is split on spaces on purpose. A failed image must not stop the batch.
+          python -m floor image $REFS --repo "${{ inputs.repo }}" --out out/reports || true
+      - id: name
+        shell: bash
+        env:
+          REFS: ${{ matrix.refs }}
+        run: echo "key=$(echo "$REFS" | sha1sum | cut -c1-12)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ github.run_id }}-${{ steps.name.outputs.key }}
+          path: out/reports
+
+  timeline:
+    needs: scan
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: reports-${{ github.run_id }}-*
+          path: out/reports
+      - shell: bash
+        run: |
+          python -m floor timeline out/reports --out out/timeline.json | tee out/timeline.txt
+          { echo '```'; cat out/timeline.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timeline-${{ github.run_id }}
+          path: out
