@@ -43,7 +43,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
 | T-30 | `.floor/policy.yml` + JSON Schema + CI validation | F1.1, §11.3 | done | @JaiadityaS | `floor policy` (`policy.py`); CI step in `ci.yml`. The ratchet check (F1.2) is not done yet |
-| T-31 | Ratchet check: a looser policy needs a merged notice | F1.2 | ready | - | |
+| T-31 | Ratchet check: a looser policy needs a merged notice | F1.2 | done | @JaiadityaS | `floor ratchet` (`ratchet.py`), CI step in `ci.yml`. A notice counts when it is in `.floor/notices/` on the target branch and has an `Approved by:` line. Code-owner approval itself is T-36 |
 | T-32 | Judge: held / lowered / raised / inconclusive; Pareto rule; unit tests | F5.1, F5.2 | done | @JaiadityaS | `floor judge` (`judge.py`). Memory and connectivity inputs are JSON stubs until T-44 and the offline job give real files |
 | T-33 | Manifest writer + diff against the previous release | F5.3, §11.1 | done | @JaiadityaS | `floor manifest`, `floor diff` (`manifest.py`). In-toto Statement only; signing is T-34 (F5.4). Footprint values stay null until measured |
 | T-34 | `cosign attest` (keyless, GitLab OIDC) and `verify-attestation` | F5.4 | blocked | - | Needs GitLab |

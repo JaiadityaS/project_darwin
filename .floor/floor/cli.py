@@ -5,13 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 import requests
 
 from . import __version__
-from . import backtest, h1, judge, manifest, policy, qemu
+from . import backtest, h1, judge, manifest, policy, qemu, ratchet
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -180,6 +181,34 @@ def _cmd_policy(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_ratchet(args: argparse.Namespace) -> int:
+    try:
+        new = policy.load(args.new)
+        if args.base:
+            old, notices = ratchet.from_git(args.base)
+        elif args.old:
+            old, notices = policy.load(args.old), ratchet.from_dir(args.notices)
+        else:
+            print("floor: give --base REF or --old FILE", file=sys.stderr)
+            return 2
+    except (OSError, policy.PolicyError, ValueError) as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    except subprocess.CalledProcessError as exc:
+        print(f"floor: git failed: {exc.stderr.strip()}", file=sys.stderr)
+        return 2
+    result = ratchet.check(old, new, notices)
+    for row in result["changes"]:
+        scope = f"{row['artifact']}: " if row["artifact"] else ""
+        cover = ""
+        if row["direction"] == "looser":
+            cover = f" (notice: {', '.join(row['notices'])})" if row["notices"] else " NEEDS A MERGED NOTICE"
+        print(f"{scope}{row['field']}: {row['from']} -> {row['to']}: {row['direction']}{cover}")
+    if not result["changes"]:
+        print("policy floors did not change")
+    return 0 if result["ok"] else 1
+
+
 def _read_json(path: str | None) -> dict | None:
     return json.loads(Path(path).read_text(encoding="utf-8")) if path else None
 
@@ -329,6 +358,13 @@ def main(argv: list[str] | None = None) -> int:
     jd.add_argument("--notice", action="append", metavar="FLOOR", help="a floor with a merged Leave-Behind Notice (repeat)")
     jd.add_argument("--out", metavar="FILE", help="write the result as JSON")
     jd.set_defaults(func=_cmd_judge)
+
+    rt = sub.add_parser("ratchet", help="a looser policy needs a merged Leave-Behind Notice (PRD F1.2)")
+    rt.add_argument("new", nargs="?", default=str(policy.DEFAULT_POLICY), help="the changed policy file")
+    rt.add_argument("--base", metavar="REF", help="target branch: read the old policy and the notices from git")
+    rt.add_argument("--old", metavar="FILE", help="old policy file (without git)")
+    rt.add_argument("--notices", default=ratchet.NOTICE_DIR, metavar="DIR", help="merged notices, with --old")
+    rt.set_defaults(func=_cmd_ratchet)
 
     mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")

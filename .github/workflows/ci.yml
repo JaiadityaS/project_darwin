@@ -18,6 +18,19 @@ jobs:
         run: pip install -e "./.floor[dev]"
       - name: Policy
         run: python -m floor policy
+      - name: Policy ratchet (F1.2)
+        env:
+          BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ -n "${BASE_REF:-}" ]; then
+            git fetch -q origin "$BASE_REF" && base="origin/$BASE_REF"
+          elif [ -n "${BEFORE:-}" ] && git cat-file -e "${BEFORE}:.floor/policy.yml" 2>/dev/null; then
+            base="$BEFORE"
+          else
+            echo "no earlier policy to compare with"; exit 0
+          fi
+          python -m floor ratchet --base "$base"
       - name: Unit tests
         run: python -m pytest .floor/tests -q
       - name: Hygiene guard
