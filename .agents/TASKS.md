@@ -47,7 +47,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-32 | Judge: held / lowered / raised / inconclusive; Pareto rule; unit tests | F5.1, F5.2 | done | @JaiadityaS | `floor judge` (`judge.py`). Memory and connectivity inputs are JSON stubs until T-44 and the offline job give real files |
 | T-33 | Manifest writer + diff against the previous release | F5.3, §11.1 | done | @JaiadityaS | `floor manifest`, `floor diff` (`manifest.py`). In-toto Statement only; signing is T-34 (F5.4). Footprint values stay null until measured |
 | T-34 | `cosign attest` (keyless, GitLab OIDC) and `verify-attestation` | F5.4 | blocked | - | Needs GitLab |
-| T-35 | Leave-Behind Notice template and MR check (agents cannot approve) | F6, §11.2 | ready | - | |
+| T-35 | Leave-Behind Notice template and MR check (agents cannot approve) | F6, §11.2 | doing | @JaiadityaS | Done: MR template `.gitlab/merge_request_templates/Leave-Behind-Notice.md`, `.floor/notices/`, `floor notice`, `notice.approval_problems` (tested on fixed data). Open: the GitLab job that reads the MR approvals API and calls it (needs T-01) |
 | T-36 | CODEOWNERS, protected branch and tag settings, path-allowlist job | F1.2, §10.1 | ready | - | |
 
 ## Release loop (Oct 19–22)

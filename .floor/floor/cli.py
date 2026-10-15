@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, h1, judge, manifest, policy, qemu, ratchet
+from . import backtest, h1, judge, manifest, notice, policy, qemu, ratchet
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -209,6 +209,17 @@ def _cmd_ratchet(args: argparse.Namespace) -> int:
     return 0 if result["ok"] else 1
 
 
+def _cmd_notice(args: argparse.Namespace) -> int:
+    failed = 0
+    for path in args.files:
+        if Path(path).name == "README.md":
+            continue
+        found = notice.problems(Path(path).read_text(encoding="utf-8"), draft=args.draft)
+        print(f"{path}: {'complete' if not found else '; '.join(found)}")
+        failed += bool(found)
+    return 1 if failed else 0
+
+
 def _read_json(path: str | None) -> dict | None:
     return json.loads(Path(path).read_text(encoding="utf-8")) if path else None
 
@@ -365,6 +376,11 @@ def main(argv: list[str] | None = None) -> int:
     rt.add_argument("--old", metavar="FILE", help="old policy file (without git)")
     rt.add_argument("--notices", default=ratchet.NOTICE_DIR, metavar="DIR", help="merged notices, with --old")
     rt.set_defaults(func=_cmd_ratchet)
+
+    nt = sub.add_parser("notice", help="check that Leave-Behind Notices are complete (PRD F6, §11.2)")
+    nt.add_argument("files", nargs="+", help="notice files")
+    nt.add_argument("--draft", action="store_true", help="allow an empty 'Approved by' (open notice MR)")
+    nt.set_defaults(func=_cmd_notice)
 
     mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")

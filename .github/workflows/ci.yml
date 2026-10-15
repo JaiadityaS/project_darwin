@@ -18,6 +18,12 @@ jobs:
         run: pip install -e "./.floor[dev]"
       - name: Policy
         run: python -m floor policy
+      - name: Notices complete (F6)
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(.floor/notices/[0-9]*.md)
+          if [ ${#files[@]} -eq 0 ]; then echo "no notices"; else python -m floor notice "${files[@]}"; fi
       - name: Policy ratchet (F1.2)
         env:
           BEFORE: ${{ github.event.before }}
