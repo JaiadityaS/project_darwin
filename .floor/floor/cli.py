@@ -11,7 +11,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, h1, judge, policy, qemu
+from . import backtest, h1, judge, manifest, policy, qemu
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -184,6 +184,34 @@ def _read_json(path: str | None) -> dict | None:
     return json.loads(Path(path).read_text(encoding="utf-8")) if path else None
 
 
+def _previous_floors(doc: dict | None) -> dict | None:
+    """Accepts a manifest (floors under "predicate") or a judge output."""
+    if not doc:
+        return None
+    return (doc.get("predicate") or doc).get("floors")
+
+
+def _cmd_manifest(args: argparse.Namespace) -> int:
+    verdict = _read_json(args.judge)
+    scan = _read_json(args.scan)
+    previous = _read_json(args.previous)
+    doc = manifest.build(verdict, subject=args.subject, digest=args.digest, release=args.release, commit=args.commit,
+                         scan=scan["summary"] if scan else None, cmake_flags=args.cmake_flags,
+                         base_image=args.base_image, previous=previous, evidence=args.evidence,
+                         fixed_by=args.fixed_by, notices=args.notice, project_url=args.project_url)
+    _write_json(Path(args.out), doc)
+    text = manifest.diff_markdown(previous, doc)
+    if args.diff:
+        Path(args.diff).write_text(text, encoding="utf-8", newline="\n")
+    print(text, end="")
+    return 0
+
+
+def _cmd_diff(args: argparse.Namespace) -> int:
+    print(manifest.diff_markdown(_read_json(args.old), _read_json(args.new)), end="")
+    return 0
+
+
 def _cmd_judge(args: argparse.Namespace) -> int:
     try:
         doc = policy.for_artifact(policy.load(args.policy), args.artifact)
@@ -194,7 +222,7 @@ def _cmd_judge(args: argparse.Namespace) -> int:
     previous = _read_json(args.previous)
     result = judge.judge(doc, scan=scan["summary"] if scan else None, probe=_read_json(args.probe),
                          memory=_read_json(args.memory), connectivity=_read_json(args.connectivity),
-                         previous=(previous or {}).get("floors"), notices=args.notice)
+                         previous=_previous_floors(previous), notices=args.notice)
     result["artifact"] = args.artifact
     if args.out:
         _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
@@ -301,6 +329,29 @@ def main(argv: list[str] | None = None) -> int:
     jd.add_argument("--notice", action="append", metavar="FLOOR", help="a floor with a merged Leave-Behind Notice (repeat)")
     jd.add_argument("--out", metavar="FILE", help="write the result as JSON")
     jd.set_defaults(func=_cmd_judge)
+
+    mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
+    mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")
+    mf.add_argument("--subject", required=True, help="image name, for example registry.gitlab.com/g/whisper.cpp/server")
+    mf.add_argument("--digest", required=True, help="image digest (sha256:...)")
+    mf.add_argument("--release", required=True, help="release tag, for example v1.8.1-floor.1")
+    mf.add_argument("--commit", required=True, help="source commit")
+    mf.add_argument("--scan", metavar="FILE", help="floor scan --json output")
+    mf.add_argument("--cmake-flags", help="the CMake flags of the build")
+    mf.add_argument("--base-image", help="base image digest")
+    mf.add_argument("--previous", metavar="FILE", help="floor-manifest.json of the previous release")
+    mf.add_argument("--evidence", metavar="URL", help="job URL to record as evidence")
+    mf.add_argument("--fixed-by", choices=["agent", "fallback"], help="what lowered a floor in this release")
+    mf.add_argument("--notice", action="append", metavar="REF", help="a merged Leave-Behind Notice (repeat)")
+    mf.add_argument("--project-url", help="project URL for predicateType (default: $CI_PROJECT_URL)")
+    mf.add_argument("--out", default="floor-manifest.json", metavar="FILE", help="output (default floor-manifest.json)")
+    mf.add_argument("--diff", metavar="FILE", help="also write the diff as Markdown")
+    mf.set_defaults(func=_cmd_manifest)
+
+    df = sub.add_parser("diff", help="readable diff of two floor manifests (AC-F5)")
+    df.add_argument("old", help="previous floor-manifest.json")
+    df.add_argument("new", help="new floor-manifest.json")
+    df.set_defaults(func=_cmd_diff)
 
     args = parser.parse_args(argv)
     return args.func(args)
