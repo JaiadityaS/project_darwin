@@ -16,6 +16,8 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: pip install -e "./.floor[dev]"
+      - name: Policy
+        run: python -m floor policy
       - name: Unit tests
         run: python -m pytest .floor/tests -q
       - name: Hygiene guard

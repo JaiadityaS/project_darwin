@@ -1,0 +1,35 @@
+# Floor policy (PRD §11.3). The gate holds every release to these floors.
+# This file is a ratchet (PRD F1.2): a stricter floor needs a normal MR, a looser
+# floor needs a merged Leave-Behind Notice. Schema: .floor/policy.schema.json
+version: 1
+
+cpu:
+  x86_64_min_level: x86-64-v1        # README: AVX support is optional
+  emulate: [qemu64, Nehalem, SandyBridge, EPYC-Milan]
+
+memory_mb:                           # set from measurement (T-44); null = not measured yet
+  tiny: null
+  base: null
+  small: null
+
+connectivity:
+  offline_required: true             # README: runs fully offline, on-device
+
+language:
+  gate: false                        # report-only table (F9.1); a gate is a COULD (F9.3)
+  metric: drift_vs_f16
+
+footprint:
+  report_only: true
+
+repair:
+  agent_attempts_per_human_action: 1
+  fallback: canned_inclusive_config  # F4.3
+
+on_unfixable_raise: ship_last_held
+
+# Optional per-artifact floors (F1.1). An entry replaces the top-level values for that artifact.
+artifacts:
+  server:
+    cpu:
+      x86_64_min_level: x86-64-v1

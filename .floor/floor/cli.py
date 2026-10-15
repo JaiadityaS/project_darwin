@@ -11,7 +11,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, h1, qemu
+from . import backtest, h1, judge, policy, qemu
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -166,6 +166,52 @@ def _cmd_probe(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_policy(args: argparse.Namespace) -> int:
+    try:
+        doc = policy.load(args.file, args.schema)
+    except (OSError, policy.PolicyError) as exc:
+        print(f"floor: policy not valid: {exc}", file=sys.stderr)
+        return 1
+    if args.artifact:
+        print(json.dumps(policy.for_artifact(doc, args.artifact), indent=2))
+    else:
+        artifacts = ", ".join(sorted(doc.get("artifacts") or {})) or "none"
+        print(f"{args.file}: valid (CPU floor {doc['cpu']['x86_64_min_level']}, per-artifact entries: {artifacts})")
+    return 0
+
+
+def _read_json(path: str | None) -> dict | None:
+    return json.loads(Path(path).read_text(encoding="utf-8")) if path else None
+
+
+def _cmd_judge(args: argparse.Namespace) -> int:
+    try:
+        doc = policy.for_artifact(policy.load(args.policy), args.artifact)
+    except (OSError, policy.PolicyError) as exc:
+        print(f"floor: policy not valid: {exc}", file=sys.stderr)
+        return 2
+    scan = _read_json(args.scan)
+    previous = _read_json(args.previous)
+    result = judge.judge(doc, scan=scan["summary"] if scan else None, probe=_read_json(args.probe),
+                         memory=_read_json(args.memory), connectivity=_read_json(args.connectivity),
+                         previous=(previous or {}).get("floors"), notices=args.notice)
+    result["artifact"] = args.artifact
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+    rows = [("FLOOR", "STATUS", "VALUE", "PROOF", "POLICY")]
+    for name, floor in result["floors"].items():
+        value = floor.get("x86_64") or floor.get("offline") or json.dumps(floor.get("smallest_passing_mb"))
+        proof = (floor.get("proof") or "-") + (" (coverage-limited)" if floor.get("coverage_limited") else "")
+        rows.append((name, floor["status"], str(value), proof, {True: "met", False: "NOT met", None: "-"}[floor["meets_policy"]]))
+    _print_rows(rows)
+    for name in result["unmeasured"]:
+        print(f"{name}: not measured")
+    print(f"Pareto: {result['pareto']}. Decision: {result['decision']}.")
+    for reason in result["reasons"]:
+        print(f"  {reason}")
+    return 0 if result["decision"] != "fail" else 1
+
+
 def _print_table(reports: list[FileReport], summary: dict) -> None:
     rows = [("FILE", "ROLE", "LEVEL", "EXTRAS")]
     for r in reports:
@@ -237,6 +283,24 @@ def main(argv: list[str] | None = None) -> int:
     pr.add_argument("--out", metavar="FILE", help="write the result as JSON")
     pr.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     pr.set_defaults(func=_cmd_probe)
+
+    pol = sub.add_parser("policy", help="validate .floor/policy.yml against its JSON Schema (PRD F1.1)")
+    pol.add_argument("file", nargs="?", default=str(policy.DEFAULT_POLICY), help="policy file (default: .floor/policy.yml)")
+    pol.add_argument("--schema", default=str(policy.DEFAULT_SCHEMA), help="JSON Schema file")
+    pol.add_argument("--artifact", help="print the resolved policy for this artifact")
+    pol.set_defaults(func=_cmd_policy)
+
+    jd = sub.add_parser("judge", help="mark each floor held, lowered, raised or inconclusive (PRD F5)")
+    jd.add_argument("--policy", default=str(policy.DEFAULT_POLICY), help="policy file")
+    jd.add_argument("--artifact", help="artifact name, for per-artifact floors")
+    jd.add_argument("--scan", metavar="FILE", help="floor scan --json output")
+    jd.add_argument("--probe", metavar="FILE", help="floor probe --out output")
+    jd.add_argument("--memory", metavar="FILE", help='JSON {"tiny": MB, ...}: smallest passing memory limits')
+    jd.add_argument("--connectivity", metavar="FILE", help='JSON {"offline": bool, "network_attempts": int}')
+    jd.add_argument("--previous", metavar="FILE", help="manifest (or judge output) of the previous release")
+    jd.add_argument("--notice", action="append", metavar="FLOOR", help="a floor with a merged Leave-Behind Notice (repeat)")
+    jd.add_argument("--out", metavar="FILE", help="write the result as JSON")
+    jd.set_defaults(func=_cmd_judge)
 
     args = parser.parse_args(argv)
     return args.func(args)

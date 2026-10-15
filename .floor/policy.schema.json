@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "floor-policy/v1",
+  "title": "Floor policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "cpu", "memory_mb", "connectivity", "on_unfixable_raise"],
+  "$defs": {
+    "level": { "type": "string", "enum": ["x86-64-v1", "x86-64-v2", "x86-64-v3", "x86-64-v4"] },
+    "cpu": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x86_64_min_level"],
+      "properties": {
+        "x86_64_min_level": { "$ref": "#/$defs/level" },
+        "emulate": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": { "enum": ["qemu64", "Nehalem", "SandyBridge", "EPYC-Milan"] }
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tiny": { "type": ["integer", "null"], "minimum": 64 },
+        "base": { "type": ["integer", "null"], "minimum": 64 },
+        "small": { "type": ["integer", "null"], "minimum": 64 }
+      }
+    },
+    "connectivity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["offline_required"],
+      "properties": { "offline_required": { "type": "boolean" } }
+    }
+  },
+  "properties": {
+    "version": { "const": 1 },
+    "cpu": { "$ref": "#/$defs/cpu" },
+    "memory_mb": { "$ref": "#/$defs/memory" },
+    "connectivity": { "$ref": "#/$defs/connectivity" },
+    "language": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gate": { "type": "boolean" },
+        "metric": { "enum": ["drift_vs_f16"] }
+      }
+    },
+    "footprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "report_only": { "const": true } }
+    },
+    "repair": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agent_attempts_per_human_action": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "fallback": { "enum": ["canned_inclusive_config", "none"] }
+      }
+    },
+    "on_unfixable_raise": { "enum": ["ship_last_held", "block"] },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cpu": { "$ref": "#/$defs/cpu" },
+          "memory_mb": { "$ref": "#/$defs/memory" },
+          "connectivity": { "$ref": "#/$defs/connectivity" }
+        }
+      }
+    }
+  }
+}
