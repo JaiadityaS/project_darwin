@@ -1,0 +1,758 @@
+{
+  "tool": "floor 0.1.0",
+  "images": [
+    {
+      "ref": "main-e6234cd435eb1299ac405916f4083a62ac044b81",
+      "created": "2025-04-04T15:38:17.936328775Z",
+      "manifest_digest": "sha256:449b8f512e547b751ab8969218ee40f002fab7229ac2e6d3e160df815bfd8561",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-e8536202704cb2cc9e48aa16f31ada877de08ee6",
+      "created": "2025-04-11T04:46:33.321060915Z",
+      "manifest_digest": "sha256:8c548be2b662f64eb5e2ff5c8afc51edae00ae17ed99d77cf23b83de209cd293",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-f9b2dfdd8cec7e4c381ce0fb2c2a7549312c0152",
+      "created": "2025-04-28T04:18:56.896065789Z",
+      "manifest_digest": "sha256:ca94c820dad2934dff22a75d981ea307884a7094477d52cb2b2534a74e0d45e2",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-0778b6ff5fb86439a4aeaec32359416413ecaa2d",
+      "created": "2025-05-01T10:30:57.812323304Z",
+      "manifest_digest": "sha256:b6f96cb2252d45bd9b7747a0aea2c7db273492b5e6a13d162905472b82fae274",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-0676b2dab255fc6ccef77c2d8eb6f68d9a6dc465",
+      "created": "2025-05-07T14:59:46.280165946Z",
+      "manifest_digest": "sha256:47ce00808757bb7f561b14b23f1cc3c9cea1fbc1af98e067a7b335e3f20ed516",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-587ea01f55d3947e31b2f4eef3d7b42f2868c1ac",
+      "created": "2025-05-13T04:05:53.630185615Z",
+      "manifest_digest": "sha256:8b7b0f566c37c5da946039b1b1cd09fb406fa9e0b51f776c4a7bbff2bb98c2b0",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-62dc8f7d7b72ca8e75c57cd6a100712c631fa5d5",
+      "created": "2025-05-20T10:17:46.012463531Z",
+      "manifest_digest": "sha256:49cc834a4ed52a18d57085ad1d8ab77c89aa09294bda8e8c480c71d0abc5eedf",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-5720426d97eb86e76a3fe34c97054b44ed13a71f",
+      "created": "2025-05-28T08:39:43.587668746Z",
+      "manifest_digest": "sha256:81d73a787f70479f301914af795ad40d7ce71be1dc1a1aca5052b05481e0b452",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-82f461eaa4e6a1ba29fc0dbdaa415a9934ee8a1d",
+      "created": "2025-06-03T05:58:55.850041064Z",
+      "manifest_digest": "sha256:9b184c373431f20f6561bcf641a8e5cab4a48cbbaf63860c879bac2e41bdde84",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-2a4d6db7d90899aff3d58d70996916968e4e0d27",
+      "created": "2025-06-16T10:44:27.878558906Z",
+      "manifest_digest": "sha256:24446a2eeeece0cd7cb5024312ee9f861ee80a8b7ca6e4fced682d73404a5c4e",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-4d6ae52ed330cbc044524f97508fd6e2bbd787f8",
+      "created": "2025-06-24T04:46:45.191757834Z",
+      "manifest_digest": "sha256:76c20ab0b9c2b97e0b676603c3a8cf906c000766ab7d5847f61c491336acb61e",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-897b071dc68f11bc41f55e26b741902e3a4e4c10",
+      "created": "2025-06-26T11:29:53.539555831Z",
+      "manifest_digest": "sha256:9a42431d82716b84e9a4ce451adcaa00060f452001ee47341247a0e51c072e93",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-a16da91365700f396da916d16a7f5a2ec99364b9",
+      "created": "2025-07-12T21:26:45.612758534Z",
+      "manifest_digest": "sha256:c6a7f1d223dda72acdc6c74bf466c857edbe674c045cde71a240ed99ba1e353a",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-f7502dca872866a310fe69d30b163fa87d256319",
+      "created": "2025-07-30T19:10:31.60838759Z",
+      "manifest_digest": "sha256:85dddf85ceb704310864e7139e84f8ed821e6c4150f8feaab5abe2a74f2ddfa7",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-bb0e1fc60f26a707cabf724edcf7cfcab2a269b6",
+      "created": "2025-09-05T13:26:14.269313049Z",
+      "manifest_digest": "sha256:169fb089f8e861ce2eaa48ff1770ba426fec86dd0dbc12bf10f166d1e8f3c674",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-0b3587acddb936648d3a3a39dda4998eeee7611e",
+      "created": "2025-09-30T13:42:42.521631297Z",
+      "manifest_digest": "sha256:79335a52ace16accf05cc6b0372c63f134f4100dc4c98e36cfc7b57bc38f9d96",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-c3b5c4d9349f4353dd8620fa621a4386ab8812a6",
+      "created": "2025-10-11T15:33:05.343481995Z",
+      "manifest_digest": "sha256:6f93620e762c1d85118eb08f8fa1e1027b4bda5c49f11b476c6522fb5f86b5f7",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-f16c12f3f55f5bd3d6ac8cf2f31ab90a42c884d5",
+      "created": "2025-10-27T06:58:19.760804821Z",
+      "manifest_digest": "sha256:72ebdc7fe134ae3cc11dfc077f82259c3dc6cdc80ce2f1631478d21cd3fbd00d",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-c62adfbd1ecdaea9e295c72d672992514a2d887c",
+      "created": "2025-10-28T20:48:22.099560813Z",
+      "manifest_digest": "sha256:443a117d35686119485a19af9f3176037d7553a1cd92f8c2c700c842fc204ba4",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-999a7e0cbf8484dc2cea1e9f855d6b39f34f7ae9",
+      "created": "2025-11-01T12:48:42.457995564Z",
+      "manifest_digest": "sha256:61f70cafc4dff4c5773f698f48e01dbf105601ccb9c6c2381b8c73b3cb389ffd",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+      "created": "2025-11-09T21:41:21.751053304Z",
+      "manifest_digest": "sha256:f17338119e0376459c300d800745fea006f4ec827212189cc19736dc3df226fb",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-d9b7613b34a343848af572cc14467fc5e82fc788",
+      "created": "2025-11-13T01:20:22.618572591Z",
+      "manifest_digest": "sha256:31c884b6cc2544309591445f8a6fffcb4a7ae78b66f167f40a167e565c6268b1",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-27f485a14c80a1f993e716367529422d54afd7d3",
+      "created": "2025-11-17T15:36:24.814508748Z",
+      "manifest_digest": "sha256:ed74dc9e82ad92a0c65b94ab4e2a6fc95ae9c05c0628af278ada8e55a49a4524",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-b12abefa9be2abae39a73fa903322af135024a36",
+      "created": "2025-11-17T21:00:58.170123729Z",
+      "manifest_digest": "sha256:e1c34d2e455a5128f50b48c6a5409b84f2d8c943d2c9a5e0d18138549bb03881",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.9.4-dirty"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-961aec7384e6c4afeea5fa3f63abc198e7fe4d18",
+      "created": "2025-11-20T13:24:10.219106392Z",
+      "manifest_digest": "sha256:322d55138f8d74b0af834a0caca81afb672836ad76553777e1d100426f3dc855",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.9.4-dirty"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-40e788a5d1ce2e0c2669a59e6c0e058c44328a4b",
+      "created": "2025-11-20T13:43:26.620612062Z",
+      "manifest_digest": "sha256:9a7026ae91acdbe377846b99fa5fd076505c9379b0ff09766502583de1656350",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.9.4-dirty"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-3e79e73eee32e924fbd34587f2f2ac5a45a26b61",
+      "created": "2025-12-17T12:13:40.205026727Z",
+      "manifest_digest": "sha256:ac857bddec3e5af1e1dd2afc051035593fa28e4d40de1f2d21fb2eb52a519170",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.9.4"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-aa1bc0d1a6dfd70dbb9f60c11df12441e03a9075",
+      "created": "2026-01-30T15:45:24.241623571Z",
+      "manifest_digest": "sha256:4ee38b6837126ea6a8b426056f2f8f173f3eb5ff8629f6bf6085447c68d832eb",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.9.5"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-9453b4b9be9b73adfc35051083f37cefa039acee",
+      "created": "2026-02-27T20:14:35.249224944Z",
+      "manifest_digest": "sha256:5415facce20e8d7e9c957c0c7a842dda00d436bbb8910a834076195ae6d3bf68",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.9.7"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-9386f239401074690479731c1e41683fbbeac557",
+      "created": "2026-03-19T09:52:54.539258619Z",
+      "manifest_digest": "sha256:b59f05db3f3db91ffaa6ffd7efb8130821af08ab3a2456dbcca6dbb6fd9251c3",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.9.8"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-c81b2dabbc45484dee2ca6658cfe39c841df5c70",
+      "created": "2026-05-07T04:31:49.780155084Z",
+      "manifest_digest": "sha256:b3bb402549f75beaf0ae323f021c2938e7e044311396c540201fd2611a36cd8f",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.10.2"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-c33c5618b72bb345df029b730b36bc0e369845a3",
+      "created": "2026-05-10T15:28:06.356845913Z",
+      "manifest_digest": "sha256:f119810fe21c67523f24c4cb54c9af54eed6b2e8c277db3759f45e5f4c858c6f",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.10.2"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-338cce1e58133261753243802a0e7a430118866d",
+      "created": "2026-05-12T06:35:29.941970113Z",
+      "manifest_digest": "sha256:afc214148ab32f1f8f4ed418351bef88602f8dd754318dcfb953d9628319c43d",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.10.2"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-f08258abd74b995bb95d8005103f72f1afd66a8a",
+      "created": "2026-05-13T05:35:43.955035527Z",
+      "manifest_digest": "sha256:d7eb2eb11d6bc11ac86d9701fe00e2a71092c1c472c7a2107bfe5e3f500e968c",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.10.2"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-a604a9b5b0ff9108191769a09843ae325c6c0d7f",
+      "created": "2026-05-13T08:07:51.560177309Z",
+      "manifest_digest": "sha256:a725b5bbc3b3344ffe79288b893eb771bdc7760f6d3057a997e0a12c3038047f",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.10.2"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-3e9b7d0fef3528ee2208da3cdb873a2c53d2ae2f",
+      "created": "2026-05-13T10:59:47.381825649Z",
+      "manifest_digest": "sha256:c85e7ae6e54a504e9455b1646619ed372defb62f2f60eaef9a7067da28529b1b",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.10.2"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+      "created": "2026-05-14T20:31:30.446972903Z",
+      "manifest_digest": "sha256:f8cb0ed561072ff82f7b2292930df089508b339849dda6bfa92eb2704c0f812e",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-968eebe77225d25e57a3f981da7c696310f0e881",
+      "created": "2026-05-15T12:27:54.011562896Z",
+      "manifest_digest": "sha256:d0a05639e120245a91ff248f92582bbe0f35af8499c1cdb0a17931b3d86bf91a",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+      "created": "2026-05-18T08:12:25.666724715Z",
+      "manifest_digest": "sha256:078428368ab7373d48a05a53c807858059ef3f0e507260d029fe728413e770f3",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_BF16",
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-47b9eb37a33c5031a1b667ace64477330b9f36c1",
+      "created": "2026-05-18T10:19:56.491507156Z",
+      "manifest_digest": "sha256:3354d7202c40f2c712e9e0481b33fa95334e3b26a7175871e2de3c3c2e70f9c8",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-afa2ea544fb4b0448916b4a31ecd33c8685bd482",
+      "created": "2026-05-19T11:56:14.364641656Z",
+      "manifest_digest": "sha256:d63ac88de1f6494c0c0cebef35964aa13c8a43a87f82dc5a9489928bf4d178f7",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+      "created": "2026-05-21T15:11:25.666424124Z",
+      "manifest_digest": "sha256:bbec98919e06cacef6670369111bdaf8f5e23c6c9eb1460cbeb4385c09093c5c",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-0ccd896f5b882628e1c077f9769735ef4ce52860",
+      "created": "2026-05-22T07:30:00.860419989Z",
+      "manifest_digest": "sha256:4a485683170a86e4544905416e97b43ddf68a815fc1520ee93e981ef9214b586",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+      "created": "2026-05-25T10:56:41.084261668Z",
+      "manifest_digest": "sha256:8311515954dcb25f1906e6bae7b1b48653f7bb9936ea1377db00045678c15434",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.11.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-865ec171aa83625a388bce0b43f091bb3054f56b",
+      "created": "2026-05-25T18:57:08.454030551Z",
+      "manifest_digest": "sha256:165f9bd8659b56482506b6bdadedaf7d093ef832202031633f56ef97e3760a56",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.12.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+      "created": "2026-05-25T21:04:10.670330638Z",
+      "manifest_digest": "sha256:ea2fee3b520bd5fd055f49b5c36cdad756afd11b290cbe6244e7864bc5e7e72a",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.12.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-f14ae77f4082afaf10a98c17dde8282e12744d7c",
+      "created": "2026-05-25T23:24:47.128992574Z",
+      "manifest_digest": "sha256:3d82f48e1153dc64bb2bbe5111c492835a4a5711ed18b96850c093501fd47ae2",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+      "created": "2026-05-25T23:46:27.314007793Z",
+      "manifest_digest": "sha256:d0cc2779aadb011186d7dfb35a3c1585b6c5aeb8227c402e2c5d094746bab81a",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-27101c01dcac1676e2b6422256233cd0f1f9ae28",
+      "created": "2026-05-26T07:18:58.129183505Z",
+      "manifest_digest": "sha256:ba69cb6ea2cc4d5dbca8b90029636cf680c04dad2fad592b3217091a3323eeac",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-f6e617bab7843d86d94237f9791ee41d524333f9",
+      "created": "2026-05-28T07:31:04.572980562Z",
+      "manifest_digest": "sha256:1a2396e05352143cb78edf5880d57f000b54a58e18079b329577a0d93f712806",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-9186e2453bdd051854b17cfb0d068f629663e114",
+      "created": "2026-05-28T11:36:28.566924192Z",
+      "manifest_digest": "sha256:a200e1444577a3f004ebddd49eadf798f71e418b5f34b2afed0f87499168dc5f",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-f24588a272ae8e23280d9c220536437164e6ed28",
+      "created": "2026-05-29T07:25:52.781683376Z",
+      "manifest_digest": "sha256:1095ce7e034c1526a1949510c0a2e5f922d603654f8f3bc4f99aa9b856d74730",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-f39cc7128295ff5c67bbedb73161bed549f96e96",
+      "created": "2026-05-31T12:47:23.117799874Z",
+      "manifest_digest": "sha256:043f04fbe1ca6fd6be1ddadf713dcd917cb7b32f85f72e732f8653847e0e60a0",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_VNNI"
+      ],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    },
+    {
+      "ref": "main-2e045a967b802564844fa17cf19792c8cf1f04ac",
+      "created": "2026-05-31T13:11:19.218329098Z",
+      "manifest_digest": "sha256:7525b36f73eaf4f53673f8d0c50bb97e1dcd9dc771369d54bfcba47d1eab131c",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-fe69461618ffc50ba8afa65c25cc6c6e34d4537f",
+      "created": "2026-05-31T13:44:59.041451205Z",
+      "manifest_digest": "sha256:943b4969461c34cbae2422acf8eaa6e846b901de5e7299f924e20d128e293e24",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-23ee03506a91ac3d3f0071b40e66a430eebdfa1d",
+      "created": "2026-06-01T12:02:05.592506918Z",
+      "manifest_digest": "sha256:03029178eb6fd7fbd9777c507038de0f757c8991f8c2f4eeca6e8f642fc41c76",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.13.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-0ec0845110dc934911dc48e8c5beb5ad3189b3f3",
+      "created": "2026-06-16T06:16:16.883824884Z",
+      "manifest_digest": "sha256:3e6ebf25591b655dff8b67f9e2bce7b25d693ae106639ecbca2646d7e710498d",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/ggml/src/libggml-cpu.so.0.15.1"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-080bbbe85230f624f0b52127f1ae1218247989f9",
+      "created": "2026-07-28T06:09:38.792675988Z",
+      "manifest_digest": "sha256:02f7434f40268d63bbc60cdbce2bf62689cef5941d56355737c9240c56a52f7a",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/bin/libggml-cpu.so.0.16.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-233fe1fc9b48a09e361d3594520838ca266537fe",
+      "created": "2026-08-24T04:29:27.592242724Z",
+      "manifest_digest": "sha256:3888b12de3cf9b17c8b068697e88158d25dbefb7e78c65a2b47b296e2b8a41cc",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/bin/libggml-cpu.so.0.21.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-4afa009405863a41b4e86e0bca141ac62f9ea194",
+      "created": "2026-09-18T04:29:23.801219548Z",
+      "manifest_digest": "sha256:aa91b006f425474933eef6a6870834743f19d53431063cdc3c370b498260ea4a",
+      "floor": "x86-64-v3",
+      "extras": [],
+      "sources": [
+        "app/build/bin/libggml-cpu.so.0.24.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v3"
+    },
+    {
+      "ref": "main-0c7be696371069e0baa2515ed7aa08d5a5473aa6",
+      "created": "2026-10-15T04:29:12.384241591Z",
+      "manifest_digest": "sha256:23da2ac176ae6be2633f5766f1e532746383dce1864cbebf6c7af64887a23647",
+      "floor": "x86-64-v4",
+      "extras": [
+        "AVX512_BF16",
+        "AVX512_VNNI",
+        "GFNI"
+      ],
+      "sources": [
+        "app/build/bin/libggml-cpu.so.0.26.0"
+      ],
+      "baseline_variant": null,
+      "highest_level_found": "x86-64-v4"
+    }
+  ]
+}

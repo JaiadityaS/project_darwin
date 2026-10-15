@@ -33,7 +33,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
 | T-20 | OCI client for ghcr.io: tags, manifests, config history, `/app` layer pull, cache by layer digest | F10.1 | done | @JaiadityaS | `.floor/floor/oci.py`, `python -m floor image`. Pull images in `.github/workflows/backtest.yml` (a home link is too slow) |
-| T-21 | Backtest sampler: ≥ 30 images across the `main-<sha>` tags, plus every image within two weeks of #3510 and #3814; timeline JSON | F10.1 | doing | @JaiadityaS | `floor sample`, `floor timeline`, `.github/workflows/sweep.yml`. First sweep: run 38700707825. Record the result (STATE.md next step 2) |
+| T-21 | Backtest sampler: ≥ 30 images across the `main-<sha>` tags, plus every image within two weeks of #3510 and #3814; timeline JSON | F10.1 | done | @JaiadityaS | `floor sample`, `floor timeline`, `.github/workflows/sweep.yml`. Run 38700707825: 61 images, 9 at v4, 15 flips. Evidence in `.floor/evidence/backtest/` |
 | T-22 | H-1 analysis: level per image vs changes to `.devops/` and ggml CPU code; verdict with evidence | F10.3 | ready | - | Needs a local whisper.cpp clone for `git log` |
 | T-23 | Backtest footprint (bytes downloaded, CPU time) | F14.4 | later | - | |
 | T-24 | #3814: scan `main-cuda` and `main` at the same commit (a strong H-1 test) | F10.2 | done | @JaiadityaS | Run 38538051321: commit 47b9eb37, both v3. #3814 not reproduced at this commit; follow-up in STATE.md |
