@@ -1,0 +1,389 @@
+{
+  "tool": "floor 0.1.0",
+  "timeline": ".floor/evidence/backtest/main-2026-10-15.json",
+  "images": 61,
+  "levels": {
+    "x86-64-v3": 52,
+    "x86-64-v4": 9
+  },
+  "flips": 15,
+  "flips_without_floor_path_changes": 10,
+  "floor_paths": [
+    ".devops/",
+    ".github/workflows/docker.yml",
+    "CMakeLists.txt",
+    "Makefile",
+    "cmake/",
+    "ggml/CMakeLists.txt",
+    "ggml/cmake/",
+    "ggml/src/CMakeLists.txt",
+    "ggml/src/ggml-cpu/"
+  ],
+  "verdict": "partly supported: some flips have no change in the floor paths",
+  "details": [
+    {
+      "from": {
+        "ref": "main-999a7e0cbf8484dc2cea1e9f855d6b39f34f7ae9",
+        "created": "2025-11-01T12:48:42.457995564Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+        "created": "2025-11-09T21:41:21.751053304Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        "ggml/CMakeLists.txt",
+        "ggml/src/CMakeLists.txt",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/arch/loongarch/quants.c",
+        "ggml/src/ggml-cpu/arch/riscv/quants.c",
+        "ggml/src/ggml-cpu/arch/s390/cpu-feats.cpp",
+        "ggml/src/ggml-cpu/ggml-cpu-impl.h",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/repack.cpp",
+        "ggml/src/ggml-cpu/simd-mappings.h"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-d9b7613b34a343848af572cc14467fc5e82fc788",
+        "created": "2025-11-13T01:20:22.618572591Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-27f485a14c80a1f993e716367529422d54afd7d3",
+        "created": "2025-11-17T15:36:24.814508748Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-f08258abd74b995bb95d8005103f72f1afd66a8a",
+        "created": "2026-05-13T05:35:43.955035527Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-a604a9b5b0ff9108191769a09843ae325c6c0d7f",
+        "created": "2026-05-13T08:07:51.560177309Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-a604a9b5b0ff9108191769a09843ae325c6c0d7f",
+        "created": "2026-05-13T08:07:51.560177309Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-3e9b7d0fef3528ee2208da3cdb873a2c53d2ae2f",
+        "created": "2026-05-13T10:59:47.381825649Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-968eebe77225d25e57a3f981da7c696310f0e881",
+        "created": "2026-05-15T12:27:54.011562896Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+        "created": "2026-05-18T08:12:25.666724715Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+        "created": "2026-05-18T08:12:25.666724715Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-47b9eb37a33c5031a1b667ace64477330b9f36c1",
+        "created": "2026-05-18T10:19:56.491507156Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-afa2ea544fb4b0448916b4a31ecd33c8685bd482",
+        "created": "2026-05-19T11:56:14.364641656Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+        "created": "2026-05-21T15:11:25.666424124Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+        "created": "2026-05-21T15:11:25.666424124Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-0ccd896f5b882628e1c077f9769735ef4ce52860",
+        "created": "2026-05-22T07:30:00.860419989Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-0ccd896f5b882628e1c077f9769735ef4ce52860",
+        "created": "2026-05-22T07:30:00.860419989Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+        "created": "2026-05-25T10:56:41.084261668Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+        "created": "2026-05-25T10:56:41.084261668Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-865ec171aa83625a388bce0b43f091bb3054f56b",
+        "created": "2026-05-25T18:57:08.454030551Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": [
+        "ggml/CMakeLists.txt",
+        "ggml/cmake/ggml-config.cmake.in",
+        "ggml/src/CMakeLists.txt",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/cmake/FindSMTIME.cmake",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime.h",
+        "ggml/src/ggml-cpu/spacemit/ime1_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime2_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime_env.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime_env.h",
+        "ggml/src/ggml-cpu/spacemit/ime_kernels.h",
+        "ggml/src/ggml-cpu/spacemit/repack.cpp",
+        "ggml/src/ggml-cpu/spacemit/repack.h",
+        "ggml/src/ggml-cpu/spacemit/rvv_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/rvv_kernels.h",
+        "ggml/src/ggml-cpu/spacemit/spine_barrier.h",
+        "ggml/src/ggml-cpu/spacemit/spine_mem_pool.cpp",
+        "ggml/src/ggml-cpu/spacemit/spine_mem_pool.h",
+        "ggml/src/ggml-cpu/spacemit/spine_tcm.h"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-865ec171aa83625a388bce0b43f091bb3054f56b",
+        "created": "2026-05-25T18:57:08.454030551Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+        "created": "2026-05-25T21:04:10.670330638Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+        "created": "2026-05-25T21:04:10.670330638Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-f14ae77f4082afaf10a98c17dde8282e12744d7c",
+        "created": "2026-05-25T23:24:47.128992574Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": [
+        "ggml/CMakeLists.txt"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-f24588a272ae8e23280d9c220536437164e6ed28",
+        "created": "2026-05-29T07:25:52.781683376Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-f39cc7128295ff5c67bbedb73161bed549f96e96",
+        "created": "2026-05-31T12:47:23.117799874Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        "CMakeLists.txt"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-f39cc7128295ff5c67bbedb73161bed549f96e96",
+        "created": "2026-05-31T12:47:23.117799874Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-2e045a967b802564844fa17cf19792c8cf1f04ac",
+        "created": "2026-05-31T13:11:19.218329098Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-4afa009405863a41b4e86e0bca141ac62f9ea194",
+        "created": "2026-09-18T04:29:23.801219548Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-0c7be696371069e0baa2515ed7aa08d5a5473aa6",
+        "created": "2026-10-15T04:29:12.384241591Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        ".devops/main-vulkan.Dockerfile",
+        "CMakeLists.txt",
+        "ggml/CMakeLists.txt",
+        "ggml/cmake/common.cmake",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/amx/amx.cpp",
+        "ggml/src/ggml-cpu/arch-fallback.h",
+        "ggml/src/ggml-cpu/arch/arm/quants.c",
+        "ggml/src/ggml-cpu/arch/arm/repack.cpp",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/ggml-cpu.cpp",
+        "ggml/src/ggml-cpu/hbm.cpp",
+        "ggml/src/ggml-cpu/iqp.cpp",
+        "ggml/src/ggml-cpu/iqp.h",
+        "ggml/src/ggml-cpu/kleidiai/kleidiai.cpp",
+        "ggml/src/ggml-cpu/llamafile/sgemm.cpp",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/repack.cpp",
+        "ggml/src/ggml-cpu/repack.h",
+        "ggml/src/ggml-cpu/simd-gemm.h",
+        "ggml/src/ggml-cpu/simd-mappings.h",
+        "ggml/src/ggml-cpu/spacemit/ime.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime1_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime_kernels.h",
+        "ggml/src/ggml-cpu/spacemit/repack.cpp",
+        "ggml/src/ggml-cpu/spacemit/rvv_kernels.cpp",
+        "ggml/src/ggml-cpu/tiled/tiled-kernel.cpp",
+        "ggml/src/ggml-cpu/tiled/tiled-kernel.h",
+        "ggml/src/ggml-cpu/tiled/tiled.cpp",
+        "ggml/src/ggml-cpu/tiled/tiled.h",
+        "ggml/src/ggml-cpu/vec.cpp",
+        "ggml/src/ggml-cpu/vec.h"
+      ]
+    }
+  ],
+  "pair_timeline": ".floor/evidence/backtest/main-cuda-2026-10-15.json",
+  "shared_commits": 38,
+  "same_commit_different_floor": [
+    {
+      "commit": "a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+      "a": "main-a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+      "a_floor": "x86-64-v4",
+      "b": "main-cuda-a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "d9b7613b34a343848af572cc14467fc5e82fc788",
+      "a": "main-d9b7613b34a343848af572cc14467fc5e82fc788",
+      "a_floor": "x86-64-v4",
+      "b": "main-cuda-d9b7613b34a343848af572cc14467fc5e82fc788",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+      "a": "main-46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+      "a_floor": "x86-64-v3",
+      "b": "main-cuda-46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "968eebe77225d25e57a3f981da7c696310f0e881",
+      "a": "main-968eebe77225d25e57a3f981da7c696310f0e881",
+      "a_floor": "x86-64-v3",
+      "b": "main-cuda-968eebe77225d25e57a3f981da7c696310f0e881",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "6227a0ef739a78312d96e6f8f85e7b6d63683445",
+      "a": "main-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+      "a_floor": "x86-64-v4",
+      "b": "main-cuda-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+      "a": "main-8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+      "a_floor": "x86-64-v4",
+      "b": "main-cuda-8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+      "a": "main-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+      "a_floor": "x86-64-v4",
+      "b": "main-cuda-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "865ec171aa83625a388bce0b43f091bb3054f56b",
+      "a": "main-865ec171aa83625a388bce0b43f091bb3054f56b",
+      "a_floor": "x86-64-v3",
+      "b": "main-cuda-865ec171aa83625a388bce0b43f091bb3054f56b",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+      "a": "main-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+      "a_floor": "x86-64-v4",
+      "b": "main-cuda-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "f14ae77f4082afaf10a98c17dde8282e12744d7c",
+      "a": "main-f14ae77f4082afaf10a98c17dde8282e12744d7c",
+      "a_floor": "x86-64-v3",
+      "b": "main-cuda-f14ae77f4082afaf10a98c17dde8282e12744d7c",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+      "a": "main-e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+      "a_floor": "x86-64-v3",
+      "b": "main-cuda-e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+      "b_floor": "x86-64-v4"
+    }
+  ],
+  "pair_verdict": "supported: 11 of 38 shared commits have different floors in the two images. The source is the same, so the build machine set the floor"
+}

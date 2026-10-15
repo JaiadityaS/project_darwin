@@ -1,0 +1,458 @@
+{
+  "tool": "floor 0.1.0",
+  "timeline": ".floor/evidence/backtest/main-cuda-2026-10-15.json",
+  "images": 60,
+  "levels": {
+    "x86-64-v3": 48,
+    "x86-64-v4": 12
+  },
+  "flips": 15,
+  "flips_without_floor_path_changes": 5,
+  "floor_paths": [
+    ".devops/",
+    ".github/workflows/docker.yml",
+    "CMakeLists.txt",
+    "Makefile",
+    "cmake/",
+    "ggml/CMakeLists.txt",
+    "ggml/cmake/",
+    "ggml/src/CMakeLists.txt",
+    "ggml/src/ggml-cpu/"
+  ],
+  "verdict": "partly supported: some flips have no change in the floor paths",
+  "details": [
+    {
+      "from": {
+        "ref": "main-cuda-44fa2f647cf2a6953493b21ab83b50d5f5dbc483",
+        "created": "2025-09-19T04:58:43.488703396Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-527ff158d03f67eb11195f0f343874be9b74c172",
+        "created": "2025-09-30T13:25:06.460260237Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        "ggml/CMakeLists.txt",
+        "ggml/src/CMakeLists.txt",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/amx/amx.cpp",
+        "ggml/src/ggml-cpu/arch-fallback.h",
+        "ggml/src/ggml-cpu/arch/loongarch/quants.c",
+        "ggml/src/ggml-cpu/arch/powerpc/quants.c",
+        "ggml/src/ggml-cpu/arch/riscv/quants.c",
+        "ggml/src/ggml-cpu/arch/s390/quants.c",
+        "ggml/src/ggml-cpu/arch/x86/repack.cpp",
+        "ggml/src/ggml-cpu/common.h",
+        "ggml/src/ggml-cpu/ggml-cpu-impl.h",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/ggml-cpu.cpp",
+        "ggml/src/ggml-cpu/kleidiai/kernels.cpp",
+        "ggml/src/ggml-cpu/kleidiai/kernels.h",
+        "ggml/src/ggml-cpu/kleidiai/kleidiai.cpp",
+        "ggml/src/ggml-cpu/llamafile/sgemm.cpp",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/ops.h",
+        "ggml/src/ggml-cpu/simd-mappings.h",
+        "ggml/src/ggml-cpu/spacemit/ime.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime.h",
+        "ggml/src/ggml-cpu/spacemit/ime1_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime_kernels.h",
+        "ggml/src/ggml-cpu/vec.cpp",
+        "ggml/src/ggml-cpu/vec.h"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-c8223a8548ad64435266e551385fc51aca9ee8ab",
+        "created": "2025-10-06T14:31:52.99898664Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-cuda-a91dd3be72f70dd1b3cb6e252f35fa17b93f596c",
+        "created": "2025-10-12T09:52:56.262328021Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": [
+        "CMakeLists.txt",
+        "ggml/CMakeLists.txt",
+        "ggml/src/CMakeLists.txt",
+        "ggml/src/ggml-cpu/amx/amx.cpp",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/kleidiai/kernels.cpp",
+        "ggml/src/ggml-cpu/kleidiai/kernels.h",
+        "ggml/src/ggml-cpu/kleidiai/kleidiai.cpp",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/unary-ops.cpp",
+        "ggml/src/ggml-cpu/unary-ops.h",
+        "ggml/src/ggml-cpu/vec.cpp",
+        "ggml/src/ggml-cpu/vec.h"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-f08258abd74b995bb95d8005103f72f1afd66a8a",
+        "created": "2026-05-13T07:27:49.919712304Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-a604a9b5b0ff9108191769a09843ae325c6c0d7f",
+        "created": "2026-05-13T09:41:27.798478064Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-cuda-a604a9b5b0ff9108191769a09843ae325c6c0d7f",
+        "created": "2026-05-13T09:41:27.798478064Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-cuda-3e9b7d0fef3528ee2208da3cdb873a2c53d2ae2f",
+        "created": "2026-05-13T11:33:19.264070606Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-cuda-3e9b7d0fef3528ee2208da3cdb873a2c53d2ae2f",
+        "created": "2026-05-13T11:33:19.264070606Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+        "created": "2026-05-14T21:40:12.559169312Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        ".devops/main-intel.Dockerfile",
+        ".devops/main-vulkan.Dockerfile",
+        "ggml/CMakeLists.txt",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/arch-fallback.h",
+        "ggml/src/ggml-cpu/arch/riscv/quants.c",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/ops.h"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-968eebe77225d25e57a3f981da7c696310f0e881",
+        "created": "2026-05-15T14:39:00.216363253Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-cuda-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+        "created": "2026-05-18T10:01:16.464837451Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-cuda-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+        "created": "2026-05-25T13:15:10.110160979Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-865ec171aa83625a388bce0b43f091bb3054f56b",
+        "created": "2026-05-25T21:11:20.027338877Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        "ggml/CMakeLists.txt",
+        "ggml/cmake/ggml-config.cmake.in",
+        "ggml/src/CMakeLists.txt",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/cmake/FindSMTIME.cmake",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime.h",
+        "ggml/src/ggml-cpu/spacemit/ime1_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime2_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime_env.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime_env.h",
+        "ggml/src/ggml-cpu/spacemit/ime_kernels.h",
+        "ggml/src/ggml-cpu/spacemit/repack.cpp",
+        "ggml/src/ggml-cpu/spacemit/repack.h",
+        "ggml/src/ggml-cpu/spacemit/rvv_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/rvv_kernels.h",
+        "ggml/src/ggml-cpu/spacemit/spine_barrier.h",
+        "ggml/src/ggml-cpu/spacemit/spine_mem_pool.cpp",
+        "ggml/src/ggml-cpu/spacemit/spine_mem_pool.h",
+        "ggml/src/ggml-cpu/spacemit/spine_tcm.h"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-865ec171aa83625a388bce0b43f091bb3054f56b",
+        "created": "2026-05-25T21:11:20.027338877Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-cuda-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+        "created": "2026-05-25T22:03:23.294958034Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-cuda-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+        "created": "2026-05-25T22:03:23.294958034Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+        "created": "2026-05-26T00:35:36.946505486Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        "CMakeLists.txt",
+        "ggml/CMakeLists.txt"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-f14ae77f4082afaf10a98c17dde8282e12744d7c",
+        "created": "2026-05-26T01:09:05.049145299Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-cuda-27101c01dcac1676e2b6422256233cd0f1f9ae28",
+        "created": "2026-05-26T10:09:54.635271112Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": [
+        "CMakeLists.txt"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-f24588a272ae8e23280d9c220536437164e6ed28",
+        "created": "2026-05-29T09:21:06.268034495Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-f39cc7128295ff5c67bbedb73161bed549f96e96",
+        "created": "2026-05-31T14:34:58.660254588Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        "CMakeLists.txt"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-f39cc7128295ff5c67bbedb73161bed549f96e96",
+        "created": "2026-05-31T14:34:58.660254588Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-cuda-2e045a967b802564844fa17cf19792c8cf1f04ac",
+        "created": "2026-05-31T14:53:19.06016107Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": []
+    },
+    {
+      "from": {
+        "ref": "main-cuda-23ee03506a91ac3d3f0071b40e66a430eebdfa1d",
+        "created": "2026-06-01T14:01:04.448090338Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-e1da83d7736f4a170a4c8057c205df35c39fe230",
+        "created": "2026-06-08T08:58:11.140930088Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        ".devops/main-cuda.Dockerfile",
+        ".devops/main-intel.Dockerfile",
+        ".devops/main-musa.Dockerfile",
+        ".devops/main-vulkan.Dockerfile",
+        ".devops/main.Dockerfile",
+        ".github/workflows/docker.yml",
+        "CMakeLists.txt",
+        "cmake/whisper.pc.in"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-f049fff95a089aa9969deb009cdd4892b3e74916",
+        "created": "2026-06-19T07:53:00.45961639Z",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "ref": "main-cuda-7695a5331230c585f5ce92291c4256973985ae5a",
+        "created": "2026-07-11T07:28:06.468077783Z",
+        "floor": "x86-64-v3"
+      },
+      "direction": "lowered",
+      "floor_path_changes": [
+        "cmake/parakeet.pc.in",
+        "cmake/whisper.pc.in",
+        "ggml/CMakeLists.txt",
+        "ggml/src/CMakeLists.txt",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/amx/mmq.cpp",
+        "ggml/src/ggml-cpu/arch-fallback.h",
+        "ggml/src/ggml-cpu/arch/arm/quants.c",
+        "ggml/src/ggml-cpu/arch/x86/quants.c",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/llamafile/sgemm.cpp",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/quants.c",
+        "ggml/src/ggml-cpu/quants.h",
+        "ggml/src/ggml-cpu/simd-gemm.h",
+        "ggml/src/ggml-cpu/simd-mappings.h",
+        "ggml/src/ggml-cpu/vec.cpp"
+      ]
+    },
+    {
+      "from": {
+        "ref": "main-cuda-a44e07845931421bb6f3447ce0010ed9dc76a118",
+        "created": "2026-09-23T05:18:50.011870109Z",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "ref": "main-cuda-0c7be696371069e0baa2515ed7aa08d5a5473aa6",
+        "created": "2026-10-15T05:16:53.033399158Z",
+        "floor": "x86-64-v4"
+      },
+      "direction": "raised",
+      "floor_path_changes": [
+        "CMakeLists.txt",
+        "ggml/CMakeLists.txt",
+        "ggml/cmake/common.cmake",
+        "ggml/src/ggml-cpu/CMakeLists.txt",
+        "ggml/src/ggml-cpu/amx/amx.cpp",
+        "ggml/src/ggml-cpu/arch-fallback.h",
+        "ggml/src/ggml-cpu/arch/arm/quants.c",
+        "ggml/src/ggml-cpu/arch/arm/repack.cpp",
+        "ggml/src/ggml-cpu/ggml-cpu.c",
+        "ggml/src/ggml-cpu/ggml-cpu.cpp",
+        "ggml/src/ggml-cpu/hbm.cpp",
+        "ggml/src/ggml-cpu/iqp.cpp",
+        "ggml/src/ggml-cpu/iqp.h",
+        "ggml/src/ggml-cpu/kleidiai/kleidiai.cpp",
+        "ggml/src/ggml-cpu/llamafile/sgemm.cpp",
+        "ggml/src/ggml-cpu/ops.cpp",
+        "ggml/src/ggml-cpu/repack.cpp",
+        "ggml/src/ggml-cpu/repack.h",
+        "ggml/src/ggml-cpu/simd-gemm.h",
+        "ggml/src/ggml-cpu/simd-mappings.h",
+        "ggml/src/ggml-cpu/spacemit/ime.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime1_kernels.cpp",
+        "ggml/src/ggml-cpu/spacemit/ime_kernels.h",
+        "ggml/src/ggml-cpu/spacemit/repack.cpp",
+        "ggml/src/ggml-cpu/spacemit/rvv_kernels.cpp",
+        "ggml/src/ggml-cpu/tiled/tiled-kernel.cpp",
+        "ggml/src/ggml-cpu/tiled/tiled-kernel.h",
+        "ggml/src/ggml-cpu/tiled/tiled.cpp",
+        "ggml/src/ggml-cpu/tiled/tiled.h",
+        "ggml/src/ggml-cpu/vec.cpp",
+        "ggml/src/ggml-cpu/vec.h"
+      ]
+    }
+  ],
+  "pair_timeline": ".floor/evidence/backtest/main-2026-10-15.json",
+  "shared_commits": 38,
+  "same_commit_different_floor": [
+    {
+      "commit": "a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+      "a": "main-cuda-a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+      "a_floor": "x86-64-v3",
+      "b": "main-a1867e0dad0b21b35afa43fc815dae60c9a139d6",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "d9b7613b34a343848af572cc14467fc5e82fc788",
+      "a": "main-cuda-d9b7613b34a343848af572cc14467fc5e82fc788",
+      "a_floor": "x86-64-v3",
+      "b": "main-d9b7613b34a343848af572cc14467fc5e82fc788",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+      "a": "main-cuda-46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+      "a_floor": "x86-64-v4",
+      "b": "main-46ca43d6399fdeada1b49fb2126ba373bd9ebc38",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "968eebe77225d25e57a3f981da7c696310f0e881",
+      "a": "main-cuda-968eebe77225d25e57a3f981da7c696310f0e881",
+      "a_floor": "x86-64-v4",
+      "b": "main-968eebe77225d25e57a3f981da7c696310f0e881",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "6227a0ef739a78312d96e6f8f85e7b6d63683445",
+      "a": "main-cuda-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+      "a_floor": "x86-64-v3",
+      "b": "main-6227a0ef739a78312d96e6f8f85e7b6d63683445",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+      "a": "main-cuda-8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+      "a_floor": "x86-64-v3",
+      "b": "main-8443cf05e3fa8ce1b32348e1bcbcf8fc31f7f3ae",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+      "a": "main-cuda-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+      "a_floor": "x86-64-v3",
+      "b": "main-b3877e10c0a8435c53209b2ebfbaa8359f7baaae",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "865ec171aa83625a388bce0b43f091bb3054f56b",
+      "a": "main-cuda-865ec171aa83625a388bce0b43f091bb3054f56b",
+      "a_floor": "x86-64-v4",
+      "b": "main-865ec171aa83625a388bce0b43f091bb3054f56b",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+      "a": "main-cuda-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+      "a_floor": "x86-64-v3",
+      "b": "main-44a50ca41a574d596eef4b2d0a4ffcc1575d6000",
+      "b_floor": "x86-64-v4"
+    },
+    {
+      "commit": "e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+      "a": "main-cuda-e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+      "a_floor": "x86-64-v4",
+      "b": "main-e0fd1f6787a5bd4a4957dd97c5b64df882ee7b0c",
+      "b_floor": "x86-64-v3"
+    },
+    {
+      "commit": "f14ae77f4082afaf10a98c17dde8282e12744d7c",
+      "a": "main-cuda-f14ae77f4082afaf10a98c17dde8282e12744d7c",
+      "a_floor": "x86-64-v4",
+      "b": "main-f14ae77f4082afaf10a98c17dde8282e12744d7c",
+      "b_floor": "x86-64-v3"
+    }
+  ],
+  "pair_verdict": "supported: 11 of 38 shared commits have different floors in the two images. The source is the same, so the build machine set the floor"
+}

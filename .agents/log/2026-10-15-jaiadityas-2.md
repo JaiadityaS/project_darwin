@@ -1,5 +1,5 @@
 # 2026-10-15 @JaiadityaS session 2
-- Tasks: #3814 follow-up (part of T-21), T-16, T-21
+- Tasks: #3814 follow-up (part of T-21), T-16, T-21, T-22
 - Done:
   - #3814 follow-up: `backtest.yml` run 38543908892 on four `main-cuda-<sha>` images. Two are v4 (see STATE.md "Facts learned").
   - Scan evidence now has a `functions` field: the function symbols of up to 32 sample addresses per opcode form (`.floor/floor/isa/elf.py` `Symbols`, `func_symbols`; `decode.py` `sample_ips`).
@@ -7,13 +7,15 @@
   - T-16 rule: LZCNT is allowed inside `ma_dr_flac_*` / `drflac_*` only. `allowlist.base_name` handles `_ZL<len><name>` mangling.
   - Test ELF builder: `build_elf(..., symbols=[(name, offset, size)])` adds `.symtab` and `.strtab`.
   - T-21: `.floor/floor/backtest.py` (`main_tags`, `image_dates`, `choose`, `batches`, `timeline`); commands `floor sample` and `floor timeline`; `.github/workflows/sweep.yml` (sample → matrix scan in batches → timeline in the run summary).
-- Verified: sweep run 38700707825 (61 images, 9 at v4; `.floor/evidence/backtest/main-2026-10-15.json`). run 38700683985: whisper-cli and the four other audio tools are v1 now, so T-16 is done. `python -m pytest .floor/tests -q`: 59 passed. Run 38544501988 gave the LZCNT functions (before the mangled-name fix).
+- Verified: sweep run 38700707825 (61 images, 9 at v4; `.floor/evidence/backtest/main-2026-10-15.json`). run 38700683985: whisper-cli and the four other audio tools are v1 now, so T-16 is done. `python -m pytest .floor/tests -q`: 63 passed. CUDA sweep run 38701134589 (60 images). Run 38544501988 gave the LZCNT functions (before the mangled-name fix).
 - Open:
-  - Run 38701134589: the main-cuda sweep. Record it like the main sweep.
   - Then STATE.md "Next agent: start here" items 3 to 6.
 - Gotchas:
   - Symbols in whisper.cpp binaries are C++ mangled. Match patterns against `base_name(symbol)`, not the raw symbol.
   - In this shell, a Python heredoc turns `\\0` into a real NUL byte, and `Path.write_text` on Windows writes CRLF. Write edit scripts to a file, and use `newline="\n"`.
+  - T-22: `.floor/floor/h1.py` and `floor h1 <timeline> --git <whisper.cpp clone> --pair <timeline>`. Tests in `.floor/tests/test_h1.py` (a small local git repo).
+  - Evidence files in `.floor/evidence/backtest/` (timelines and H-1 results for `main-` and `main-cuda-`).
   - `--prefix` on `floor sample` and `sweep.yml` (for `main-cuda-`).
+  - `scripts/guard.sh` refuses new top-level folders. Product data goes below `.floor/`.
   - `floor sample` reads the config of every `main-<sha>` tag (three requests each). Run it in CI, not on a home link.
 - Branch: main

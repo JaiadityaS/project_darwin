@@ -11,7 +11,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest
+from . import backtest, h1
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -108,6 +108,39 @@ def _cmd_timeline(args: argparse.Namespace) -> int:
     return 0
 
 
+def _load_timeline(path: str) -> list[dict]:
+    return json.loads(Path(path).read_text(encoding="utf-8"))["images"]
+
+
+def _cmd_h1(args: argparse.Namespace) -> int:
+    rows = _load_timeline(args.timeline)
+    result = h1.analyse(rows, args.git)
+    if args.pair:
+        other = _load_timeline(args.pair)
+        pairs = h1.same_commit_pairs(rows, other)
+        shared = h1.shared_commits(rows, other)
+        result["pair_timeline"] = args.pair
+        result["shared_commits"] = shared
+        result["same_commit_different_floor"] = pairs
+        result["pair_verdict"] = h1.pair_verdict(pairs, shared)
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", "timeline": args.timeline, **result})
+    print(f"Images: {result['images']}  {result['levels']}")
+    print(f"Flips: {result['flips']}  without a change in the floor paths: {result['flips_without_floor_path_changes']}")
+    for flip in result["details"]:
+        changes = flip["floor_path_changes"]
+        note = "not checked" if changes is None else (", ".join(changes[:4]) or "no change")
+        print(f"  {flip['from']['created'][:16]} {flip['from']['floor']} -> {flip['to']['created'][:16]} "
+              f"{flip['to']['floor']}  {flip['to']['ref'][:13]}  {note}")
+    for pair in result.get("same_commit_different_floor", []):
+        print(f"  same commit {pair['commit'][:8]}: {pair['a_floor']} ({pair['a'][:-41]}) vs "
+              f"{pair['b_floor']} ({pair['b'][:-41]})")
+    print(f"Verdict (flips): {result['verdict']}")
+    if "pair_verdict" in result:
+        print(f"Verdict (same commit): {result['pair_verdict']}")
+    return 0
+
+
 def _print_table(reports: list[FileReport], summary: dict) -> None:
     rows = [("FILE", "ROLE", "LEVEL", "EXTRAS")]
     for r in reports:
@@ -161,6 +194,13 @@ def main(argv: list[str] | None = None) -> int:
     tl.add_argument("paths", nargs="+", help="report files or directories")
     tl.add_argument("--out", metavar="FILE", help="write the timeline as JSON")
     tl.set_defaults(func=_cmd_timeline)
+
+    hyp = sub.add_parser("h1", help="H-1 analysis: flips in a timeline vs changes in the floor paths (PRD F10.3)")
+    hyp.add_argument("timeline", help="timeline JSON from floor timeline")
+    hyp.add_argument("--git", metavar="DIR", help="a whisper.cpp clone (--filter=blob:none is enough)")
+    hyp.add_argument("--pair", metavar="TIMELINE", help="a second timeline (for example main-cuda-) to join on the commit")
+    hyp.add_argument("--out", metavar="FILE", help="write the analysis as JSON")
+    hyp.set_defaults(func=_cmd_h1)
 
     args = parser.parse_args(argv)
     return args.func(args)

@@ -16,16 +16,15 @@ Last update: 2026-10-15 · @JaiadityaS · session 2
 |---|---|---|
 | G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
 | G-1 CPU proof | Oct 15 | scanner done; T-15 static part done; T-16 done (run 38700683985: the audio tools are v1); T-12 and T-13 not started |
-| G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 done: 61 images, 9 at v4 (run 38700707825); main-cuda sweep is run 38701134589; T-22 next |
+| G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
 | G-3 Gate integrity | Oct 18 | not started |
 | G-4 Release loop | Oct 22 | not started |
 
 ## Next agent: start here
 
-1. **main-cuda sweep.** Run 38701134589 (`sweep.yml -f prefix=main-cuda-`). Download `timeline-<run_id>`, copy `timeline.json` to `.floor/evidence/backtest/main-cuda-<date>.json`, add a row to `.floor/evidence/backtest/README.md`, and record the counts in "Facts learned".
-2. **T-22: H-1 analysis.** Clone whisper.cpp (`git clone --filter=blob:none`) and compare each flip in the timeline with `git log` of `.devops/` and `ggml/src/ggml-cpu/`. If the code and the Dockerfile do not change at a flip, the build machine set the floor (H-1).
-3. T-12 and T-13 need Linux: write a GitHub Actions job like `backtest.yml`. T-12 builds whisper.cpp three ways (native, `GGML_NATIVE=OFF`, all-variants) and scans each. T-13 runs the builds under `qemu-x86_64 -cpu qemu64|Nehalem|SandyBridge|EPYC-Milan`.
-4. Pure Python work that needs no access: T-30 (policy file and schema), T-32 (judge), T-33 (manifest writer and diff).
+1. T-12 and T-13 need Linux: write a GitHub Actions job like `backtest.yml`. T-12 builds whisper.cpp three ways (native, `GGML_NATIVE=OFF`, all-variants) and scans each. T-13 runs the builds under `qemu-x86_64 -cpu qemu64|Nehalem|SandyBridge|EPYC-Milan`.
+2. Pure Python work that needs no access: T-30 (policy file and schema), T-32 (judge), T-33 (manifest writer and diff).
+3. T-60 (Floor page) can start now: the data is in `.floor/evidence/backtest/`.
 
 ## Needs a human (agents cannot do these)
 
@@ -43,6 +42,11 @@ Last update: 2026-10-15 · @JaiadityaS · session 2
   - Both: 19 ELF files below `app/` (13 core, 6 CMake build tools); the `/app` layer is about 152 MB; no OCI revision label.
 - **False positive (T-16).** whisper-cli, whisper-server, test-vad, test-vad-full and vad-speech-segments show v3 only because of LZCNT ×24. bench, main, quantize and libggml-base are v1. The LZCNT is probably the CPUID-guarded path of the FLAC decoder in miniaudio. It does not change T-15, but it breaks AC-F2 for the all-variants build until T-16 is fixed.
 - **T-24 (run 38538051321).** Commit 47b9eb37 (2026-05-18): `main-<sha>` and `main-cuda-<sha>` both have floor x86-64-v3 and the same `libggml-cpu.so` profile (VMOVSS x1508). This pair does not reproduce #3814, because a Zen 3 CPU runs v3 code. The reporter's `main-cuda` image probably came from another commit, built on an AVX-512 runner. The CUDA image has no CMakeFiles probe binaries. Its `/app` layer is about 316 MB.
+- **T-22 verdict: H-1 is supported** (`.floor/evidence/backtest/h1-*.json`, from `python -m floor h1`).
+  - Same source, two builds: 38 commits have both a `main` and a `main-cuda` image in the sweeps. 11 of them have different floors (v3 in one image, v4 in the other). The two jobs run the same `make` on `ubuntu-24.04` GitHub-hosted runners, in the same workflow run. Only the runner differs.
+  - Flips over time: `main` has 15 flips, and 10 of them have no change in any floor path (`.devops/`, `docker.yml`, CMake files, `ggml/src/ggml-cpu/`). `main-cuda` has 15 flips, and 5 have no change. The other flips come with ggml syncs, which touch the CMake files every time, so they prove nothing either way.
+  - Cause in the upstream recipe: `.devops/main.Dockerfile` runs `make base.en`, so `GGML_NATIVE` is ON (the default), and the build targets whatever CPU the hosted runner has.
+  - `main-cuda` sweep (run 38701134589): 60 images from 2025-06-25 to 2026-10-15, 48 at v3 and 12 at v4. Extras seen: AVX512_BF16, AVX512_VNNI, AVX_VNNI, GFNI.
 - **T-21 sweep (run 38700707825), H-1 signal 3.** 61 `main-<sha>` images from 2025-04-04 to 2026-10-15 (`.floor/evidence/backtest/main-2026-10-15.json`). 52 are v3 and 9 are v4 (all with AVX512_VNNI). The floor flips 15 times. Flips happen within hours, faster than code can change:
   - 2026-05-25: v4 at 10:56Z (`b3877e10`), v3 at 18:57Z (`865ec171`), v4 at 21:04Z (`44a50ca4`), v3 at 23:24Z (`f14ae77f`).
   - 2026-05-31: v4 at 12:47Z (`f39cc712`), v3 at 13:11Z (`2e045a96`).
