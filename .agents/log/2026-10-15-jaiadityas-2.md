@@ -1,0 +1,19 @@
+# 2026-10-15 @JaiadityaS session 2
+- Tasks: #3814 follow-up (part of T-21), T-16, T-21
+- Done:
+  - #3814 follow-up: `backtest.yml` run 38543908892 on four `main-cuda-<sha>` images. Two are v4 (see STATE.md "Facts learned").
+  - Scan evidence now has a `functions` field: the function symbols of up to 32 sample addresses per opcode form (`.floor/floor/isa/elf.py` `Symbols`, `func_symbols`; `decode.py` `sample_ips`).
+  - Function-scoped allowlist: `allowlist.GUARDED` and `guarded_reason`. `decode_region` applies it when the file has symbols, and counts allowed instructions under their own key.
+  - T-16 rule: LZCNT is allowed inside `ma_dr_flac_*` / `drflac_*` only. `allowlist.base_name` handles `_ZL<len><name>` mangling.
+  - Test ELF builder: `build_elf(..., symbols=[(name, offset, size)])` adds `.symtab` and `.strtab`.
+  - T-21: `.floor/floor/backtest.py` (`main_tags`, `image_dates`, `choose`, `batches`, `timeline`); commands `floor sample` and `floor timeline`; `.github/workflows/sweep.yml` (sample → matrix scan in batches → timeline in the run summary).
+- Verified: `python -m pytest .floor/tests -q`: 59 passed. Run 38544501988 gave the LZCNT functions (before the mangled-name fix).
+- Open:
+  - Run 38700683985: confirms the T-16 rule on real binaries.
+  - Run 38700707825: the first full sweep. Record the timeline in STATE.md.
+  - Then STATE.md "Next agent: start here" items 3 to 6.
+- Gotchas:
+  - Symbols in whisper.cpp binaries are C++ mangled. Match patterns against `base_name(symbol)`, not the raw symbol.
+  - In this shell, a Python heredoc turns `\\0` into a real NUL byte, and `Path.write_text` on Windows writes CRLF. Write edit scripts to a file, and use `newline="\n"`.
+  - `floor sample` reads the config of every `main-<sha>` tag (three requests each). Run it in CI, not on a home link.
+- Branch: main

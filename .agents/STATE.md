@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-14 09:20 UTC · @JaiadityaS · session 1 (bootstrap)
+Last update: 2026-10-15 · @JaiadityaS · session 2
 
 ## Where we are
 
@@ -8,23 +8,26 @@ Last update: 2026-10-14 09:20 UTC · @JaiadityaS · session 1 (bootstrap)
 - Done: repo, team-sync system, hooks, CI for tests and hygiene.
 - Done: the static scanner (T-10, T-11) and the ghcr.io client (T-20). `python -m floor scan <path>` and `python -m floor image <ref>` work.
 - Done: T-15 static part (the first H-1 signal) and T-24 for one commit. See "Facts learned".
+- Done in session 2: the #3814 follow-up (H-1 signal 2), function symbols in scan evidence, the T-16 rule, the sampler and timeline (`floor sample`, `floor timeline`) and the sweep workflow (`sweep.yml`).
 
 ## Gates (PRD §17.1)
 
 | Gate | Due | Status |
 |---|---|---|
 | G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
-| G-1 CPU proof | Oct 15 | scanner done; T-15 static part done; T-16 false positive open; T-12 and T-13 not started |
-| G-2 Backtest and H-1 | Oct 16 | client done (T-20); sampler (T-21) not started |
+| G-1 CPU proof | Oct 15 | scanner done; T-15 static part done; T-16 rule pushed, confirm with run 38700683985; T-12 and T-13 not started |
+| G-2 Backtest and H-1 | Oct 16 | client done (T-20); sampler and sweep done (T-21); first sweep is run 38700707825 |
 | G-3 Gate integrity | Oct 18 | not started |
 | G-4 Release loop | Oct 22 | not started |
 
 ## Next agent: start here
 
-1. #3814 follow-up (part of T-21): run `backtest.yml` on `main-cuda-<sha>` for the other commits of 2026-05-13 to 2026-05-18 (6227a0ef73, 968eebe772, 46ca43d639, 3e9b7d0fef). Get the full hashes with `gh api "repos/ggml-org/whisper.cpp/commits?since=2026-05-01T00:00:00Z&until=2026-05-18T23:59:59Z"`. Look for a v4 build: the reporter's Zen 3 CPU runs v3 code.
-2. T-16: fix the LZCNT false positive. Pull one image locally once (`python -m floor image <ref> --verbose`, about 23 minutes on a home link), map the LZCNT addresses to symbols (`.symtab`), then write the rule and its tests.
-3. T-21: sampler that picks ≥ 30 `main-<sha>` tags across time (use the config `created` date), plus every image within two weeks of #3510 (opened 2025-11-10) and #3814 (2026-05-18). Run batches of about 10 refs per job.
-4. T-12 and T-13 need Linux (WSL Ubuntu, or a GitHub Actions job like `backtest.yml`).
+1. **T-16 confirm.** Open run 38700683985 (`backtest.yml` on `main-47b9eb37…`). Expected: whisper-cli, whisper-server, test-vad, test-vad-full and whisper-vad-speech-segments are now v1, with `LZCNT: 24` under `allowlisted`, and the floor is set only by `libggml-cpu.so` (v3). If yes, set T-16 to `done`. If not, read the `functions` field of the LZCNT evidence in the JSON report.
+2. **T-21 result.** Open run 38700707825 (`sweep.yml`, 30 spread images plus every image within 14 days of #3510 and #3814). Download the `timeline-<run_id>` artifact. Record the number of v3 and v4 images and the dates of each flip in "Facts learned". If a batch failed, scan its refs again with `backtest.yml`. Then set T-21 to `done`.
+3. **Sweep for main-cuda too.** The #3814 evidence is in the CUDA images. Add a `--prefix` option to `floor sample` (default `main-`, so `main-cuda-` also works; `backtest.MAIN_TAG_RE` is the place) and run the sweep on `main-cuda-`.
+4. **T-22: H-1 analysis.** Clone whisper.cpp (`git clone --filter=blob:none`) and compare each flip in the timeline with `git log` of `.devops/` and `ggml/src/ggml-cpu/`. If the code and the Dockerfile do not change at a flip, the build machine set the floor (H-1).
+5. T-12 and T-13 need Linux: write a GitHub Actions job like `backtest.yml`. T-12 builds whisper.cpp three ways (native, `GGML_NATIVE=OFF`, all-variants) and scans each. T-13 runs the builds under `qemu-x86_64 -cpu qemu64|Nehalem|SandyBridge|EPYC-Milan`.
+6. Pure Python work that needs no access: T-30 (policy file and schema), T-32 (judge), T-33 (manifest writer and diff).
 
 ## Needs a human (agents cannot do these)
 
@@ -42,6 +45,13 @@ Last update: 2026-10-14 09:20 UTC · @JaiadityaS · session 1 (bootstrap)
   - Both: 19 ELF files below `app/` (13 core, 6 CMake build tools); the `/app` layer is about 152 MB; no OCI revision label.
 - **False positive (T-16).** whisper-cli, whisper-server, test-vad, test-vad-full and vad-speech-segments show v3 only because of LZCNT ×24. bench, main, quantize and libggml-base are v1. The LZCNT is probably the CPUID-guarded path of the FLAC decoder in miniaudio. It does not change T-15, but it breaks AC-F2 for the all-variants build until T-16 is fixed.
 - **T-24 (run 38538051321).** Commit 47b9eb37 (2026-05-18): `main-<sha>` and `main-cuda-<sha>` both have floor x86-64-v3 and the same `libggml-cpu.so` profile (VMOVSS x1508). This pair does not reproduce #3814, because a Zen 3 CPU runs v3 code. The reporter's `main-cuda` image probably came from another commit, built on an AVX-512 runner. The CUDA image has no CMakeFiles probe binaries. Its `/app` layer is about 316 MB.
+- **#3814 follow-up (run 38543908892), H-1 signal 2.** `main-cuda` images from adjacent commits, same Dockerfile:
+  - `3e9b7d0f…` (built 2026-05-13T11:33Z): v3.
+  - `46ca43d6…` (built 2026-05-14T21:40Z): **v4 + AVX512_VNNI**.
+  - `968eebe7…` (built 2026-05-15T14:39Z): **v4 + AVX512_BF16, AVX512_VNNI**.
+  - `6227a0ef…` (built 2026-05-18T10:01Z): v3. `47b9eb37…` (2026-05-18T10:19Z): v3 (T-24).
+  - The floor goes v3 → v4 → v4 → v3 in five days. A Zen 3 CPU (#3814) has no AVX-512, so the two v4 images crash on it. Check in T-22 that `.devops/main-cuda.Dockerfile` and the ggml CPU code did not change between these commits.
+- **T-16 cause (run 38544501988).** All 24 LZCNT instructions in whisper-cli and the four other audio tools are in miniaudio's embedded FLAC decoder. The symbols are mangled C++ names, for example `_ZL29ma_dr_flac__decode_flac_frameP10ma_dr_flac`. The other functions are `ma_dr_flac__seek_flac_frame`, `ma_dr_flac__read_and_seek_residual` and `ma_dr_flac__decode_samples_with_residual`. `allowlist.GUARDED` now allows LZCNT only in functions whose plain name matches `^(?:ma_)?dr_?flac_`. `allowlist.base_name` takes the plain name from `_ZL<len><name>`.
 - ghcr.io `ggml-org/whisper.cpp` has 1174 tags (2026-10-14). Tags use the full commit hash: `main-<40 hex>`, `main-cuda-<40 hex>`, `main-intel-<40 hex>`.
 - A home link pulls ghcr.io blobs at about 108 KB/s. Pull images in GitHub Actions.
 
