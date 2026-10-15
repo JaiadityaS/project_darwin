@@ -1,0 +1,105 @@
+name: floors
+
+# Memory floor (PRD F7, T-44) and connectivity tripwire (PRD F8, T-45) for one whisper.cpp
+# build, then the Judge and the manifest on the results (T-32, T-33).
+#   gh workflow run floors.yml
+#   gh workflow run floors.yml -f commit=<40 hex> -f flags="-DGGML_NATIVE=OFF"
+# Results: the run summary and the artifact "floors-<run_id>".
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "whisper.cpp commit to build"
+        default: "0c7be696371069e0baa2515ed7aa08d5a5473aa6"
+      flags:
+        description: "CMake flags (default: the all-variants build)"
+        default: "-DGGML_NATIVE=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DBUILD_SHARED_LIBS=ON"
+      models:
+        description: "models, space-separated"
+        default: "tiny.en base.en small.en"
+
+jobs:
+  floors:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      EXPECT: "ask not what your country can do for you"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/whisper.cpp
+          ref: ${{ inputs.commit }}
+          path: w
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - name: Install strace
+        run: sudo apt-get update -q && sudo apt-get install -y -q strace
+      - name: Build
+        shell: bash
+        run: |
+          mkdir -p out
+          cmake -S w -B w/build -DCMAKE_BUILD_TYPE=Release ${{ inputs.flags }} > out/cmake.txt 2>&1
+          cmake --build w/build -j "$(nproc)" --config Release 2>&1 | tail -n 5
+          python -m floor scan w/build --json out/scan.json --quiet
+      - name: Tripwire self-test
+        run: python -m pytest .floor/tests/test_floors_linux.py -q
+      - name: Models
+        shell: bash
+        run: for m in ${{ inputs.models }}; do bash w/models/download-ggml-model.sh "$m"; done
+      - name: Memory floor (F7)
+        shell: bash
+        run: |
+          py="$(command -v python)"
+          for m in ${{ inputs.models }}; do
+            name="${m%.en}"
+            sudo "$py" -m floor memory --no-sudo --model "$name" --expect "$EXPECT" --out "out/memory-$name.json" -- \
+              "$PWD/w/build/bin/whisper-cli" -m "$PWD/w/models/ggml-$m.bin" -f "$PWD/w/samples/jfk.wav" -t 4 -nt \
+              | tee -a out/memory.txt
+          done
+      - name: Connectivity tripwire (F8)
+        shell: bash
+        run: |
+          py="$(command -v python)"
+          m="$(echo ${{ inputs.models }} | cut -d' ' -f1)"
+          sudo "$py" -m floor offline --no-sudo --expect "$EXPECT" --out out/offline.json \
+            --artifact "w/models/ggml-$m.bin" --artifact w/build/bin/whisper-cli \
+            $(find w/build -name '*.so*' -type f -printf '--artifact %p ') -- \
+            "$PWD/w/build/bin/whisper-cli" -m "$PWD/w/models/ggml-$m.bin" -f "$PWD/w/samples/jfk.wav" -t 4 -nt \
+            | tee out/offline.txt
+      - name: Judge and manifest
+        shell: bash
+        run: |
+          sudo chown -R "$(id -u)" out
+          python -m floor judge --scan out/scan.json $(printf -- '--memory %s ' out/memory-*.json) \
+            --connectivity out/offline.json --out out/judge.json | tee out/judge.txt || true
+          python -m floor manifest --judge out/judge.json --scan out/scan.json \
+            --subject "github.com/${{ github.repository }}/whisper-cli" \
+            --digest "sha256:$(sha256sum w/build/bin/whisper-cli | cut -d' ' -f1)" \
+            --release "dry-run-${{ github.run_id }}" --commit "${{ inputs.commit }}" \
+            --cmake-flags "${{ inputs.flags }}" \
+            --evidence "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --project-url "${{ github.server_url }}/${{ github.repository }}" \
+            --out out/floor-manifest.json --diff out/diff.md > /dev/null
+      - name: Run summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### floors (whisper.cpp ${{ inputs.commit }})"
+            echo
+            echo "Flags: \`${{ inputs.flags }}\`"
+            echo
+            echo '```'
+            cat out/memory.txt out/offline.txt out/judge.txt 2>/dev/null || true
+            echo '```'
+            echo
+            cat out/diff.md 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: floors-${{ github.run_id }}
+          path: out

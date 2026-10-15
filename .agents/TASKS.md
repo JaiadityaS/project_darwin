@@ -58,8 +58,8 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-41 | Fallback script applies the canned inclusive config; the gate re-verifies | F4.3 | ready | - | |
 | T-42 | Merge-bot merge job and `-floor.N` tag job | F4.4 | blocked | - | Needs T-05 |
 | T-43 | Draft notice when the fallback also fails | F4.5 | ready | - | |
-| T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | ready | - | Linux |
-| T-45 | Connectivity tripwire: `--network none` + syscall trace; download sizes | F8 | ready | - | Linux |
+| T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | doing | @JaiadityaS | `floor memory` (`memory.py`), `.github/workflows/floors.yml`. Then set `memory_mb` in the policy from the result |
+| T-45 | Connectivity tripwire: `--network none` + syscall trace; download sizes | F8 | doing | @JaiadityaS | `floor offline` (`offline.py`): `unshare --net` + strace, in `floors.yml` |
 | T-46 | Herald CI job (Duo CLI) with a deterministic template fallback | F12.1 | blocked | - | Needs T-04 |
 | T-47 | `.gitlab-ci.yml`: build → static gate → QEMU → judge → attest → herald → release → deploy | §7.1 | ready | - | |
 

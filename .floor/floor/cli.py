@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, h1, judge, manifest, notice, policy, qemu, ratchet
+from . import backtest, h1, judge, manifest, memory, notice, offline, policy, qemu, ratchet
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -252,6 +252,54 @@ def _cmd_diff(args: argparse.Namespace) -> int:
     return 0
 
 
+def _memory_inputs(paths: list[str] | None) -> dict | None:
+    """Joins `floor memory --out` files (one per model) or plain {"model": MB} files."""
+    joined = {}
+    for path in paths or []:
+        doc = _read_json(path)
+        if "runs" in doc:
+            joined[doc["model"]] = doc["smallest_passing_mb"]
+        else:
+            joined.update(doc)
+    return joined or None
+
+
+def _command(args: argparse.Namespace) -> list[str] | None:
+    cmd = args.cmd[1:] if args.cmd[:1] == ["--"] else args.cmd
+    if not cmd:
+        print("floor: give the command after --", file=sys.stderr)
+    return cmd or None
+
+
+def _cmd_memory(args: argparse.Namespace) -> int:
+    cmd = _command(args)
+    if not cmd:
+        return 2
+    limits = [int(x) for x in args.limits.split(",")]
+    result = {"model": args.model, **memory.measure(cmd, limits, args.expect, args.timeout, sudo=not args.no_sudo)}
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+    rows = [("LIMIT_MB", "RESULT", "EXIT", "PEAK_RSS_MB")]
+    rows += [(str(r["limit_mb"]), r["result"], str(r["exit"]), str(r["peak_rss_mb"])) for r in result["runs"]]
+    _print_rows(rows)
+    print(f"{args.model}: smallest passing limit {result['smallest_passing_mb']} MB, peak RSS {result['peak_rss_mb']} MB")
+    return 0
+
+
+def _cmd_offline(args: argparse.Namespace) -> int:
+    cmd = _command(args)
+    if not cmd:
+        return 2
+    result = offline.check(cmd, args.expect, args.artifact, args.timeout, sudo=not args.no_sudo)
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+    print(f"result {result['result']}, network attempts {result['network_attempts']}, "
+          f"offline {'proven' if result['offline'] else 'NOT proven'}, download {result['download_mb']} MB")
+    for line in result["attempts"]:
+        print(f"  {line}")
+    return 0
+
+
 def _cmd_judge(args: argparse.Namespace) -> int:
     try:
         doc = policy.for_artifact(policy.load(args.policy), args.artifact)
@@ -261,7 +309,7 @@ def _cmd_judge(args: argparse.Namespace) -> int:
     scan = _read_json(args.scan)
     previous = _read_json(args.previous)
     result = judge.judge(doc, scan=scan["summary"] if scan else None, probe=_read_json(args.probe),
-                         memory=_read_json(args.memory), connectivity=_read_json(args.connectivity),
+                         memory=_memory_inputs(args.memory), connectivity=_read_json(args.connectivity),
                          previous=_previous_floors(previous), notices=args.notice)
     result["artifact"] = args.artifact
     if args.out:
@@ -363,7 +411,7 @@ def main(argv: list[str] | None = None) -> int:
     jd.add_argument("--artifact", help="artifact name, for per-artifact floors")
     jd.add_argument("--scan", metavar="FILE", help="floor scan --json output")
     jd.add_argument("--probe", metavar="FILE", help="floor probe --out output")
-    jd.add_argument("--memory", metavar="FILE", help='JSON {"tiny": MB, ...}: smallest passing memory limits')
+    jd.add_argument("--memory", action="append", metavar="FILE", help="floor memory --out output (repeat per model)")
     jd.add_argument("--connectivity", metavar="FILE", help='JSON {"offline": bool, "network_attempts": int}')
     jd.add_argument("--previous", metavar="FILE", help="manifest (or judge output) of the previous release")
     jd.add_argument("--notice", action="append", metavar="FLOOR", help="a floor with a merged Leave-Behind Notice (repeat)")
@@ -381,6 +429,25 @@ def main(argv: list[str] | None = None) -> int:
     nt.add_argument("files", nargs="+", help="notice files")
     nt.add_argument("--draft", action="store_true", help="allow an empty 'Approved by' (open notice MR)")
     nt.set_defaults(func=_cmd_notice)
+
+    mem = sub.add_parser("memory", help="smallest cgroup memory limit that passes, and peak RSS (PRD F7; Linux)")
+    mem.add_argument("--model", required=True, help="model name, for example tiny")
+    mem.add_argument("--limits", default=",".join(map(str, memory.DEFAULT_LIMITS_MB)), help="MB, comma-separated")
+    mem.add_argument("--expect", help="text that the output must contain")
+    mem.add_argument("--timeout", type=float, default=900, help="seconds per run")
+    mem.add_argument("--no-sudo", action="store_true", help="do not prefix sudo (already root)")
+    mem.add_argument("--out", metavar="FILE", help="write the result as JSON")
+    mem.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
+    mem.set_defaults(func=_cmd_memory)
+
+    off = sub.add_parser("offline", help="run with no network under strace; count network attempts (PRD F8; Linux)")
+    off.add_argument("--expect", help="text that the output must contain")
+    off.add_argument("--artifact", action="append", metavar="FILE", help="file a user must download (repeat)")
+    off.add_argument("--timeout", type=float, default=900, help="seconds")
+    off.add_argument("--no-sudo", action="store_true", help="do not prefix sudo (already root)")
+    off.add_argument("--out", metavar="FILE", help="write the result as JSON")
+    off.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
+    off.set_defaults(func=_cmd_offline)
 
     mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")
