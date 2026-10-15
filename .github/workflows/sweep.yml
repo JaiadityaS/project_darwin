@@ -3,10 +3,14 @@ name: sweep
 # The full backtest (PRD F10.1): choose images, scan them in parallel batches, join one timeline.
 #   gh workflow run sweep.yml
 #   gh workflow run sweep.yml -f count=40 -f batch=8
+#   gh workflow run sweep.yml -f prefix=main-cuda-
 # The timeline is in the run summary and in the artifact "timeline-<run_id>".
 on:
   workflow_dispatch:
     inputs:
+      prefix:
+        description: "Tag prefix before the commit hash (main- or main-cuda-)"
+        default: "main-"
       count:
         description: "Images spread evenly in time"
         default: "30"
@@ -33,7 +37,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p out
-          python -m floor sample --repo "${{ inputs.repo }}" --count "${{ inputs.count }}" --batch "${{ inputs.batch }}" --out out/sample.json > out/batches.txt
+          python -m floor sample --repo "${{ inputs.repo }}" --prefix "${{ inputs.prefix }}" --count "${{ inputs.count }}" --batch "${{ inputs.batch }}" --out out/sample.json > out/batches.txt
           echo "batches=$(python -c 'import json; print(json.dumps([" ".join(b) for b in json.load(open("out/sample.json"))["batches"]]))')" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:

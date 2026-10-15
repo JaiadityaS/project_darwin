@@ -18,14 +18,17 @@ import requests
 from .oci import DEFAULT_REPO, Registry
 
 MAIN_TAG_RE = re.compile(r"^main-[0-9a-f]{40}$")
+DEFAULT_PREFIX = "main-"
 
 # Crash reports that the backtest must cover (PRD §3.6): opening date and label.
 DEFAULT_AROUND = (("2025-11-10", "#3510"), ("2026-05-18", "#3814"))
 
 
-def main_tags(tags: list[str]) -> list[str]:
-    """Returns the CPU image tags of `main` builds: `main-<40 hex>`."""
-    return sorted(t for t in tags if MAIN_TAG_RE.match(t))
+def main_tags(tags: list[str], prefix: str = DEFAULT_PREFIX) -> list[str]:
+    """Returns the tags `<prefix><40 hex>`. The default prefix gives the CPU images of `main`;
+    `main-cuda-` gives the CUDA images."""
+    pattern = MAIN_TAG_RE if prefix == DEFAULT_PREFIX else re.compile("^" + re.escape(prefix) + "[0-9a-f]{40}$")
+    return sorted(t for t in tags if pattern.match(t))
 
 
 def _created(repo: str, ref: str) -> str | None:

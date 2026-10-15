@@ -14,6 +14,7 @@ SHA = "0123456789abcdef0123456789abcdef01234567"
 def test_main_tags_keeps_only_cpu_main_builds():
     tags = ["main", f"main-{SHA}", f"main-cuda-{SHA}", f"main-intel-{SHA}", "main-a1867e0", "v1.8.2"]
     assert main_tags(tags) == [f"main-{SHA}"]
+    assert main_tags(tags, "main-cuda-") == [f"main-cuda-{SHA}"]
 
 
 def test_parse_around():

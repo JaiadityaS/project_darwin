@@ -78,7 +78,7 @@ def _cmd_image(args: argparse.Namespace) -> int:
 
 
 def _cmd_sample(args: argparse.Namespace) -> int:
-    tags = backtest.main_tags(Registry(args.repo).tags())
+    tags = backtest.main_tags(Registry(args.repo).tags(), args.prefix)
     dated = backtest.image_dates(tags, args.repo)
     around = [backtest.parse_around(text) for text in args.around] if args.around else \
         [backtest.parse_around(f"{day}:{label}") for day, label in backtest.DEFAULT_AROUND]
@@ -147,6 +147,8 @@ def main(argv: list[str] | None = None) -> int:
 
     sample = sub.add_parser("sample", help="choose main-<sha> images for the backtest (PRD F10.1)")
     sample.add_argument("--repo", default=DEFAULT_REPO, help=f"repository on ghcr.io (default {DEFAULT_REPO})")
+    sample.add_argument("--prefix", default=backtest.DEFAULT_PREFIX,
+                        help=f"tag prefix before the commit hash (default {backtest.DEFAULT_PREFIX}; or main-cuda-)")
     sample.add_argument("--count", type=int, default=30, help="images spread evenly in time (default 30)")
     sample.add_argument("--around", action="append", metavar="DATE[:LABEL]",
                         help="also take every image near this date (repeat; default: #3510 and #3814)")
