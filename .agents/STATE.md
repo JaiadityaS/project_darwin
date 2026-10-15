@@ -15,19 +15,18 @@ Last update: 2026-10-15 · @JaiadityaS · session 2
 | Gate | Due | Status |
 |---|---|---|
 | G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
-| G-1 CPU proof | Oct 15 | scanner done; T-15 static part done; T-16 rule pushed, confirm with run 38700683985; T-12 and T-13 not started |
+| G-1 CPU proof | Oct 15 | scanner done; T-15 static part done; T-16 done (run 38700683985: the audio tools are v1); T-12 and T-13 not started |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); sampler and sweep done (T-21); first sweep is run 38700707825 |
 | G-3 Gate integrity | Oct 18 | not started |
 | G-4 Release loop | Oct 22 | not started |
 
 ## Next agent: start here
 
-1. **T-16 confirm.** Open run 38700683985 (`backtest.yml` on `main-47b9eb37…`). Expected: whisper-cli, whisper-server, test-vad, test-vad-full and whisper-vad-speech-segments are now v1, with `LZCNT: 24` under `allowlisted`, and the floor is set only by `libggml-cpu.so` (v3). If yes, set T-16 to `done`. If not, read the `functions` field of the LZCNT evidence in the JSON report.
-2. **T-21 result.** Open run 38700707825 (`sweep.yml`, 30 spread images plus every image within 14 days of #3510 and #3814). Download the `timeline-<run_id>` artifact. Record the number of v3 and v4 images and the dates of each flip in "Facts learned". If a batch failed, scan its refs again with `backtest.yml`. Then set T-21 to `done`.
-3. **Sweep for main-cuda too.** The #3814 evidence is in the CUDA images. Add a `--prefix` option to `floor sample` (default `main-`, so `main-cuda-` also works; `backtest.MAIN_TAG_RE` is the place) and run the sweep on `main-cuda-`.
-4. **T-22: H-1 analysis.** Clone whisper.cpp (`git clone --filter=blob:none`) and compare each flip in the timeline with `git log` of `.devops/` and `ggml/src/ggml-cpu/`. If the code and the Dockerfile do not change at a flip, the build machine set the floor (H-1).
-5. T-12 and T-13 need Linux: write a GitHub Actions job like `backtest.yml`. T-12 builds whisper.cpp three ways (native, `GGML_NATIVE=OFF`, all-variants) and scans each. T-13 runs the builds under `qemu-x86_64 -cpu qemu64|Nehalem|SandyBridge|EPYC-Milan`.
-6. Pure Python work that needs no access: T-30 (policy file and schema), T-32 (judge), T-33 (manifest writer and diff).
+1. **T-21 result.** Open run 38700707825 (`sweep.yml`, 30 spread images plus every image within 14 days of #3510 and #3814). Download the `timeline-<run_id>` artifact. Record the number of v3 and v4 images and the dates of each flip in "Facts learned". If a batch failed, scan its refs again with `backtest.yml`. Then set T-21 to `done`.
+2. **Sweep for main-cuda too.** The #3814 evidence is in the CUDA images. Add a `--prefix` option to `floor sample` (default `main-`, so `main-cuda-` also works; `backtest.MAIN_TAG_RE` is the place) and run the sweep on `main-cuda-`.
+3. **T-22: H-1 analysis.** Clone whisper.cpp (`git clone --filter=blob:none`) and compare each flip in the timeline with `git log` of `.devops/` and `ggml/src/ggml-cpu/`. If the code and the Dockerfile do not change at a flip, the build machine set the floor (H-1).
+4. T-12 and T-13 need Linux: write a GitHub Actions job like `backtest.yml`. T-12 builds whisper.cpp three ways (native, `GGML_NATIVE=OFF`, all-variants) and scans each. T-13 runs the builds under `qemu-x86_64 -cpu qemu64|Nehalem|SandyBridge|EPYC-Milan`.
+5. Pure Python work that needs no access: T-30 (policy file and schema), T-32 (judge), T-33 (manifest writer and diff).
 
 ## Needs a human (agents cannot do these)
 

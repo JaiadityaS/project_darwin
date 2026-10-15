@@ -7,9 +7,8 @@
   - T-16 rule: LZCNT is allowed inside `ma_dr_flac_*` / `drflac_*` only. `allowlist.base_name` handles `_ZL<len><name>` mangling.
   - Test ELF builder: `build_elf(..., symbols=[(name, offset, size)])` adds `.symtab` and `.strtab`.
   - T-21: `.floor/floor/backtest.py` (`main_tags`, `image_dates`, `choose`, `batches`, `timeline`); commands `floor sample` and `floor timeline`; `.github/workflows/sweep.yml` (sample → matrix scan in batches → timeline in the run summary).
-- Verified: `python -m pytest .floor/tests -q`: 59 passed. Run 38544501988 gave the LZCNT functions (before the mangled-name fix).
+- Verified: run 38700683985: whisper-cli and the four other audio tools are v1 now, so T-16 is done. `python -m pytest .floor/tests -q`: 59 passed. Run 38544501988 gave the LZCNT functions (before the mangled-name fix).
 - Open:
-  - Run 38700683985: confirms the T-16 rule on real binaries.
   - Run 38700707825: the first full sweep. Record the timeline in STATE.md.
   - Then STATE.md "Next agent: start here" items 3 to 6.
 - Gotchas:
