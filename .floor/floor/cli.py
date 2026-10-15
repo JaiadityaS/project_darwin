@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, h1, judge, manifest, memory, notice, offline, paths, policy, qemu, ratchet
+from . import backtest, fallback, h1, judge, manifest, memory, notice, offline, paths, policy, qemu, ratchet
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -231,6 +231,14 @@ def _cmd_paths(args: argparse.Namespace) -> int:
         print(line)
     print(f"{len(changed)} changed path(s); {args.actor}: {'allowed' if not found else 'NOT allowed'}")
     return 1 if found else 0
+
+
+def _cmd_fallback(args: argparse.Namespace) -> int:
+    changed = fallback.apply(args.root, args.dockerfile, args.artifact)
+    for path in changed:
+        print(f"changed {path}")
+    print(f"canned config: {fallback.flags_text()}" if changed else "canned config already applied")
+    return 0
 
 
 def _read_json(path: str | None) -> dict | None:
@@ -467,6 +475,12 @@ def main(argv: list[str] | None = None) -> int:
     pa.add_argument("--base", default="origin/main", metavar="REF", help="target branch (default origin/main)")
     pa.add_argument("files", nargs="*", help="changed paths (default: git diff BASE...HEAD)")
     pa.set_defaults(func=_cmd_paths)
+
+    fb = sub.add_parser("fallback", help="apply the canned inclusive config to the build files (PRD F4.3)")
+    fb.add_argument("--root", default=".", help="repository root")
+    fb.add_argument("--dockerfile", action="append", help="Dockerfile path relative to root (default: .devops/*.Dockerfile)")
+    fb.add_argument("--artifact", default="main", help="override file name in .floor/overrides/")
+    fb.set_defaults(func=_cmd_fallback)
 
     mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")

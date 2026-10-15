@@ -55,7 +55,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
 | T-40 | floor-repair flow (AI Catalog, private): exit unless raised → diagnose → fix MR | F4.1, F4.2 | blocked | - | Needs T-03 |
-| T-41 | Fallback script applies the canned inclusive config; the gate re-verifies | F4.3 | ready | - | |
+| T-41 | Fallback script applies the canned inclusive config; the gate re-verifies | F4.3 | doing | @JaiadityaS | Done: `floor fallback` (`fallback.py`): adds CMAKE_ARGS to `make` lines in `.devops/*.Dockerfile` (upstream Makefile reads it) and writes `.floor/overrides/main.flags`; changes only allowlist paths. Open: the CI job that runs it on the agent branch and re-runs the gate (T-47) |
 | T-42 | Merge-bot merge job and `-floor.N` tag job | F4.4 | blocked | - | Needs T-05 |
 | T-43 | Draft notice when the fallback also fails | F4.5 | ready | - | |
 | T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | doing | @JaiadityaS | `floor memory` (`memory.py`), `.github/workflows/floors.yml`. Then set `memory_mb` in the policy from the result |
