@@ -1,0 +1,22 @@
+# ΔM scenario (PRD §13.3): ΔM = N_affected × e × p × (Δ / L).
+# A scenario, not a measurement. Every range needs a source; `floor delta-m` refuses a missing one.
+# Copy this file for one notice, for example .floor/scenarios/0001-cpu.yml, and fill every value.
+dimension: <cpu | memory | connectivity>
+change: "<from> -> <to>"
+n_affected:          # devices below the new floor among users in scope (a labelled proxy)
+  low: null
+  high: null
+  source: "<survey or telemetry, with date; surveys skew toward newer machines>"
+e_kgco2e:            # embodied emissions of one replacement device
+  low: null
+  high: null
+  source: "<manufacturer product carbon footprint reports>"
+p: [0.01, 0.02, 0.05]  # share of affected users who replace their device because of this release
+delta_years:         # useful life cut short
+  low: null
+  high: null
+  source: "<reasoning or source>"
+lifespan_years:      # expected device lifespan
+  low: null
+  high: null
+  source: "<source>"

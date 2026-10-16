@@ -73,7 +73,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-53 | `/floor` endpoint: host level and loaded variant | F13.4 | later | - | |
 | T-54 | SCI per audio-minute and per release check (Impact Framework manifests) | F14.1 | ready | - | |
 | T-55 | Energy per audio-minute: native vs folk fix vs all-variants on the same hardware | F14.2, G7 | ready | - | |
-| T-56 | ΔM calculator: range and sensitivity table | F14.3, §13.3 | ready | - | |
+| T-56 | ΔM calculator: range and sensitivity table | F14.3, §13.3 | done | @JaiadityaS | `floor delta-m` (`delta_m.py`), `.floor/scenarios/TEMPLATE.yml`; `floor manifest --delta-m`. Every input needs a source. Sourced values for a demo scenario are still open |
 
 ## Communication, SHOULD and COULD
 

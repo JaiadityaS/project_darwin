@@ -1,5 +1,5 @@
 # 2026-10-15 @JaiadityaS session 3
-- Tasks: T-12, T-13, T-30, T-31, T-32, T-33, T-35, T-36, T-41, T-44, T-45, T-60
+- Tasks: T-12, T-13, T-56, T-30, T-31, T-32, T-33, T-35, T-36, T-41, T-44, T-45, T-60
 - Done:
   - T-30: `.floor/policy.yml`, `.floor/policy.schema.json`, `policy.py`, `floor policy`; CI step.
   - T-31: `ratchet.py`, `floor ratchet --base <ref>`; CI step (PR: target branch; push: the commit before).
@@ -9,7 +9,8 @@
   - T-41 (part): `fallback.py`, `floor fallback`.
   - T-44, T-45: `memory.py`, `offline.py`, `floor memory`, `floor offline`, `.github/workflows/floors.yml`.
   - T-60 (part): `page.py`, `floor page --out site` (`site/` is in .gitignore; CI builds it).
-- Verified: cpu-proof run 38702242235 (G-1 met), floors run 38704136185, `python -m pytest .floor/tests -q`: 129 passed, 5 skipped (the QEMU and strace tests run in CI).
+  - T-56: `delta_m.py`, `floor delta-m <scenario.yml>`, `.floor/scenarios/TEMPLATE.yml`, `floor manifest --delta-m`.
+- Verified: cpu-proof run 38702242235 (G-1 met), floors run 38704136185, `python -m pytest .floor/tests -q`: 140 passed, 5 skipped (the QEMU and strace tests run in CI).
 - Open:
   - GitLab parts of T-35, T-36, T-41 and T-60 wait on T-01 and T-47.
   - `.gitlab/CODEOWNERS` uses `@JaiadityaS`. Check the GitLab handle at T-01.

@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, fallback, h1, judge, manifest, memory, notice, offline, page, paths, policy, qemu, ratchet
+from . import backtest, delta_m, fallback, h1, judge, manifest, memory, notice, offline, page, paths, policy, qemu, ratchet
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -246,6 +246,21 @@ def _cmd_page(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_delta_m(args: argparse.Namespace) -> int:
+    try:
+        scenario = delta_m.load(args.scenario)
+    except (OSError, delta_m.ScenarioError) as exc:
+        print(f"floor: scenario not valid: {exc}", file=sys.stderr)
+        return 2
+    verdict = _read_json(args.judge)
+    held = bool(verdict) and verdict.get("pareto") in ("held", "inclusive")
+    result = delta_m.compute(scenario, floors_held=held)
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+    print(delta_m.markdown(result), end="")
+    return 0
+
+
 def _read_json(path: str | None) -> dict | None:
     return json.loads(Path(path).read_text(encoding="utf-8")) if path else None
 
@@ -264,7 +279,8 @@ def _cmd_manifest(args: argparse.Namespace) -> int:
     doc = manifest.build(verdict, subject=args.subject, digest=args.digest, release=args.release, commit=args.commit,
                          scan=scan["summary"] if scan else None, cmake_flags=args.cmake_flags,
                          base_image=args.base_image, previous=previous, evidence=args.evidence,
-                         fixed_by=args.fixed_by, notices=args.notice, project_url=args.project_url)
+                         fixed_by=args.fixed_by, notices=args.notice, project_url=args.project_url,
+                         delta_m=_read_json(args.delta_m))
     _write_json(Path(args.out), doc)
     text = manifest.diff_markdown(previous, doc)
     if args.diff:
@@ -493,6 +509,12 @@ def main(argv: list[str] | None = None) -> int:
     pg.add_argument("--out", default="site", help="output folder (index.html)")
     pg.set_defaults(func=_cmd_page)
 
+    dm = sub.add_parser("delta-m", help="ΔM scenario: range and sensitivity table (PRD F14.3, §13.3)")
+    dm.add_argument("scenario", help="scenario YAML (see .floor/scenarios/TEMPLATE.yml)")
+    dm.add_argument("--judge", metavar="FILE", help="floor judge output: ΔM is 0 when every floor holds")
+    dm.add_argument("--out", metavar="FILE", help="write the result as JSON")
+    dm.set_defaults(func=_cmd_delta_m)
+
     mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")
     mf.add_argument("--subject", required=True, help="image name, for example registry.gitlab.com/g/whisper.cpp/server")
@@ -509,6 +531,7 @@ def main(argv: list[str] | None = None) -> int:
     mf.add_argument("--project-url", help="project URL for predicateType (default: $CI_PROJECT_URL)")
     mf.add_argument("--out", default="floor-manifest.json", metavar="FILE", help="output (default floor-manifest.json)")
     mf.add_argument("--diff", metavar="FILE", help="also write the diff as Markdown")
+    mf.add_argument("--delta-m", metavar="FILE", help="floor delta-m --out output (used when a floor rises)")
     mf.set_defaults(func=_cmd_manifest)
 
     df = sub.add_parser("diff", help="readable diff of two floor manifests (AC-F5)")

@@ -61,7 +61,7 @@ def changes(previous: dict | None, floors: dict, fixed_by: str | None = None) ->
 def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str,
           scan: dict | None = None, cmake_flags: str | None = None, base_image: str | None = None,
           previous: dict | None = None, evidence: str | None = None, fixed_by: str | None = None,
-          notices: list[str] | None = None, project_url: str | None = None) -> dict:
+          notices: list[str] | None = None, project_url: str | None = None, delta_m: dict | None = None) -> dict:
     """``verdict`` is `floor judge` output, ``scan`` a scan summary, ``previous`` the previous manifest."""
     floors = _floors(verdict, evidence)
     previous_predicate = (previous or {}).get("predicate") or {}
@@ -88,8 +88,7 @@ def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str
         "leave_behind_notices": list(notices or []),
         "footprint": {"sci_gco2e_per_audio_minute": None, "sci_gco2e_per_release_check": None,
                       "method": "GSF Impact Framework"},
-        "delta_m_kgco2e": ({"low": 0, "high": 0, "note": "0 when every floor holds"} if not raised else
-                           {"low": None, "high": None, "note": "set by the Leave-Behind Notice scenario"}),
+        "delta_m_kgco2e": _delta_m(raised, delta_m),
     }
     return {
         "_type": STATEMENT_TYPE,
@@ -97,6 +96,15 @@ def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str
         "predicateType": predicate_type(project_url),
         "predicate": predicate,
     }
+
+
+def _delta_m(raised: list[str], scenario: dict | None) -> dict:
+    """``scenario`` is `floor delta-m` output. ΔM stays beside SCI, never inside it (§13.3)."""
+    if not raised:
+        return {"low": 0, "high": 0, "note": "0 when every floor holds"}
+    if scenario:
+        return {"low": scenario["low_kgco2e"], "high": scenario["high_kgco2e"], "note": scenario["note"]}
+    return {"low": None, "high": None, "note": "set by the Leave-Behind Notice scenario"}
 
 
 def _cell(value) -> str:
