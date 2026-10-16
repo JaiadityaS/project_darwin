@@ -10,7 +10,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
 | T-01 | Confirm GitLab hackathon group access and tier (Premium or Ultimate) and the Duo credit pool for service-account flows | §9.1, §19 | human | - | Access confirmed 2026-10-16 (D-010). Open: the credit pool |
-| T-02 | `scripts/assemble-gitlab.sh`: clone whisper.cpp at a pinned commit, overlay the product files, push to the GitLab project | §0, D-001 | doing | @JaiadityaS | Record the pinned commit in DECISIONS |
+| T-02 | `scripts/assemble-gitlab.sh`: clone whisper.cpp at a pinned commit, overlay the product files, push to the GitLab project | §0, D-001, D-012 | doing | @JaiadityaS | Script done and tested on local repos. Open: the first real run with `--push` (a human, in their own terminal) |
 | T-03 | Trigger-chain test: a human tag push fails the gate; the pipeline-failed trigger starts a flow; record who counts as the actor | F4.1, §9.1 | blocked | - | Needs T-01, T-02 |
 | T-04 | Duo CLI runs headless in a CI job (Herald, and the floor-repair fallback) | F4.1, F12.1 | blocked | - | Needs T-01 |
 | T-05 | Auto-merge test: the flow opens a non-code-owned MR and sets auto-merge; it merges only after the gate passes; an agent change to a code-owned path cannot merge | F4.4, D-010 | blocked | - | Needs T-02. No project token is possible (D-010) |

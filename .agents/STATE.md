@@ -25,7 +25,7 @@ Last update: 2026-10-16 · @JaiadityaS · session 4
 
 ## Next agent: start here
 
-1. When T-01 is done: T-02 (assemble the GitLab project), then T-47 (`.gitlab-ci.yml`). Every gate step exists as a `floor` command; `floors.yml` and `cpu-proof.yml` show the order and the flags. T-47 also wires the open parts of T-35, T-36 and T-41.
+1. T-02 script is ready (`scripts/assemble-gitlab.sh`, D-012). After the first real push, do T-47 (`.gitlab-ci.yml`), then T-05 (auto-merge test, D-010). Every gate step exists as a `floor` command; `floors.yml` and `cpu-proof.yml` show the order and the flags. T-47 also wires the open parts of T-35, T-36 and T-41.
 2. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
 3. T-90 README: the measured claims are in "Facts learned" below.
 
