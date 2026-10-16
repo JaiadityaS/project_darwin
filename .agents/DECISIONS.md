@@ -43,3 +43,17 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Local hooks (`scripts/install-hooks.sh`) run `scripts/guard.sh`: no co-author trailers, no agent-tool files, no tool or vendor names.
 - CI runs the same guard on every push.
 - Agent-tool files go to `.git/info/exclude`, never to `.gitignore`.
+
+## D-010 (2026-10-16) Merge path: GitLab auto-merge, no merge-bot token
+- Facts (2026-10-16, read-only check of the Showcase project 87296266): the team role is "Developer+" (level 30). It can push and merge to protected `main`, run pipelines, add CI/CD variables and webhooks, manage AI Catalog items and change MR settings. It cannot create project access tokens, change protected branches or tags, or manage runners. Duo features and shared runners are on.
+- So the PRD merge-bot (F4.4, a project access token) is not possible.
+- Decision: the flow opens the fix MR and sets auto-merge ("merge when the pipeline succeeds"). "Pipelines must succeed" is on in the MR settings. GitLab merges only when the gate pipeline passes. A release job on `main` cuts `-floor.N` with `CI_JOB_TOKEN`. The tag pipeline is not needed: the main pipeline does the release work.
+- No personal access token in CI. A personal token acts as the human code owner, so CI could then approve and merge Leave-Behind Notices (breaks F6.1), and every merge would look human-made (breaks the Hands-off claim).
+- Code-owner approval on `main` needs a Maintainer. Instead, `floor paths` fails the MR pipeline when an agent account changes a code-owned path. With "pipelines must succeed", that blocks the merge.
+- Open (T-05): can the flow set auto-merge on its own MR? If not, record it and choose a fallback before G-4.
+- PRD impact: F4.4, §10.1, NFR-6. Glossary "Merge-bot" now means this auto-merge path.
+
+## D-011 (2026-10-16) Special prize: Environmental
+- Path B Hands-off stays the main target. The special prize is Environmental, and the pitch also uses its creative side.
+- Why: Floor is the only entry with ΔM and CPU floors. The six green rivals all measure the operational SCI of pipelines only. The extra work is small (T-54, T-55, T-56, T-60).
+- If time is short after Oct 22, cut ΔM polish first.

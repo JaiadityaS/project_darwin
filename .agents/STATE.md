@@ -31,7 +31,8 @@ Last update: 2026-10-16 · @JaiadityaS · session 4
 
 ## Needs a human (agents cannot do these)
 
-- [ ] T-01: confirm GitLab hackathon group access, the tier (Premium or Ultimate) and the Duo credit pool.
+- [ ] T-01: access is confirmed (D-010). Still open: the Duo credit pool.
+- [ ] Run `scripts/assemble-gitlab.sh` one time when T-02 is ready. Git Credential Manager signs you in to GitLab in the browser, so the push is in your name. Never push this repo itself to GitLab: the Showcase project is public.
 - [ ] T-06: Google Cloud project with billing and a budget alert, for Cloud Run and WIF.
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
