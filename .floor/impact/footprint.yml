@@ -1,0 +1,64 @@
+# Inputs for SCI (PRD §13.1): SCI = (E × I + M) / R. Every value has a source. Fetched 2026-10-16.
+# `floor footprint write` copies the values that it uses into the Impact Framework manifests
+# (sci-*.yml in this folder). Do not edit those manifests by hand.
+version: 1
+
+watts_per_vcpu:
+  # Idle (min) and full-load (max) watts for one vCPU. Cloud Carbon Footprint (CCF), from SPECpower.
+  source: https://github.com/cloud-carbon-footprint/ccf-coefficients/tree/main/output (coefficients-azure-use.csv, coefficients-gcp-use.csv)
+  microarchitecture:
+    EPYC 2nd Gen: {min: 0.4742621527777778, max: 1.6929615162037037, table: azure}
+    EPYC 3rd Gen: {min: 0.44538981119791665, max: 2.0193277994791665, table: azure}
+    EPYC 4th Gen: {min: 0.7391482469512195, max: 2.1958768628048784, table: gcp}
+    Ice Lake: {min: 0.766796875, max: 3.6515791249999996, table: gcp}
+    Sapphire Rapids: {min: 1.0362861003136936, max: 4.06210101745772, table: gcp}
+    Emerald Rapids: {min: 0.8140104166666666, max: 4.3816792499999995, table: gcp}
+    Cascade Lake: {min: 0.6389493581523519, max: 3.9673047343937564, table: azure}
+    Skylake: {min: 0.6446044454253452, max: 4.193436438541878, table: azure}
+    Broadwell: {min: 0.7128342245989304, max: 3.6853275401069516, table: azure}
+  provider:
+    # For a host whose CPU platform is not published (Cloud Run, GitLab-hosted runners).
+    source: https://www.cloudcarbonfootprint.org/docs/methodology/
+    gcp: {min: 0.71, max: 4.26}
+    azure: {min: 0.78, max: 3.76}
+
+memory_watts_per_gb:
+  value: 0.392  # 0.000392 kWh per GB-hour
+  source: https://www.cloudcarbonfootprint.org/docs/methodology/
+
+pue:
+  source: https://www.cloudcarbonfootprint.org/docs/methodology/
+  gcp: 1.1
+  azure: 1.185
+
+grid_intensity:
+  # gCO2e per kWh, location-based, no offsets. Google Cloud region carbon data, year 2025.
+  source: https://github.com/GoogleCloudPlatform/region-carbon-info/blob/main/data/yearly/2025.csv
+  northamerica-northeast1: 11.36
+  europe-west9: 15.83
+  us-central1: 431.95
+  us-east1: 579.44
+
+embodied:
+  # CCF: M = TE × (time reserved / lifespan) × (vCPUs reserved / host vCPUs). The host vCPUs are
+  # those of the largest machine type in the family.
+  source: https://www.cloudcarbonfootprint.org/docs/embodied-emissions/ and ccf-coefficients output/coefficients-gcp-embodied.csv
+  lifespan_s: 126144000  # 4 years: CCF, and the Impact Framework SciEmbodied default
+  hosts:
+    n2d-standard: {total_kgco2e: 2321.46, vcpus: 224}
+    e2-standard: {total_kgco2e: 1255.46, vcpus: 32}
+
+sites:
+  # Where each functional unit is served. Neither Cloud Run nor GitLab-hosted runners publish
+  # their CPU platform, so the GCP provider watts and an n2d-standard host are assumptions.
+  service:
+    unit: audio-minutes
+    provider: gcp
+    host: n2d-standard
+    region: northamerica-northeast1  # the lowest grid intensity in the 2025 data; Cloud Run lists it as Low CO2
+    compare_region: us-central1      # a common default region (PRD §13.2, lever 5)
+  release-check:
+    unit: release-checks
+    provider: gcp
+    host: n2d-standard
+    region: us-east1  # GitLab-hosted Linux runners: https://docs.gitlab.com/ci/runners/hosted_runners/linux/

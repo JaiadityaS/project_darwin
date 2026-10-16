@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-15 · @JaiadityaS · session 3
+Last update: 2026-10-16 · @JaiadityaS · session 4
 
 ## Where we are
 
@@ -10,7 +10,8 @@ Last update: 2026-10-15 · @JaiadityaS · session 3
 - Done: T-15 static part (the first H-1 signal) and T-24 for one commit. See "Facts learned".
 - Done in session 2: the #3814 follow-up (H-1 signal 2), function symbols in scan evidence, the T-16 rule, the sampler and timeline (`floor sample`, `floor timeline`) and the sweep workflow (`sweep.yml`).
 - Done in session 3: G-1 (T-12, T-13), the policy and its ratchet (T-30, T-31), the Judge (T-32), the manifest and diff (T-33), memory and offline floors (T-44, T-45). Partly done, the parts that need no GitLab: T-35 notices, T-36 CODEOWNERS and path allowlist, T-41 fallback script, T-60 Floor page.
-- CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | notice | paths | fallback | page | manifest | diff`. Run `python -m floor <command> -h`.
+- Done in session 4: T-56 (ΔM calculator) and the SCI part of T-54 (`floor footprint`, the Impact Framework manifests, the coefficients in `.floor/impact/footprint.yml`). See `.agents/log/2026-10-16-jaiadityas-4.md`.
+- CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | notice | paths | fallback | page | manifest | diff | delta-m | footprint`. Run `python -m floor <command> -h`.
 
 ## Gates (PRD §17.1)
 
@@ -25,7 +26,7 @@ Last update: 2026-10-15 · @JaiadityaS · session 3
 ## Next agent: start here
 
 1. When T-01 is done: T-02 (assemble the GitLab project), then T-47 (`.gitlab-ci.yml`). Every gate step exists as a `floor` command; `floors.yml` and `cpu-proof.yml` show the order and the flags. T-47 also wires the open parts of T-35, T-36 and T-41.
-2. No access needed: T-56 (ΔM calculator), T-54 (SCI manifests), T-55 (energy per audio-minute for the three builds), the SCI and language sections of the Floor page.
+2. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
 3. T-90 README: the measured claims are in "Facts learned" below.
 
 ## Needs a human (agents cannot do these)
@@ -36,7 +37,8 @@ Last update: 2026-10-15 · @JaiadityaS · session 3
 
 ## Facts learned (measured)
 
-- **G-1 met (cpu-proof run 38702242235, whisper.cpp 0c7be696).** Runner: AMD EPYC 9V74 (Zen 4), but the VM hides AVX-512, so `-march=native` gives v3 here.
+- **Region data (for T-50).** Lowest grid intensity in Google's 2025 region data: northamerica-northeast1, 11.36 gCO2e/kWh. Lowest in Tier 1 pricing: europe-west9, 15.83. us-central1 is 431.95. With the test numbers, SCI per audio-minute is about 6.6 times higher in us-central1, and embodied carbon is about 85% of SCI in northamerica-northeast1.
+- **G-1 met (cpu-proof run 38702242235, whisper.cpp 0c7be696).** Runners (2 vCPUs each): the native and folk-fix jobs ran on an AMD EPYC 9V74 (Zen 4), and the VM hides AVX-512, so `-march=native` gives v3 there. The all-variants job ran on an AMD EPYC 7763 (Zen 3).
   - Static (AC-F2): native v3; folk fix (`GGML_NATIVE=OFF`) v3, because ggml then turns on AVX, AVX2, FMA, F16C and BMI2 by default; all-variants v1 (highest level found v4, only in variants).
   - QEMU (AC-F3): native and folk fix crash with SIGILL on qemu64, Nehalem and SandyBridge, and pass on EPYC-Milan. All-variants passes on all four and loads x64, sse42, sandybridge and haswell. Every positive control passed and every negative control crashed.
   - So the folk fix does not fix #3510-type crashes on pre-AVX2 CPUs. Only the all-variants build holds the v1 floor.

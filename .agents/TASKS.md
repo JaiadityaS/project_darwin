@@ -71,15 +71,15 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-51 | Staging → smoke test → production; rollback | F13.2 | blocked | - | Needs T-50 |
 | T-52 | Upload page: 30 s cap, rate limit, max instances, no storage | F13.3 | ready | - | |
 | T-53 | `/floor` endpoint: host level and loaded variant | F13.4 | later | - | |
-| T-54 | SCI per audio-minute and per release check (Impact Framework manifests) | F14.1 | ready | - | |
-| T-55 | Energy per audio-minute: native vs folk fix vs all-variants on the same hardware | F14.2, G7 | ready | - | |
+| T-54 | SCI per audio-minute and per release check (Impact Framework manifests) | F14.1 | doing | @JaiadityaS | `floor footprint write|stale|check` (`footprint.py`), coefficients and sources in `.floor/impact/footprint.yml`, `floor manifest --footprint`. Open: `meter.py` (the R2 input), the `floors.yml` and `ci.yml` steps, then the committed manifests and `.floor/evidence/footprint/sci.json`. Design: `.agents/log/2026-10-16-jaiadityas-4.md` |
+| T-55 | Energy per audio-minute: native vs folk fix vs all-variants on the same hardware | F14.2, G7 | ready | - | Design: `.agents/log/2026-10-16-jaiadityas-4.md` (`energy.py`, `energy.yml`, x64-only as a fourth build) |
 | T-56 | ΔM calculator: range and sensitivity table | F14.3, §13.3 | done | @JaiadityaS | `floor delta-m` (`delta_m.py`), `.floor/scenarios/TEMPLATE.yml`; `floor manifest --delta-m`. Every input needs a source. Sourced values for a demo scenario are still open |
 
 ## Communication, SHOULD and COULD
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-60 | Floor page: backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: SCI and language sections (no data yet), publish on GitLab Pages (T-47) |
+| T-60 | Floor page: backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: energy, SCI and language sections (they wait on T-54 and T-55), publish on GitLab Pages (T-47) |
 | T-61 | Pinned issue summary | F12.3 | later | - | |
 | T-62 | Language served / not-served table | F9 | later | - | |
 | T-63 | Field triage flow | F11 | later | - | |

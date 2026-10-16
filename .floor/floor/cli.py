@@ -12,7 +12,8 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import backtest, delta_m, fallback, h1, judge, manifest, memory, notice, offline, page, paths, policy, qemu, ratchet
+from . import (backtest, delta_m, fallback, footprint, h1, judge, manifest, memory, notice, offline, page, paths,
+               policy, qemu, ratchet)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -265,6 +266,51 @@ def _read_json(path: str | None) -> dict | None:
     return json.loads(Path(path).read_text(encoding="utf-8")) if path else None
 
 
+def _g(value) -> str:
+    return "-" if value is None else f"{value:.4g}"
+
+
+def _cmd_footprint(args: argparse.Namespace) -> int:
+    if args.action == "check":
+        if not args.files:
+            print("floor: give the if-run output files", file=sys.stderr)
+            return 2
+        rows, problems = [], []
+        for path in args.files:
+            found_rows, found = footprint.check_file(path)
+            rows += found_rows
+            problems += found
+        summary = footprint.summarize(rows)
+        if args.expect:
+            problems += footprint.differences(summary, _read_json(args.expect) if Path(args.expect).exists() else None)
+        if args.out:
+            _write_json(Path(args.out), {"tool": f"floor {__version__}", **summary})
+        if rows:
+            _print_rows([("MANIFEST", "CHILD", "REGION", "ENERGY_KWH", "CARBON_G", "SCI_G")] + [
+                (r["manifest"] or "-", r["child"] + (" (headline)" if r["headline"] else ""), r["region"] or "-",
+                 _g(r["energy_kwh"]), _g(r["carbon_gco2e"]), _g(r["sci_gco2e"])) for r in rows])
+        for line in problems:
+            print(line)
+        print(f"{len(rows)} result(s): {'every output matches the formulas' if not problems else f'{len(problems)} problem(s)'}")
+        return 1 if problems or not rows else 0
+    energy, meter = (_read_json(p) if p and Path(p).exists() else None for p in (args.energy, args.meter))
+    files = footprint.write(footprint.load(args.config), energy, meter)
+    out_dir = Path(args.out_dir)
+    if args.action == "stale":
+        found = footprint.stale(files, out_dir)
+        for line in found:
+            print(line)
+        print(f"{len(files)} manifest(s): {'up to date' if not found else 'STALE: run floor footprint write'}")
+        return 1 if found else 0
+    if not files:
+        print("floor: no energy or meter evidence, so no manifest", file=sys.stderr)
+    for name, text in files.items():
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / name).write_text(text, encoding="utf-8", newline="\n")
+        print(f"wrote {out_dir / name}")
+    return 0
+
+
 def _previous_floors(doc: dict | None) -> dict | None:
     """Accepts a manifest (floors under "predicate") or a judge output."""
     if not doc:
@@ -280,7 +326,7 @@ def _cmd_manifest(args: argparse.Namespace) -> int:
                          scan=scan["summary"] if scan else None, cmake_flags=args.cmake_flags,
                          base_image=args.base_image, previous=previous, evidence=args.evidence,
                          fixed_by=args.fixed_by, notices=args.notice, project_url=args.project_url,
-                         delta_m=_read_json(args.delta_m))
+                         delta_m=_read_json(args.delta_m), footprint=_read_json(args.footprint))
     _write_json(Path(args.out), doc)
     text = manifest.diff_markdown(previous, doc)
     if args.diff:
@@ -532,7 +578,21 @@ def main(argv: list[str] | None = None) -> int:
     mf.add_argument("--out", default="floor-manifest.json", metavar="FILE", help="output (default floor-manifest.json)")
     mf.add_argument("--diff", metavar="FILE", help="also write the diff as Markdown")
     mf.add_argument("--delta-m", metavar="FILE", help="floor delta-m --out output (used when a floor rises)")
+    mf.add_argument("--footprint", metavar="FILE", help="floor footprint check --out output (the SCI values)")
     mf.set_defaults(func=_cmd_manifest)
+
+    fp = sub.add_parser("footprint", help="SCI with Impact Framework manifests (PRD F14.1)")
+    fp.add_argument("action", choices=["write", "stale", "check"],
+                    help="write: make the manifests from the evidence; stale: fail when the manifests in --out-dir "
+                         "differ from the evidence; check: recompute every if-run output")
+    fp.add_argument("files", nargs="*", help="if-run output files (check)")
+    fp.add_argument("--config", default=str(footprint.DEFAULT_CONFIG), help="coefficients and sites")
+    fp.add_argument("--energy", default=str(footprint.ENERGY_FILE), metavar="FILE", help="floor energy --out output")
+    fp.add_argument("--meter", default=str(footprint.METER_FILE), metavar="FILE", help="floor meter stop --out output")
+    fp.add_argument("--out-dir", default=str(footprint.IMPACT_DIR), metavar="DIR", help="manifest folder (write, stale)")
+    fp.add_argument("--out", metavar="FILE", help="write the SCI summary as JSON (check)")
+    fp.add_argument("--expect", metavar="FILE", help="a committed SCI summary: fail when the results differ (check)")
+    fp.set_defaults(func=_cmd_footprint)
 
     df = sub.add_parser("diff", help="readable diff of two floor manifests (AC-F5)")
     df.add_argument("old", help="previous floor-manifest.json")

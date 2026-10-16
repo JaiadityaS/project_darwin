@@ -61,8 +61,10 @@ def changes(previous: dict | None, floors: dict, fixed_by: str | None = None) ->
 def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str,
           scan: dict | None = None, cmake_flags: str | None = None, base_image: str | None = None,
           previous: dict | None = None, evidence: str | None = None, fixed_by: str | None = None,
-          notices: list[str] | None = None, project_url: str | None = None, delta_m: dict | None = None) -> dict:
-    """``verdict`` is `floor judge` output, ``scan`` a scan summary, ``previous`` the previous manifest."""
+          notices: list[str] | None = None, project_url: str | None = None, delta_m: dict | None = None,
+          footprint: dict | None = None) -> dict:
+    """``verdict`` is `floor judge` output, ``scan`` a scan summary, ``previous`` the previous manifest,
+    ``footprint`` `floor footprint check --out` output."""
     floors = _floors(verdict, evidence)
     previous_predicate = (previous or {}).get("predicate") or {}
     raised = [name for name, floor in floors.items() if floor["status"] == "raised"]
@@ -86,8 +88,9 @@ def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str
         "diff_from": previous_predicate.get("release"),
         "changes": changes(previous_predicate.get("floors"), floors, fixed_by),
         "leave_behind_notices": list(notices or []),
-        "footprint": {"sci_gco2e_per_audio_minute": None, "sci_gco2e_per_release_check": None,
-                      "method": "GSF Impact Framework"},
+        "footprint": {"sci_gco2e_per_audio_minute": (footprint or {}).get("sci_gco2e_per_audio_minute"),
+                      "sci_gco2e_per_release_check": (footprint or {}).get("sci_gco2e_per_release_check"),
+                      "method": (footprint or {}).get("method", "GSF Impact Framework")},
         "delta_m_kgco2e": _delta_m(raised, delta_m),
     }
     return {
