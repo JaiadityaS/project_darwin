@@ -372,7 +372,12 @@ def _cmd_memory(args: argparse.Namespace) -> int:
     if not cmd:
         return 2
     limits = [int(x) for x in args.limits.split(",")]
-    result = {"model": args.model, **memory.measure(cmd, limits, args.expect, args.timeout, sudo=not args.no_sudo)}
+    try:
+        result = {"model": args.model, **memory.measure(cmd, limits, args.expect, args.timeout, sudo=not args.no_sudo,
+                                                        cgroup_root=memory.CGROUP_ROOT if args.cgroup else None)}
+    except OSError as exc:  # --cgroup: not cgroup v2, not root, or no swap accounting
+        print(f"floor: cannot set the memory limits in {memory.CGROUP_ROOT}: {exc}", file=sys.stderr)
+        return 2
     if args.out:
         _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
     rows = [("LIMIT_MB", "RESULT", "EXIT", "PEAK_RSS_MB")]
@@ -532,6 +537,8 @@ def main(argv: list[str] | None = None) -> int:
     mem.add_argument("--expect", help="text that the output must contain")
     mem.add_argument("--timeout", type=float, default=900, help="seconds per run")
     mem.add_argument("--no-sudo", action="store_true", help="do not prefix sudo (already root)")
+    mem.add_argument("--cgroup", action="store_true",
+                     help="no systemd: one child cgroup of /sys/fs/cgroup per run (cgroup v2, as root)")
     mem.add_argument("--out", metavar="FILE", help="write the result as JSON")
     mem.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     mem.set_defaults(func=_cmd_memory)

@@ -1,5 +1,6 @@
 import json
 import shutil
+import subprocess
 import sys
 
 import pytest
@@ -39,6 +40,43 @@ def test_smallest_passing():
     assert memory.smallest_passing(runs) is None
     assert "MemoryMax=512M" in memory.wrapper(512)
     assert memory.wrapper(512, sudo=False)[0] == "systemd-run"
+
+
+def test_cgroup_setup_moves_the_processes_first(tmp_path):
+    (tmp_path / "cgroup.procs").write_text("1\n42\n", encoding="utf-8")
+    (tmp_path / "cgroup.subtree_control").write_text("", encoding="utf-8")
+    memory.cgroup_setup(tmp_path)
+    assert (tmp_path / "floor-job" / "cgroup.procs").read_text(encoding="utf-8") == "42"  # one PID per write
+    assert (tmp_path / "cgroup.subtree_control").read_text(encoding="utf-8") == "+memory"
+    (tmp_path / "cgroup.subtree_control").write_text("memory pids", encoding="utf-8")
+    (tmp_path / "cgroup.procs").write_text("7", encoding="utf-8")
+    memory.cgroup_setup(tmp_path)  # already on: nothing moves
+    assert (tmp_path / "floor-job" / "cgroup.procs").read_text(encoding="utf-8") == "42"
+
+
+def test_cgroup_run_sets_the_limit_and_no_swap(tmp_path, monkeypatch):
+    seen = {}
+
+    def fake_run(argv, **kwargs):
+        group = tmp_path / "floor-512"
+        seen.update(argv=argv, max=(group / "memory.max").read_text(encoding="utf-8"),
+                    swap=(group / "memory.swap.max").read_text(encoding="utf-8"))
+        return subprocess.CompletedProcess(argv, 0, "And so, ask not what your country", TIME_V)
+
+    monkeypatch.setattr(memory.subprocess, "run", fake_run)
+    result = memory.run(["whisper-cli"], 512, expect="ask not", cgroup_root=tmp_path)
+    assert result["result"] == "pass" and result["peak_rss_mb"] == 256
+    assert seen["max"] == str(512 * 1024 * 1024) and seen["swap"] == "0"
+    assert seen["argv"][:4] == memory.cgroup_wrapper(tmp_path / "floor-512")[:4]
+    assert seen["argv"][-3:] == ["/usr/bin/time", "-v", "whisper-cli"]
+    assert "sudo" not in seen["argv"]
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="needs a POSIX shell")
+def test_cgroup_wrapper_moves_the_command_itself(tmp_path):
+    argv = memory.cgroup_wrapper(tmp_path)[:4] + ["sh", "-c", "echo $$"]
+    pid = subprocess.run(argv, capture_output=True, text=True, check=True).stdout.strip()
+    assert (tmp_path / "cgroup.procs").read_text(encoding="utf-8").strip() == pid
 
 
 def test_network_attempts():

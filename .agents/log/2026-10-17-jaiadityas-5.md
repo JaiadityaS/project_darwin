@@ -17,6 +17,10 @@
   - The human sync: GitLab `main` is `6d9de13d` (dev `6047676`). Its pipeline 2958271425 is the first T-47 run (see Verified).
   - `floor diff` with no previous release: the text now says that the Judge compares each floor with the policy (it said "No floor moved." under a "raised" row). Test: `test_diff_without_previous_release`.
   - The page title and heading are "Rieux" (D-013, T-60).
+  - T-47 step 2 (D-014, not run on GitLab yet):
+    - `memory.py`: the cgroup v2 mode (`cgroup_setup`, `cgroup_wrapper`, `_cgroup_remove`; `run` and `measure` take `cgroup_root`). `floor memory --cgroup` uses `/sys/fs/cgroup`.
+    - `.gitlab-ci.yml`: the `memory` job (tiny.en, base.en, small.en) and the `offline` job (tiny.en). Both use chroot into the exported image. The judge job needs both and passes `--memory` and `--connectivity`.
+    - Tests: `test_cgroup_setup_moves_the_processes_first`, `test_cgroup_run_sets_the_limit_and_no_swap`, `test_cgroup_wrapper_moves_the_command_itself` (POSIX only).
 - Verified:
   - `python -m pytest .floor/tests -q`: 149 passed, 6 skipped (Windows). `bash scripts/guard.sh tree`: exit 0.
   - A structure check of `.gitlab-ci.yml` (a local script, not in the repo: YAML parse, `extends` merge, keys, stages, `needs` order): no problems. `bash -n` on every job script. `sh -n` (dash, in WSL) on `.gitlab/ci/*.sh` and the build and judge scripts: no errors.
@@ -27,8 +31,10 @@
   - GitLab pipeline 2958271425 (push on `main`): failed as planned in 310 s. check, build, scan, the four probes and pages passed. judge exited 1: "cpu raised x86-64-v4, static, policy NOT met; decision fail". Docker-in-Docker, the registry push, the `BASE_IMAGE` grep, the dotenv report, crane export, the QEMU sysroot with the real image and Pages all work. STATE.md "Facts learned" has the numbers.
   - Read with the public raw job log (`/-/jobs/<id>/raw`) and the public artifact URL (`/-/jobs/<id>/artifacts/raw/<path>`). The API gives 401 for traces and deployments.
   - After the two small fixes: `python -m pytest .floor/tests -q`: 150 passed, 6 skipped (Windows).
+  - Step 2: pytest 152 passed, 7 skipped (Windows). The structure check of `.gitlab-ci.yml`: no problems. `bash -n` on every job, and `dash -n` (WSL) on the memory, offline and judge scripts: no errors. In WSL dash, the wrapper shell writes the same PID that the command then prints (290 = 290). Not verified: the cgroup setup and chroot on the GitLab runner.
 - Open:
-  - The exact next step: T-47 step 2, the memory and offline jobs (STATE.md "Next agent", item 1). The dev fixes above reach GitLab with the next human sync.
+  - The exact next step: a human syncs. Then read the `memory` and `offline` jobs of the new pipeline (STATE.md "Next agent", item 1).
+  - The AC-F7 and AC-F8 gap: no peak RSS and no download sizes in the manifest, and no report of a peak-RSS rise over 10% (F7.1).
   - The two known gaps of the path allowlist (D-014), T-05.
   - The four probe jobs all missed the model cache on the first run, and each one downloaded tiny.en. The cache key has a `-protected` suffix on `main`, so the first MR pipeline downloads the model again.
   - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.
@@ -41,5 +47,7 @@
   - The GitLab runner shell runs with `set -eo pipefail`. The `docker` image is Alpine (busybox `sh`). Use YAML `|` blocks for script lines that have ": " or " #".
   - `wsl.exe` joins its arguments into one command line for the Linux shell, so a quoted `sh -c '…'` script breaks. Give it a script file, with `MSYS_NO_PATHCONV=1`, and keep the files under `/mnt/d/…` (WSL cannot read the 8.3 temp path).
   - In PowerShell, plain `bash` is WSL. Use `& "C:\Program Files\Git\bin\bash.exe" …`.
+  - The GitLab-built image needs AVX-512 (the scan, and SIGILL on EPYC-Milan). The dev laptop (i5-12450H) is v3, so do not test this image's whisper-cli there (not tried). Use the runner or QEMU.
+  - `subprocess.run(timeout=…)` kills only the direct child. In the cgroup mode, `cgroup.kill` ends the grandchildren too.
   - The upstream Makefile builds with `--parallel $(nproc)`. The upstream `.dockerignore` leaves out only `build*/`, `.github/` and `.devops/`.
 - Branch: main

@@ -27,10 +27,11 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 
 ## Next agent: start here
 
-1. T-47 step 2: the memory and offline jobs. Use the runner facts below ("First GitLab pipeline"). The job container has no systemd, so `floor memory` needs a direct cgroup v2 mode: move the job processes into a leaf cgroup, enable `+memory` in the root `cgroup.subtree_control`, then one child cgroup per limit with `memory.max` and `memory.swap.max` = 0. `floor offline --no-sudo` works there as it is (`unshare --net` and strace work). Run the image's binaries with `chroot` into the exported image, so its own libraries load.
-2. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
-3. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
-4. T-90 README: the measured claims are in "Facts learned" below.
+1. T-47 step 2 is written and checked locally (D-014): the `memory` and `offline` jobs, and `floor memory --cgroup`. A human syncs (see "Needs a human"). Then read the two jobs of the new pipeline. Expected: a smallest passing limit for tiny, base and small, and "offline proven". The judge still fails on cpu ("raised"). If a job prints "floor: cannot set the memory limits", or chroot fails, fix that first.
+2. The AC-F7 and AC-F8 gap: the manifest has no peak RSS and no download sizes, and the Judge does not report a peak-RSS rise over 10% (F7.1). `cli._memory_inputs` gives `judge_memory` only the smallest passing limit per model.
+3. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
+4. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
+5. T-90 README: the measured claims are in "Facts learned" below.
 
 ## Needs a human (agents cannot do these)
 

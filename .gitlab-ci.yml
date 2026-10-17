@@ -7,11 +7,13 @@
 #   build   builds and pushes the image with upstream's recipe; records the build machine
 #   scan    static CPU-floor scan of /app in the pushed image
 #   probe   whisper-cli from the pushed image under QEMU, one job per CPU model, with controls
+#   memory  whisper-cli from the pushed image under cgroup memory limits, no swap, per model size
+#   offline whisper-cli from the pushed image with no network, under strace
 #   judge   floor judge and floor manifest; fails the pipeline when a floor rises
 #   pages   the Rieux page from the committed evidence (default branch only)
 #
 # Evidence: the artifacts below out/ (the judge job keeps all of them).
-# Not here yet: the memory and connectivity floors (step 2), attest, herald, release, deploy.
+# Not here yet: attest, herald, release, deploy.
 
 workflow:
   rules:
@@ -185,10 +187,65 @@ probe:
   artifacts:
     paths: [out/probe/]
 
+# The memory and offline jobs run the image's own binaries natively, with chroot into the
+# exported image, so the image's libraries load. The job container runs as root, has cgroup v2
+# and no systemd (STATE.md "Facts learned"), so floor memory makes the cgroups itself (--cgroup).
+memory:
+  stage: floors
+  extends: [.tools, .evidence]
+  needs: [build]
+  timeout: 45m
+  variables:
+    MEMORY_MODELS: "tiny.en base.en small.en"
+  cache:
+    key: models-tiny.en-base.en-small.en
+    paths: [.cache/models/]
+  script:
+    - mkdir -p out/memory rootfs
+    - for m in $MEMORY_MODELS; do sh .gitlab/ci/model.sh "$m"; done
+    - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - crane export "$IMAGE_REF" - | tar -x -C rootfs
+    - |
+      mkdir -p rootfs/models
+      for m in $MEMORY_MODELS; do
+        ln -f ".cache/models/ggml-$m.bin" rootfs/models/ 2> /dev/null || cp ".cache/models/ggml-$m.bin" rootfs/models/
+        floor memory --cgroup --model "${m%.en}" --expect "$EXPECT" --timeout 300 --out "out/memory/${m%.en}.json" -- \
+          chroot "$PWD/rootfs" /app/build/bin/whisper-cli -m "/models/ggml-$m.bin" -f /app/samples/jfk.wav -t 4 -nt \
+          | tee -a out/memory/memory.txt
+      done
+  artifacts:
+    paths: [out/memory/]
+
+offline:
+  stage: floors
+  extends: [.tools, .evidence]
+  needs: [build]
+  timeout: 30m
+  cache:
+    key: models-tiny.en-c78c86eb
+    paths: [.cache/models/]
+    policy: pull
+  script:
+    - mkdir -p out/offline rootfs
+    - sh .gitlab/ci/model.sh tiny.en
+    - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - crane export "$IMAGE_REF" - | tar -x -C rootfs
+    - |
+      # A new network namespace (only a down loopback), and strace on connect, sendto and sendmsg.
+      mkdir -p rootfs/models
+      ln -f .cache/models/ggml-tiny.en.bin rootfs/models/ 2> /dev/null || cp .cache/models/ggml-tiny.en.bin rootfs/models/
+      set -- --artifact rootfs/models/ggml-tiny.en.bin --artifact rootfs/app/build/bin/whisper-cli
+      for f in $(find rootfs/app/build/bin -name '*.so*' -type f); do set -- "$@" --artifact "$f"; done
+      floor offline --no-sudo --expect "$EXPECT" --timeout 600 --out out/offline/offline.json "$@" -- \
+        chroot "$PWD/rootfs" /app/build/bin/whisper-cli -m /models/ggml-tiny.en.bin -f /app/samples/jfk.wav -t 4 -nt \
+        | tee out/offline/offline.txt
+  artifacts:
+    paths: [out/offline/]
+
 judge:
   stage: judge
   extends: [.tools, .evidence]
-  needs: [build, scan, probe]
+  needs: [build, scan, probe, memory, offline]
   script:
     - |
       mkdir -p out/judge
@@ -196,6 +253,10 @@ judge:
       for f in out/probe/*.json; do
         if [ -e "$f" ]; then set -- "$@" --probe "$f"; fi
       done
+      for f in out/memory/*.json; do
+        if [ -e "$f" ]; then set -- "$@" --memory "$f"; fi
+      done
+      if [ -e out/offline/offline.json ]; then set -- "$@" --connectivity out/offline/offline.json; fi
       rc=0
       floor judge --scan out/scan/scan.json "$@" --out out/judge/judge.json > out/judge/judge.txt || rc=$?
       cat out/judge/judge.txt
