@@ -1,0 +1,109 @@
+name: energy
+
+# Energy per audio-minute (PRD F14.2, G7; task T-55). Builds whisper.cpp three ways on one runner,
+# makes an x64-only copy of the all-variants build, then times each build on the same audio with
+# `floor energy`. The builds take turns in each round, so they share the machine and the time.
+#   gh workflow run energy.yml
+#   gh workflow run energy.yml -f model=base.en -f runs=5
+# Results: the run summary and the artifact "energy-<run_id>". A human commits out/energy.json as
+# .floor/evidence/energy/energy.json (CI has no token that can push, D-010).
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "whisper.cpp commit to build"
+        default: "0c7be696371069e0baa2515ed7aa08d5a5473aa6"
+      model:
+        description: "ggml model"
+        default: "base.en"
+      runs:
+        description: "counted runs per build"
+        default: "5"
+
+jobs:
+  energy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      COMMIT: ${{ inputs.commit }}
+      MODEL: ${{ inputs.model }}
+      RUNS: ${{ inputs.runs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/whisper.cpp
+          ref: ${{ inputs.commit }}
+          path: w
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - name: Install GNU time
+        run: sudo apt-get update -q && sudo apt-get install -y -q time
+      - name: Build three ways
+        shell: bash
+        run: |
+          mkdir -p out
+          lscpu > out/runner.txt
+          grep -m1 "Model name" out/runner.txt || true
+          build() {
+            cmake -S w -B "w/build-$1" -DCMAKE_BUILD_TYPE=Release $2 > "out/cmake-$1.txt" 2>&1
+            # ggml depends on its backend modules, so this target also builds every libggml-cpu-*.so.
+            cmake --build "w/build-$1" -j "$(nproc)" --config Release --target whisper-cli 2>&1 | tail -n 5
+          }
+          build native ""
+          build folk-fix "-DGGML_NATIVE=OFF"
+          build all-variants "-DGGML_NATIVE=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DBUILD_SHARED_LIBS=ON"
+          ls w/build-all-variants/bin
+          test -f w/build-all-variants/bin/libggml-cpu-x64.so
+      - name: x64-only copy
+        shell: bash
+        run: |
+          # The all-variants build with only its lowest CPU variant: the cost of the inclusive floor alone.
+          # ggml looks for backends next to the executable, so this copy can load only libggml-cpu-x64.so.
+          cp -a w/build-all-variants/bin w/x64-only
+          find w/x64-only -name 'libggml-cpu-*.so' ! -name 'libggml-cpu-x64.so' -delete
+          ls w/x64-only
+      - name: Model and audio
+        shell: bash
+        run: |
+          bash w/models/download-ggml-model.sh "$MODEL"
+          python -m floor audio w/samples/jfk.wav out/audio.wav --copies 11 --gap 1
+      - name: Energy runs (F14.2)
+        shell: bash
+        run: |
+          # An empty working directory: ggml also loads CPU backends from the working directory.
+          mkdir run && cd run
+          W="$GITHUB_WORKSPACE/w"
+          python -m floor energy \
+            --build native="$W/build-native/bin/whisper-cli" \
+            --build folk-fix="$W/build-folk-fix/bin/whisper-cli" \
+            --build all-variants="$W/build-all-variants/bin/whisper-cli" \
+            --build x64-only="$W/x64-only/whisper-cli" \
+            --audio "$GITHUB_WORKSPACE/out/audio.wav" --expect "ask not what your country can do for you" \
+            --runs "$RUNS" --warmup 1 \
+            --evidence "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --out "$GITHUB_WORKSPACE/out/energy.json" -- \
+            -m "$W/models/ggml-$MODEL.bin" -t "$(nproc)" -nt -nf \
+            | tee "$GITHUB_WORKSPACE/out/energy.txt"
+      - name: Run summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Energy per audio-minute (whisper.cpp $COMMIT, $MODEL)"
+            echo
+            echo "Runner: $(grep -m1 'Model name' out/runner.txt | sed 's/.*: *//')"
+            echo
+            echo '```'
+            cat out/energy.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: energy-${{ github.run_id }}
+          path: |
+            out
+            !out/audio.wav
