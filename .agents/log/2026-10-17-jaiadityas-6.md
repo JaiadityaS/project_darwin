@@ -1,5 +1,5 @@
 # 2026-10-17 @JaiadityaS session 6
-- Tasks: T-43 (done, D-016), T-41 (the fallback patch; T-41 is still doing).
+- Tasks: T-43 (done, D-016), T-41 (the fallback patch; T-41 is still doing), T-36 (D-014 gap 1; T-36 is still doing).
 - Done:
   - T-43: `floor notice-draft` (`cli.py`) and `notice.draft` (`notice.py`):
     - It writes a draft only when the judge result has a dimension in `missing_notice` and the fallback has nothing left to change (or the policy has `repair.fallback: none`). In all other cases it prints "no draft: …" and exits 0. A bad input file exits 2.
@@ -12,9 +12,11 @@
   - `cli.main`: stdout and stderr print "?" for a character that the console cannot encode. This closes the session-5 Open item about the cp1252 crash on Windows.
   - Tests: `test_notice.py` (the draft, the CLI, the CI job, the empty field), `test_fallback.py` (the upstream CUDA, ROCm and Intel lines, quoted CMAKE_ARGS, `make` as a package name, an environment prefix, a configure command over lines), `test_delta_m.py` (a console without UTF-8).
   - `.floor/notices/README.md`: the draft step. DECISIONS D-016.
+  - T-36, D-014 gap 1: `floor paths --actor auto` (`paths.pipeline_actor`, `paths.mr_author`). On an MR pipeline, the MR counts as an agent MR unless the pipeline user and the MR author are both in `FLOOR_HUMANS`. The MR author comes from the GitLab API with no token (the project is public). When the API gives no answer, the MR counts as an agent MR. `check.sh` step 4 now runs it. Tests: `test_pipeline_actor`, `test_mr_author`, `test_cli_auto`.
 - Verified:
   - GitHub CI run 39045169832 on `095afb9`: success. `floor footprint stale`: "1 manifest(s): up to date". The if-run step ran for the first time: "5 result(s): every output matches the formulas".
-  - `python -m pytest .floor/tests -q -p no:cacheprovider`: 190 passed, 11 skipped (Windows). `bash scripts/guard.sh tree`: no problems.
+  - `python -m pytest .floor/tests -q -p no:cacheprovider`: 190 passed, 11 skipped (Windows). `bash scripts/guard.sh tree`: no problems. With the gap 1 fix: 193 passed, 11 skipped, and `sh -n .gitlab/ci/check.sh` has no errors.
+  - The GitLab API without a token: `GET /projects/87296266/merge_requests?state=all` gave HTTP 200 and an empty list (no MR yet). So the MR API of the Showcase project is public. The MR author part of `floor paths --actor auto` has not run on GitLab yet.
   - A local check on copies of the 7 upstream Dockerfiles (`.devops/` at whisper.cpp `0c7be696`), in a temporary folder:
     - The old code (`fallback.py` at `cad0419`) had two bugs there. `shlex` stopped with "No closing quotation" on the quoted CMAKE_ARGS of main-cuda and main-rocm. And it put CMAKE_ARGS into the dnf package list of main-rocm (`make CMAKE_ARGS="…" gcc gcc-c++ cmake …`).
     - The new code changes one line in each file (the `make` command), and the dnf list stays. A second run prints "canned config already applied". A bash `make` function that prints its arguments: each patched line gives one `CMAKE_ARGS=` word, with the upstream text and then the canned flags.
@@ -26,7 +28,8 @@
   - The `notice-draft` job has not run on GitLab. After the next human sync, the `main` pipeline fails at the judge (cpu raised), so the job runs, and it must print "no draft: the canned inclusive config is not on this branch yet …" (STATE.md "Next agent", item 1).
   - I expect that a job with `needs` and `when: on_failure` looks only at the jobs in its `needs` (here the judge). I did not confirm it in the GitLab docs. The script guard keeps the job safe in both cases: with no `judge.json`, it prints one line and passes.
   - The first real draft needs an MR with the canned config on its branch and a gate that still fails: the T-41 CI job, then T-05.
-  - Carried from session 5: the R2 meter and the manifest fields on GitLab, `floor manifest --footprint` in the judge job, the two gaps of the path allowlist (D-014).
+  - The first MR pipeline on GitLab shows the `floor paths --actor auto` lines in the check job: the pipeline user and the MR author. Check them there.
+  - Carried from session 5: the R2 meter and the manifest fields on GitLab, `floor manifest --footprint` in the judge job, gap 2 of the path allowlist (D-014: an MR pipeline runs the MR's own `.gitlab-ci.yml`).
 - Gotchas:
   - `expose_as`: letters, digits, `-`, `_` and spaces only. No glob and no variable in the artifact paths, and a directory path ends with `/`.
   - A `make` word in a RUN line is not always a command: in `dnf install -y make gcc`, it is a package name. Patch only the command position.

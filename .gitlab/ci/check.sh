@@ -27,14 +27,9 @@ elif [ "${CI_COMMIT_BEFORE_SHA:-$zero}" != "$zero" ] && git cat-file -e "$CI_COM
 fi
 if [ -n "$base" ]; then floor ratchet --base "$base"; else echo "no earlier policy to compare with"; fi
 
-# 4. Merge requests: deny by default. A pipeline user who is not in FLOOR_HUMANS counts as an
-#    agent, and an agent may change only the allowlist paths. Humans need code-owner review.
+# 4. Merge requests: deny by default. The pipeline user and the MR author (from the API) must
+#    both be in FLOOR_HUMANS. Otherwise the MR counts as an agent MR, and an agent may change
+#    only the allowlist paths. Humans need code-owner review.
 if [ -n "${CI_MERGE_REQUEST_IID:-}" ]; then
-  case " $FLOOR_HUMANS " in
-    *" ${GITLAB_USER_LOGIN:-} "*)
-      echo "pipeline user $GITLAB_USER_LOGIN is a human: code-owner review applies, not the agent allowlist" ;;
-    *)
-      echo "pipeline user ${GITLAB_USER_LOGIN:-unknown} counts as an agent"
-      floor paths --actor agent --base "$base" ;;
-  esac
+  floor paths --actor auto --base "$base"
 fi

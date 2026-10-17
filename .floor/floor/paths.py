@@ -10,6 +10,8 @@ from __future__ import annotations
 import re
 import subprocess
 
+import requests
+
 AGENT_ALLOWED = ("deploy/**", ".devops/*.Dockerfile", ".floor/overrides/**")
 ENGINE = ("src/**", "ggml/**", "include/**", "examples/**")
 CODE_OWNED = (
@@ -56,6 +58,39 @@ def check(changed: list[str], actor: str) -> list[str]:
         elif actor == "merge-bot" and matches(path, CODE_OWNED):
             problems.append(f"{path}: code-owned (needs a code owner, not the merge-bot)")
     return problems
+
+
+def mr_author(api_url: str, project_id: str, iid: str, timeout: float = 20) -> str | None:
+    """The username of the MR author from the GitLab API (a public project needs no token).
+    None when the API gives no answer."""
+    try:
+        response = requests.get(f"{api_url}/projects/{project_id}/merge_requests/{iid}", timeout=timeout)
+        response.raise_for_status()
+        return response.json()["author"]["username"] or None
+    except (requests.RequestException, ValueError, KeyError, TypeError):
+        return None
+
+
+def pipeline_actor(env, author=None) -> tuple[str, list[str]]:
+    """("human" or "agent", the reasons). Deny by default (D-014): each user must be in FLOOR_HUMANS.
+
+    The users are the pipeline user and, on an MR pipeline, the MR author. So a human who runs the
+    pipeline of an agent MR again does not turn off the agent allowlist (D-014, gap 1).
+    """
+    humans = set(env.get("FLOOR_HUMANS", "").split())
+    users = [("pipeline user", env.get("GITLAB_USER_LOGIN") or None)]
+    if env.get("CI_MERGE_REQUEST_IID"):
+        found = (author or mr_author)(env.get("CI_API_V4_URL", ""), env.get("CI_MERGE_REQUEST_PROJECT_ID", ""),
+                                      env["CI_MERGE_REQUEST_IID"])
+        users.append(("MR author", found))
+    actor, reasons = "human", []
+    for role, user in users:
+        if user in humans:
+            reasons.append(f"{role} {user}: a human (FLOOR_HUMANS)")
+        else:
+            actor = "agent"
+            reasons.append(f"{role} {user}: counts as an agent" if user else f"{role}: unknown, counts as an agent")
+    return actor, reasons
 
 
 def changed_files(base: str, head: str = "HEAD") -> list[str]:

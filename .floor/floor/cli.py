@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -271,15 +272,23 @@ def _cmd_notice_draft(args: argparse.Namespace) -> int:
 
 
 def _cmd_paths(args: argparse.Namespace) -> int:
+    actor = args.actor
+    if actor == "auto":  # a CI job: the pipeline user and the MR author decide (D-014)
+        actor, reasons = paths.pipeline_actor(os.environ)
+        for line in reasons:
+            print(line)
+        if actor == "human":
+            print("human: code-owner review applies, not the agent allowlist")
+            return 0
     try:
         changed = args.files or paths.changed_files(args.base)
     except subprocess.CalledProcessError as exc:
         print(f"floor: git failed: {exc.stderr.strip()}", file=sys.stderr)
         return 2
-    found = paths.check(changed, args.actor)
+    found = paths.check(changed, actor)
     for line in found:
         print(line)
-    print(f"{len(changed)} changed path(s); {args.actor}: {'allowed' if not found else 'NOT allowed'}")
+    print(f"{len(changed)} changed path(s); {actor}: {'allowed' if not found else 'NOT allowed'}")
     return 1 if found else 0
 
 
@@ -772,7 +781,9 @@ def main(argv: list[str] | None = None) -> int:
     mt.set_defaults(func=_cmd_meter)
 
     pa = sub.add_parser("paths", help="path allowlist for agent MRs and merge-bot merges (PRD F4.2, §10.1)")
-    pa.add_argument("--actor", required=True, choices=["agent", "merge-bot"], help="who will change or merge")
+    pa.add_argument("--actor", required=True, choices=["agent", "merge-bot", "auto"],
+                    help="who will change or merge; auto: an agent unless the pipeline user and the MR author "
+                         "are in FLOOR_HUMANS (CI variables)")
     pa.add_argument("--base", default="origin/main", metavar="REF", help="target branch (default origin/main)")
     pa.add_argument("files", nargs="*", help="changed paths (default: git diff BASE...HEAD)")
     pa.set_defaults(func=_cmd_paths)
