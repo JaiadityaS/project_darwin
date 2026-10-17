@@ -1,0 +1,34 @@
+# 2026-10-17 @JaiadityaS session 6
+- Tasks: T-43 (done, D-016), T-41 (the fallback patch; T-41 is still doing).
+- Done:
+  - T-43: `floor notice-draft` (`cli.py`) and `notice.draft` (`notice.py`):
+    - It writes a draft only when the judge result has a dimension in `missing_notice` and the fallback has nothing left to change (or the policy has `repair.fallback: none`). In all other cases it prints "no draft: …" and exits 0. A bad input file exits 2.
+    - The file name comes from `notice.next_name`: the next number after the notices in `.floor/notices/`, then the dimensions (`0002-cpu.md`).
+    - From evidence: Floor change (the judge result and the policy), Reason (the first paragraph of the MR description, HTML-escaped, at most 300 characters), Tried first (the MR, the canned flags, the pipeline), the first Guidance sentence (`on_unfixable_raise`), Who is affected and ΔM (a valid `.floor/scenarios/*.yml` file for the dimension), the gate result and the full MR text as an indented block. "Approved by" always stays the placeholder. `notice.PLACEHOLDERS` are the values of the template (a test compares them).
+    - The `notice-draft` job in `.gitlab-ci.yml`: stage `repair`, `needs: [judge]`, `when: on_failure`. On an MR pipeline it gives the MR description and the MR link. `expose_as` shows `out/notice/` in the MR widget.
+  - `fallback.py`: each RUN instruction is now read as shell words. Only a `make` or `cmake -B` in command position changes (after RUN and its flags, an operator, a shell keyword or an assignment). An existing CMAKE_ARGS keeps its text and its quotes, and the canned keys come last, so they win.
+  - `ratchet.py`: the field regexes use `[ \t]*`, so an empty "Floor change:" or "Approved by:" field does not take the text of the next line.
+  - `delta_m.load`: a YAML error or a file that is not a mapping is now a `ScenarioError`, so `floor notice-draft` can skip a bad scenario file and say so.
+  - `cli.main`: stdout and stderr print "?" for a character that the console cannot encode. This closes the session-5 Open item about the cp1252 crash on Windows.
+  - Tests: `test_notice.py` (the draft, the CLI, the CI job, the empty field), `test_fallback.py` (the upstream CUDA, ROCm and Intel lines, quoted CMAKE_ARGS, `make` as a package name, an environment prefix, a configure command over lines), `test_delta_m.py` (a console without UTF-8).
+  - `.floor/notices/README.md`: the draft step. DECISIONS D-016.
+- Verified:
+  - GitHub CI run 39045169832 on `095afb9`: success. `floor footprint stale`: "1 manifest(s): up to date". The if-run step ran for the first time: "5 result(s): every output matches the formulas".
+  - `python -m pytest .floor/tests -q -p no:cacheprovider`: 190 passed, 11 skipped (Windows). `bash scripts/guard.sh tree`: no problems.
+  - A local check on copies of the 7 upstream Dockerfiles (`.devops/` at whisper.cpp `0c7be696`), in a temporary folder:
+    - The old code (`fallback.py` at `cad0419`) had two bugs there. `shlex` stopped with "No closing quotation" on the quoted CMAKE_ARGS of main-cuda and main-rocm. And it put CMAKE_ARGS into the dnf package list of main-rocm (`make CMAKE_ARGS="…" gcc gcc-c++ cmake …`).
+    - The new code changes one line in each file (the `make` command), and the dnf list stays. A second run prints "canned config already applied". A bash `make` function that prints its arguments: each patched line gives one `CMAKE_ARGS=` word, with the upstream text and then the canned flags.
+  - A local check of `floor notice-draft` on those copies, with a hand-written judge result (the folk fix: cpu raised to x86-64-v3, memory and connectivity held, decision fail) and a hand-written MR text. This is not a pipeline result:
+    - Before the fallback: "no draft: the canned inclusive config is not on this branch yet (7 Dockerfiles, .floor/overrides/main.flags). The fallback runs first (F4.3).", exit 0.
+    - After `floor fallback`: `0001-cpu.md` with Floor change `cpu: x86-64-v1 → x86-64-v3`, the Reason from the MR text, Tried first with the MR, the flags and the pipeline, the `ship_last_held` Guidance sentence, and the gate lines. An `Approved by: @someone` line in the MR text stays in the indented block, and it is not a field.
+  - The job script (without the pip line) in a POSIX shell: with no judge result, "no draft: the judge wrote no result" and exit 0. With the MR variables: the draft with MR !7 and the note that GitLab cut the text short, exit 0. With no MR: the draft with the `<MR link>` and "<the cause: the MR states none>" placeholders, exit 0.
+- Open:
+  - The `notice-draft` job has not run on GitLab. After the next human sync, the `main` pipeline fails at the judge (cpu raised), so the job runs, and it must print "no draft: the canned inclusive config is not on this branch yet …" (STATE.md "Next agent", item 1).
+  - I expect that a job with `needs` and `when: on_failure` looks only at the jobs in its `needs` (here the judge). I did not confirm it in the GitLab docs. The script guard keeps the job safe in both cases: with no `judge.json`, it prints one line and passes.
+  - The first real draft needs an MR with the canned config on its branch and a gate that still fails: the T-41 CI job, then T-05.
+  - Carried from session 5: the R2 meter and the manifest fields on GitLab, `floor manifest --footprint` in the judge job, the two gaps of the path allowlist (D-014).
+- Gotchas:
+  - `expose_as`: letters, digits, `-`, `_` and spaces only. No glob and no variable in the artifact paths, and a directory path ends with `/`.
+  - A `make` word in a RUN line is not always a command: in `dnf install -y make gcc`, it is a package name. Patch only the command position.
+  - In CMake, the last `-D` of a key wins, so the canned flags go after the other arguments.
+- Branch: main

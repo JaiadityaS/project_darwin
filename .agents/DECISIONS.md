@@ -115,3 +115,22 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - The meter never changes a floor or a job result. When the meter cannot start, the job prints one line and continues. Then the `jobs` list of `meter.json` and the description of the R2 manifest show the missing job.
 - Evidence: a human commits `out/judge/meter.json` of a `main` pipeline as `.floor/evidence/release/meter.json` (CI has no token that can push, D-010). Then `floor footprint write` makes `sci-release-check.yml` again.
 - PRD impact: F14.1 and §13.1. R2 is measured in the GitLab pipeline. The release-check watts come from the metered CPU when the table has a row for it.
+
+## D-016 (2026-10-17) F4.5: the draft notice is a job artifact, and a code owner opens the notice MR
+- F4.5: when the fallback also fails, "a script opens a draft Leave-Behind Notice" with the agent's diagnosis, and the loop stops. CI has no token that can open an MR or push a branch (D-010). So the script writes the draft as a job artifact, and a code owner opens the notice MR from it.
+- `floor notice-draft` writes a draft only when both are true:
+  1. The judge result has a dimension in `missing_notice` (a floor moved, and no merged notice covers it).
+  2. The canned config is already on the branch (`fallback.pending` finds nothing to change), or the policy has `repair.fallback: none`.
+  In all other cases it prints "no draft: …" and exits 0. So the order stays: the agent's fix, then the fallback (F4.3), then the draft.
+- The `notice-draft` job (stage `repair`) has `needs: [judge]` and `when: on_failure`, so it runs after a failed judge. The judge keeps its artifacts on a failure (`when: always`), so the job gets `judge.json`. When the judge wrote no result, the job prints one line and passes. On an MR pipeline, the MR description (`CI_MERGE_REQUEST_DESCRIPTION`) is the diagnosis, and `--truncated` follows `CI_MERGE_REQUEST_DESCRIPTION_IS_TRUNCATED`. The pipeline URL is the evidence. The draft is `out/notice/NNNN-<dimensions>.md`. `artifacts:expose_as` shows it in the MR widget.
+- The script fills a field only from evidence:
+  - Floor change: the judge result and the policy.
+  - Reason: the first paragraph of the MR description.
+  - Tried first: the MR, the canned flags and the pipeline.
+  - Who is affected and ΔM: a valid `.floor/scenarios/*.yml` file for that dimension, if one exists.
+  - Guidance: the first sentence comes from `on_unfixable_raise`.
+  - The other values stay as the §11.2 placeholders. "Approved by" always stays a placeholder, because only a code owner fills it (F6.1).
+- The MR description is agent text, so it must not change the notice. The Reason summary is HTML-escaped and cut at 300 characters. The full text is an indented code block under "### Diagnosis", so it cannot add a field line, an approver or hidden HTML. `notice.problems` and `ratchet.notice_dimensions` read field lines only at the start of a line. (A fix in `ratchet.py`: an empty field took the text of the next line.)
+- The loop stops for three reasons. The judge failed the pipeline. The fallback has nothing left to apply. Automation cannot fire a trigger, so no new agent attempt starts (§9.1). The next step is human: a code owner opens the notice MR, or closes the agent MR.
+- `floor fallback` now reads each RUN instruction as shell words. The old line regex crashed on the quoted CMAKE_ARGS of upstream's main-cuda and main-rocm Dockerfiles ("No closing quotation"). It also put CMAKE_ARGS into the dnf package list of main-rocm (the `make` package). Now only a `make` command changes, and quotes, escapes and line continuations stay.
+- PRD impact: F4.5 (the script writes the draft, and a code owner opens the notice MR). F6.1 does not change.

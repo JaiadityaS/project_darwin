@@ -10,6 +10,7 @@
 #   memory  whisper-cli from the pushed image under cgroup memory limits, no swap, per model size
 #   offline whisper-cli from the pushed image with no network, under strace
 #   judge   floor judge and floor manifest; fails the pipeline when a floor rises
+#   notice-draft  only after a failed judge: drafts the Leave-Behind Notice for a code owner (F4.5)
 #   pages   the Rieux page from the committed evidence (default branch only)
 #
 # Evidence: the artifacts below out/ (the judge job keeps all of them).
@@ -26,7 +27,7 @@ workflow:
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-stages: [check, build, floors, judge, publish]
+stages: [check, build, floors, judge, repair, publish]
 
 variables:
   IMAGE_REPO: $CI_REGISTRY_IMAGE/main
@@ -297,6 +298,34 @@ judge:
       exit "$rc"
   artifacts:
     paths: [out/]
+
+# F4.5: the fix and the canned config (F4.3) did not hold a floor, so the repair loop stops.
+# A script drafts the Leave-Behind Notice from the judge result and the MR description. CI has
+# no token to open the notice MR (D-010): the draft is an artifact in the MR widget, and a code
+# owner opens the notice MR. floor notice-draft writes nothing while the fallback can still run.
+notice-draft:
+  stage: repair
+  extends: .evidence
+  image: python:3.12-slim
+  needs: [judge]
+  when: on_failure
+  variables:
+    GIT_DEPTH: "1"
+  script:
+    - |
+      if [ ! -s out/judge/judge.json ]; then echo "no draft: the judge wrote no result"; exit 0; fi
+      pip install -q -e ./.floor
+      set --
+      if [ -n "$CI_MERGE_REQUEST_IID" ]; then
+        printf '%s\n' "$CI_MERGE_REQUEST_DESCRIPTION" > /tmp/mr.md
+        set -- --diagnosis /tmp/mr.md --mr "$CI_MERGE_REQUEST_PROJECT_URL/-/merge_requests/$CI_MERGE_REQUEST_IID"
+        if [ "$CI_MERGE_REQUEST_DESCRIPTION_IS_TRUNCATED" = "true" ]; then set -- "$@" --truncated; fi
+      fi
+      floor notice-draft --judge out/judge/judge.json --evidence "$CI_PIPELINE_URL" "$@" --out out/notice
+  artifacts:
+    # expose_as: no glob and no variable in the path; a directory path ends with /.
+    expose_as: Leave-Behind Notice draft
+    paths: [out/notice/]
 
 pages:
   stage: publish

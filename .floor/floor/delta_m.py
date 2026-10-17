@@ -22,7 +22,12 @@ class ScenarioError(ValueError):
 
 
 def load(path: str | Path) -> dict:
-    doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    try:
+        doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError as exc:
+        raise ScenarioError(f"not valid YAML: {exc}") from exc
+    if not isinstance(doc, dict):
+        raise ScenarioError("not a mapping")
     validate(doc)
     return doc
 

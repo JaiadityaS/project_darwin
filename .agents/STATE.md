@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-17 · @JaiadityaS · session 5
+Last update: 2026-10-17 · @JaiadityaS · session 6
 
 ## Where we are
 
@@ -13,7 +13,8 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 - Done in session 3: G-1 (T-12, T-13), the policy and its ratchet (T-30, T-31), the Judge (T-32), the manifest and diff (T-33), memory and offline floors (T-44, T-45). Partly done, the parts that need no GitLab: T-35 notices, T-36 CODEOWNERS and path allowlist, T-41 fallback script, T-60 Floor page.
 - Done in session 4: T-56 (ΔM calculator) and the SCI part of T-54 (`floor footprint`, the Impact Framework manifests, the coefficients in `.floor/impact/footprint.yml`). See `.agents/log/2026-10-16-jaiadityas-4.md`.
 - Done in session 5: T-02 (first GitLab push: `main` is `36521198`), the name (D-013), and T-47 step 1 (`.gitlab-ci.yml`, `.gitlab/ci/`, D-014). The first GitLab pipeline (2958271425) failed as planned: the CPU floor of upstream's image is x86-64-v4. T-47 step 2 (the memory and offline jobs) ran in pipeline 2958309699 (see "Facts learned"). T-55 is done (energy run 39033747472). The R1 SCI files are committed (`.floor/impact/sci-audio-minute.yml`, `.floor/evidence/footprint/sci.json`). The Rieux page has the language, energy and SCI sections (T-60). See `.agents/log/2026-10-17-jaiadityas-5.md`.
-- CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | notice | paths | fallback | page | manifest | diff | delta-m | footprint`. Run `python -m floor <command> -h`.
+- Done in session 6: T-43 (D-016). `floor notice-draft` writes the draft Leave-Behind Notice when the agent's fix and the canned config did not hold a floor, and the `notice-draft` job of `.gitlab-ci.yml` keeps it as an artifact. `floor fallback` now reads RUN instructions as shell words (the old regex broke 2 of the 7 upstream Dockerfiles). See `.agents/log/2026-10-17-jaiadityas-6.md`.
+- CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | audio | energy | meter | notice | notice-draft | paths | fallback | page | manifest | diff | delta-m | footprint`. Run `python -m floor <command> -h`.
 
 ## Gates (PRD §17.1)
 
@@ -23,11 +24,11 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 | G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
 | G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014), and the first pipeline ran (2958271425). Open: the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
-| G-4 Release loop | Oct 22 | not started |
+| G-4 Release loop | Oct 22 | started: `floor fallback` (T-41) and `floor notice-draft` with its CI job (T-43, D-016), both tested locally. Open: the T-41 CI job, the flow (T-40), auto-merge (T-05), the release job (T-42) |
 
 ## Next agent: start here
 
-1. AC-F7 and AC-F8 are written and tested locally (dev, not on GitLab yet; see `.agents/log/2026-10-17-jaiadityas-5.md`): the memory floor lists the peak RSS and the download size per model; connectivity lists `download_mb` and `download_bytes` (each file); each floor links its own job (`floor manifest --floor-evidence`). A peak-RSS rise over 10% is a Judge note (report only). Next: a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job link per floor, `peak_rss_mb` and `download_mb` per model, and `download_bytes`.
+1. AC-F7 and AC-F8 are written and tested locally (dev, not on GitLab yet; see `.agents/log/2026-10-17-jaiadityas-5.md`): the memory floor lists the peak RSS and the download size per model; connectivity lists `download_mb` and `download_bytes` (each file); each floor links its own job (`floor manifest --floor-evidence`). A peak-RSS rise over 10% is a Judge note (report only). Next: a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job link per floor, `peak_rss_mb` and `download_mb` per model, and `download_bytes`. In the same pipeline, check the new `notice-draft` job (T-43, D-016): the judge fails on `main` (cpu raised), so the job runs, and it must print "no draft: the canned inclusive config is not on this branch yet …". If GitLab does not make the pipeline, read the error about `notice-draft` (`when: on_failure` with `needs`, or `expose_as`).
 2. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
 3. T-54, R2 (DECISIONS D-015): each GitLab job of the `.tools` template meters its own container (cgroup v2), and the judge job joins the meters into `out/judge/meter.json`. After the next human sync, check the `floor meter stop` line of each job, then commit `out/judge/meter.json` of a `main` pipeline as `.floor/evidence/release/meter.json`. Then make the SCI files again and commit them together: `floor footprint write`, if-run on each manifest (Node 22), `floor footprint check --out .floor/evidence/footprint/sci.json`. The commands are in `.floor/evidence/README.md`. `ci.yml` runs if-run and compares the result with `sci.json`. R1 is done: the energy evidence (T-55) and its SCI files are committed, and the Rieux page shows them (T-60).
 4. T-90 README: the measured claims are in "Facts learned" below.
@@ -99,6 +100,7 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 
 ## Environment notes
 
-- Windows (Git Bash, Python 3.13 venv) is enough for the scanner, the tests and small pulls.
+- Windows (Git Bash, Python 3.13 venv) is enough for the scanner, the tests and small pulls. When the console cannot show a character (→, Δ, ₂ in cp1252), the `floor` CLI prints "?" in its place. Files that it writes are always UTF-8.
+- Upstream's `.devops/` (whisper.cpp `0c7be696`) has 7 Dockerfiles. main-cuda and main-rocm have quoted CMAKE_ARGS, and main-rocm installs a `make` package with dnf. Do not read RUN text with `shlex`: it stops at those quotes.
 - Builds, QEMU, memory and offline tests need Linux: WSL Ubuntu, a Linux machine, or a CI job.
 - Private repo: GitHub Actions has 2000 free minutes per month. A backtest job of 2 images takes a few minutes.

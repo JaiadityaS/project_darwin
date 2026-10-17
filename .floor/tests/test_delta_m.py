@@ -1,5 +1,7 @@
 import copy
+import io
 import json
+import sys
 
 import pytest
 import yaml
@@ -31,6 +33,13 @@ def test_zero_when_floors_hold():
     result = delta_m.compute(SCENARIO, floors_held=True)
     assert result["low_kgco2e"] == result["high_kgco2e"] == 0
     assert all(row["high_kgco2e"] == 0 for row in result["sensitivity"])
+
+
+def test_load_refuses_bad_yaml(tmp_path):
+    for text in ("n_affected: [\n", "- 1\n"):
+        (tmp_path / "s.yml").write_text(text, encoding="utf-8")
+        with pytest.raises(delta_m.ScenarioError):
+            delta_m.load(tmp_path / "s.yml")
 
 
 def test_life_fraction_is_capped():
@@ -85,3 +94,14 @@ def test_cli(tmp_path, capsys):
     assert main(["delta-m", str(path), "--judge", str(verdict)]) == 0
     assert "0 when every floor holds" in capsys.readouterr().out
     assert main(["delta-m", str(policy.PACKAGE_ROOT / "scenarios" / "TEMPLATE.yml")]) == 2
+
+
+def test_cli_on_a_console_without_utf8(tmp_path, monkeypatch):
+    # A Windows pipe uses cp1252, which has no Δ or ₂.
+    path = tmp_path / "s.yml"
+    path.write_text(yaml.safe_dump(SCENARIO), encoding="utf-8")
+    console = io.TextIOWrapper(io.BytesIO(), encoding="cp1252")
+    monkeypatch.setattr(sys, "stdout", console)
+    assert main(["delta-m", str(path)]) == 0
+    console.flush()
+    assert console.buffer.getvalue().decode("cp1252").startswith("?M (scenario): 400.0–40000.0 kgCO?e")

@@ -224,6 +224,52 @@ def _cmd_notice(args: argparse.Namespace) -> int:
     return 1 if failed else 0
 
 
+def _cmd_notice_draft(args: argparse.Namespace) -> int:
+    try:
+        verdict = _read_json(args.judge)
+        doc = policy.for_artifact(policy.load(args.policy), verdict.get("artifact"))
+        diagnosis = Path(args.diagnosis).read_text(encoding="utf-8") if args.diagnosis else ""
+    except (OSError, ValueError, policy.PolicyError) as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    dimensions = verdict.get("missing_notice") or []
+    if not dimensions:
+        print(f"no draft: no floor needs a new Leave-Behind Notice (decision: {verdict.get('decision')})")
+        return 0
+    flags = None
+    if (doc.get("repair") or {}).get("fallback", "canned_inclusive_config") == "canned_inclusive_config":
+        todo = fallback.pending(args.root, artifact=verdict.get("artifact") or "main")
+        if todo:
+            print(f"no draft: the canned inclusive config is not on this branch yet ({', '.join(todo)}). "
+                  "The fallback runs first (F4.3).")
+            return 0
+        flags = fallback.flags_text()
+    scenarios = {}
+    for path in sorted(Path(args.scenarios).glob("*.yml")):
+        if path.name == "TEMPLATE.yml":
+            continue
+        try:
+            scenario = delta_m.load(path)
+        except (OSError, delta_m.ScenarioError) as exc:
+            print(f"{path.as_posix()}: not used: {exc}")
+            continue
+        if scenario.get("dimension") in dimensions:
+            scenarios[path.as_posix()] = delta_m.compute(scenario)
+    text = notice.draft(verdict, doc, diagnosis=diagnosis, truncated=args.truncated, mr=args.mr,
+                        evidence=args.evidence, flags=flags, scenarios=scenarios)
+    name = notice.next_name([p.name for p in Path(args.notices).glob("*.md")], dimensions)
+    out = Path(args.out) / name
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(text, encoding="utf-8", newline="\n")
+    fill = [found.split(":")[0] for found in notice.problems(text, draft=True)] + ["Approved by"]
+    print(text)
+    print(f"wrote {out.as_posix()}, a draft. A code owner fills: {', '.join(fill)}.")
+    print("The repair loop stops here (F4.5). To accept the change, add the draft as "
+          f"{Path(args.notices).as_posix()}/{name} in a new MR (template: Leave-Behind-Notice), fill those fields "
+          "and approve the MR as a code owner. To refuse it, close the MR.")
+    return 0
+
+
 def _cmd_paths(args: argparse.Namespace) -> int:
     try:
         changed = args.files or paths.changed_files(args.base)
@@ -565,6 +611,9 @@ def _print_table(reports: list[FileReport], summary: dict) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):  # a console that cannot show →, Δ or ₂ gets "?", not a crash
+            stream.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(prog="floor", description="Proves, for every release, who can still use it.")
     parser.add_argument("--version", action="version", version=f"floor {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -648,6 +697,20 @@ def main(argv: list[str] | None = None) -> int:
     nt.add_argument("files", nargs="+", help="notice files")
     nt.add_argument("--draft", action="store_true", help="allow an empty 'Approved by' (open notice MR)")
     nt.set_defaults(func=_cmd_notice)
+
+    nd = sub.add_parser("notice-draft", help="draft a Leave-Behind Notice when the fix and the fallback "
+                        "did not hold a floor (PRD F4.5)")
+    nd.add_argument("--judge", required=True, metavar="FILE", help="floor judge output for the branch")
+    nd.add_argument("--policy", default=str(policy.DEFAULT_POLICY), help="policy file")
+    nd.add_argument("--root", default=".", help="repository root (is the canned config on the branch?)")
+    nd.add_argument("--diagnosis", metavar="FILE", help="the MR description, where the agent states the cause (F4.2)")
+    nd.add_argument("--truncated", action="store_true", help="GitLab cut the MR description short")
+    nd.add_argument("--mr", metavar="URL", help="the MR with the fix")
+    nd.add_argument("--evidence", metavar="URL", help="the gate pipeline or job")
+    nd.add_argument("--scenarios", default=".floor/scenarios", metavar="DIR", help="ΔM scenarios (by dimension)")
+    nd.add_argument("--notices", default=ratchet.NOTICE_DIR, metavar="DIR", help="merged notices (for the number)")
+    nd.add_argument("--out", default="out/notice", metavar="DIR", help="folder for the draft")
+    nd.set_defaults(func=_cmd_notice_draft)
 
     mem = sub.add_parser("memory", help="smallest cgroup memory limit that passes, and peak RSS (PRD F7; Linux)")
     mem.add_argument("--model", required=True, help="model name, for example tiny")

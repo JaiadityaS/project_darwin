@@ -71,13 +71,13 @@
   - Energy and SCI: all four builds gave the same transcript (one SHA-256). if-run on `sci-audio-minute.yml`, then `floor footprint check`: "5 result(s): every output matches the formulas". `--expect .floor/evidence/footprint/sci.json`: no difference. `floor footprint stale`: "1 manifest(s): up to date". No local path and no email in the new files.
   - T-60: `python -m pytest .floor/tests -q`: 174 passed, 11 skipped (Windows). The page from the repo evidence, served from a temporary folder and looked at in a browser at phone and desktop widths: the values match `energy.json` and `sci.json`. At phone width, the wide tables scroll inside their card.
 - Open:
-  - GitHub CI on the next commit runs the if-run step for the first time. Check that it passes.
+  - Closed in session 6: GitHub CI run 39045169832 on `095afb9` ran the if-run step for the first time, and it passed.
   - The exact next step (STATE.md "Next agent", item 1): a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job link per floor, `peak_rss_mb` and `download_mb` per model, `download_bytes`.
   - The R2 meter has not run on GitLab yet. After the next human sync, check the `floor meter stop` line at the end of each `.tools` job log, and `out/judge/meter.json` of the judge job (8 jobs: scan, 4 probes, memory, offline, judge). Then commit it as `.floor/evidence/release/meter.json` and run `floor footprint write`.
   - `floor manifest --footprint` is not in the judge job yet. The SCI values come from the committed evidence (if-run runs on GitHub), so the manifest must say which run measured them first.
   - The two known gaps of the path allowlist (D-014), T-05.
   - The four probe jobs all missed the model cache on the first run, and each one downloaded tiny.en. The cache key has a `-protected` suffix on `main`, so the first MR pipeline downloads the model again.
-  - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.
+  - Closed in session 6: on Windows, `floor manifest` crashed when stdout was a pipe or a file (cp1252 cannot encode "→"). `cli.main` now prints "?" for such a character.
 - Gotchas:
   - WSL has Python 3.12 with `yaml`, `requests` and `jsonschema`, but no pip, venv or pytest. To run the Linux-only tests there, link the pure-Python packages of the Windows venv (`_pytest`, `pytest`, `pluggy`, `iniconfig`, `packaging`, `py.py`, `elftools`) into a `/tmp` folder on `PYTHONPATH`, and put a stub `iced_x86.py` there (the real one is compiled for Windows). The meter tests do not use the decoder.
   - After a shell heredoc writes Python code, check the newline escapes in its strings. In this session, two of them became real line breaks.

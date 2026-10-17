@@ -17,8 +17,9 @@ from .isa.levels import parse_level
 
 NOTICE_DIR = ".floor/notices"
 DIMENSIONS = {"cpu": "cpu", "memory_mb": "memory", "connectivity": "connectivity", "language": "language"}
-_FLOOR_CHANGE = re.compile(r"^Floor change:\s*(.+)$", re.MULTILINE)
-_APPROVED_BY = re.compile(r"^Approved by:\s*(\S.*)$", re.MULTILINE)
+# [ \t]*, not \s*: an empty field must not take the text of the next line.
+_FLOOR_CHANGE = re.compile(r"^Floor change:[ \t]*(\S.*)$", re.MULTILINE)
+_APPROVED_BY = re.compile(r"^Approved by:[ \t]*(\S.*)$", re.MULTILINE)
 _WORD = re.compile(r"[a-z_]+")
 
 
