@@ -1,5 +1,5 @@
 # 2026-10-17 @JaiadityaS session 5
-- Tasks: T-02 (done), T-47 step 1 (doing), the name (D-013), the CI parts of T-35, T-36 and T-60.
+- Tasks: T-02 (done), T-47 steps 1 and 2 (done; T-47 is still doing), the name (D-013), the CI parts of T-35, T-36 and T-60.
 - Done:
   - T-02: the first push to the Showcase project. GitLab `main` is `36521198`: the import merge `c503abf1` (whisper.cpp `0c7be696` with its history) plus one sync commit of dev `3c68121`. The assemble report now counts only Floor commits (`9d6190c`).
   - D-013: the product name is Rieux. D-012 (the import) was not in DECISIONS.md (commit `5ff75f7` changed only STATE and TASKS). It is back now, before D-013.
@@ -17,7 +17,7 @@
   - The human sync: GitLab `main` is `6d9de13d` (dev `6047676`). Its pipeline 2958271425 is the first T-47 run (see Verified).
   - `floor diff` with no previous release: the text now says that the Judge compares each floor with the policy (it said "No floor moved." under a "raised" row). Test: `test_diff_without_previous_release`.
   - The page title and heading are "Rieux" (D-013, T-60).
-  - T-47 step 2 (D-014, not run on GitLab yet):
+  - T-47 step 2 (D-014; it ran on GitLab in pipeline 2958309699, see Verified):
     - `memory.py`: the cgroup v2 mode (`cgroup_setup`, `cgroup_wrapper`, `_cgroup_remove`; `run` and `measure` take `cgroup_root`). `floor memory --cgroup` uses `/sys/fs/cgroup`.
     - `.gitlab-ci.yml`: the `memory` job (tiny.en, base.en, small.en) and the `offline` job (tiny.en). Both use chroot into the exported image. The judge job needs both and passes `--memory` and `--connectivity`.
     - Tests: `test_cgroup_setup_moves_the_processes_first`, `test_cgroup_run_sets_the_limit_and_no_swap`, `test_cgroup_wrapper_moves_the_command_itself` (POSIX only).
@@ -31,10 +31,10 @@
   - GitLab pipeline 2958271425 (push on `main`): failed as planned in 310 s. check, build, scan, the four probes and pages passed. judge exited 1: "cpu raised x86-64-v4, static, policy NOT met; decision fail". Docker-in-Docker, the registry push, the `BASE_IMAGE` grep, the dotenv report, crane export, the QEMU sysroot with the real image and Pages all work. STATE.md "Facts learned" has the numbers.
   - Read with the public raw job log (`/-/jobs/<id>/raw`) and the public artifact URL (`/-/jobs/<id>/artifacts/raw/<path>`). The API gives 401 for traces and deployments.
   - After the two small fixes: `python -m pytest .floor/tests -q`: 150 passed, 6 skipped (Windows).
-  - Step 2: pytest 152 passed, 7 skipped (Windows). The structure check of `.gitlab-ci.yml`: no problems. `bash -n` on every job, and `dash -n` (WSL) on the memory, offline and judge scripts: no errors. In WSL dash, the wrapper shell writes the same PID that the command then prints (290 = 290). Not verified: the cgroup setup and chroot on the GitLab runner.
+  - Step 2: pytest 152 passed, 7 skipped (Windows). The structure check of `.gitlab-ci.yml`: no problems. `bash -n` on every job, and `dash -n` (WSL) on the memory, offline and judge scripts: no errors. In WSL dash, the wrapper shell writes the same PID that the command then prints (290 = 290). The human sync made GitLab `main` `84388f56` (dev `034ca32`).
+  - GitLab pipeline 2958309699: failed as planned in 405 s. memory (181 s): tiny 512, base 512, small 768 MB; peak RSS 177, 284, 750 MB. offline (43 s): proven, 0 attempts, 81.9 MB. The judge: cpu raised, memory held, connectivity held; decision fail. The diff shows the new text for no previous release. So the cgroup setup and chroot work on the runner.
 - Open:
-  - The exact next step: a human syncs. Then read the `memory` and `offline` jobs of the new pipeline (STATE.md "Next agent", item 1).
-  - The AC-F7 and AC-F8 gap: no peak RSS and no download sizes in the manifest, and no report of a peak-RSS rise over 10% (F7.1).
+  - The exact next step (STATE.md "Next agent", item 1) is the AC-F7 and AC-F8 gap: no peak RSS and no download sizes in the manifest, and no report of a peak-RSS rise over 10% (F7.1).
   - The two known gaps of the path allowlist (D-014), T-05.
   - The four probe jobs all missed the model cache on the first run, and each one downloaded tiny.en. The cache key has a `-protected` suffix on `main`, so the first MR pipeline downloads the model again.
   - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.

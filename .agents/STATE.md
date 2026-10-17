@@ -12,7 +12,7 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 - Done in session 2: the #3814 follow-up (H-1 signal 2), function symbols in scan evidence, the T-16 rule, the sampler and timeline (`floor sample`, `floor timeline`) and the sweep workflow (`sweep.yml`).
 - Done in session 3: G-1 (T-12, T-13), the policy and its ratchet (T-30, T-31), the Judge (T-32), the manifest and diff (T-33), memory and offline floors (T-44, T-45). Partly done, the parts that need no GitLab: T-35 notices, T-36 CODEOWNERS and path allowlist, T-41 fallback script, T-60 Floor page.
 - Done in session 4: T-56 (ΔM calculator) and the SCI part of T-54 (`floor footprint`, the Impact Framework manifests, the coefficients in `.floor/impact/footprint.yml`). See `.agents/log/2026-10-16-jaiadityas-4.md`.
-- Done in session 5: T-02 (first GitLab push: `main` is `36521198`), the name (D-013), and T-47 step 1 (`.gitlab-ci.yml`, `.gitlab/ci/`, D-014). The first GitLab pipeline (2958271425) failed as planned: the CPU floor of upstream's image is x86-64-v4 (see "Facts learned"). See `.agents/log/2026-10-17-jaiadityas-5.md`.
+- Done in session 5: T-02 (first GitLab push: `main` is `36521198`), the name (D-013), and T-47 step 1 (`.gitlab-ci.yml`, `.gitlab/ci/`, D-014). The first GitLab pipeline (2958271425) failed as planned: the CPU floor of upstream's image is x86-64-v4. T-47 step 2 (the memory and offline jobs) ran in pipeline 2958309699 (see "Facts learned"). See `.agents/log/2026-10-17-jaiadityas-5.md`.
 - CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | notice | paths | fallback | page | manifest | diff | delta-m | footprint`. Run `python -m floor <command> -h`.
 
 ## Gates (PRD §17.1)
@@ -27,11 +27,10 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 
 ## Next agent: start here
 
-1. T-47 step 2 is written and checked locally (D-014): the `memory` and `offline` jobs, and `floor memory --cgroup`. A human syncs (see "Needs a human"). Then read the two jobs of the new pipeline. Expected: a smallest passing limit for tiny, base and small, and "offline proven". The judge still fails on cpu ("raised"). If a job prints "floor: cannot set the memory limits", or chroot fails, fix that first.
-2. The AC-F7 and AC-F8 gap: the manifest has no peak RSS and no download sizes, and the Judge does not report a peak-RSS rise over 10% (F7.1). `cli._memory_inputs` gives `judge_memory` only the smallest passing limit per model.
-3. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
-4. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
-5. T-90 README: the measured claims are in "Facts learned" below.
+1. The AC-F7 and AC-F8 gap (T-47 step 2 itself is done: pipeline 2958309699 in "Facts learned"): the manifest has no peak RSS and no download sizes, and the Judge does not report a peak-RSS rise over 10% (F7.1). `cli._memory_inputs` gives `judge_memory` only the smallest passing limit per model.
+2. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
+3. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
+4. T-90 README: the measured claims are in "Facts learned" below.
 
 ## Needs a human (agents cannot do these)
 
@@ -51,6 +50,10 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
   - So the same recipe gives v3 on the GitHub runner (G-1) and v4 on the GitLab runner: the build machine sets the floor.
   - Image `main@sha256:7e756879…` (full digest in the judge job's `floor-manifest.json`), base `ubuntu:22.04@sha256:0a988793…`.
 
+- **Step 2 pipeline (2958309699, GitLab `main` `84388f56`).** It failed as planned in 405 s (cpu raised). Judge: memory held, connectivity held, policy met for both. `floor memory --cgroup` and chroot work on the runner.
+  - memory (181 s): smallest passing limit tiny 512 MB (peak RSS 177), base 512 (284), small 768 (750). The GitHub run gave 179, 290 and 758.
+  - offline (43 s): 0 network attempts, offline proven, download 81.9 MB (the tiny.en model, whisper-cli and the `.so` files in `/app/build/bin`).
+  - build 200 s: the tools image was already in the registry.
 - **Region data (for T-50).** Lowest grid intensity in Google's 2025 region data: northamerica-northeast1, 11.36 gCO2e/kWh. Lowest in Tier 1 pricing: europe-west9, 15.83. us-central1 is 431.95. With the test numbers, SCI per audio-minute is about 6.6 times higher in us-central1, and embodied carbon is about 85% of SCI in northamerica-northeast1.
 - **G-1 met (cpu-proof run 38702242235, whisper.cpp 0c7be696).** Runners (2 vCPUs each): the native and folk-fix jobs ran on an AMD EPYC 9V74 (Zen 4), and the VM hides AVX-512, so `-march=native` gives v3 there. The all-variants job ran on an AMD EPYC 7763 (Zen 3).
   - Static (AC-F2): native v3; folk fix (`GGML_NATIVE=OFF`) v3, because ggml then turns on AVX, AVX2, FMA, F16C and BMI2 by default; all-variants v1 (highest level found v4, only in variants).
