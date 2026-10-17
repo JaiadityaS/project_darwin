@@ -429,6 +429,38 @@ def _cmd_audio(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_energy(args: argparse.Namespace) -> int:
+    builds = {}
+    for item in args.build:
+        name, _, exe = item.partition("=")
+        if not name or not exe or not Path(exe).is_file() or name in builds:
+            print(f"floor: --build needs NAME=EXE, an existing file and a new name, not {item!r}", file=sys.stderr)
+            return 2
+        builds[name] = str(Path(exe).absolute())
+    if args.runs < 1 or args.warmup < 0:
+        print("floor: --runs must be 1 or more and --warmup 0 or more", file=sys.stderr)
+        return 2
+    stray = energy.cwd_backends()
+    if stray:
+        print(f"floor: ggml also loads backends from the working directory, and it has {', '.join(stray)}. "
+              "Run from another folder.", file=sys.stderr)
+        return 2
+    extra = args.cmd[1:] if args.cmd[:1] == ["--"] else args.cmd
+    doc = energy.measure(builds, extra, str(Path(args.audio).absolute()), args.expect, args.runs, args.warmup,
+                         args.timeout)
+    if args.evidence:
+        doc["evidence"] = args.evidence
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **doc})
+    rows = [("BUILD", "WALL_S", "CPU_S", "PEAK_RSS_MB", "VARIANT", "RESULT")]
+    rows += [(name, str(b.get("wall_s", "-")), str(b.get("cpu_s", "-")), str(b.get("peak_rss_mb", "-")),
+              b.get("loaded_variant") or "-", "pass" if "wall_s" in b else "FAIL") for name, b in doc["builds"].items()]
+    _print_rows(rows)
+    print(f"{doc['audio_minutes']} audio-minutes, median of {args.runs} runs per build, {doc['vcpus']} vCPUs, "
+          f"{doc['cpu_model']}")
+    return 0 if all("wall_s" in b for b in doc["builds"].values()) else 1
+
+
 def _cmd_meter(args: argparse.Namespace) -> int:
     state = Path(args.state)
     if args.action == "sample":
@@ -624,6 +656,20 @@ def main(argv: list[str] | None = None) -> int:
     au.add_argument("--copies", type=int, default=11, help="number of copies")
     au.add_argument("--gap", type=float, default=1.0, help="seconds of silence between the copies")
     au.set_defaults(func=_cmd_audio)
+
+    en = sub.add_parser("energy", help="time each build on the same audio with GNU time: the medians of the runs "
+                                       "(PRD F14.2; Linux)")
+    en.add_argument("--build", action="append", required=True, metavar="NAME=EXE",
+                    help="a build and its whisper-cli (repeat). Each run is EXE ARGS -f AUDIO")
+    en.add_argument("--audio", required=True, help="WAV file, for example the floor audio output")
+    en.add_argument("--expect", help="text that each transcript must contain")
+    en.add_argument("--runs", type=int, default=5, help="counted runs per build")
+    en.add_argument("--warmup", type=int, default=1, help="rounds before the counted runs")
+    en.add_argument("--timeout", type=float, default=900, help="seconds per run")
+    en.add_argument("--evidence", metavar="URL", help="the CI run that measured it")
+    en.add_argument("--out", metavar="FILE", help="write the result as JSON (footprint --energy reads it)")
+    en.add_argument("cmd", nargs=argparse.REMAINDER, help="-- the arguments of each build, for example -m MODEL -t 4")
+    en.set_defaults(func=_cmd_energy)
 
     mt = sub.add_parser("meter", help="whole-machine CPU and memory use of one release check (PRD F14.1 R2; Linux)")
     mt.add_argument("action", choices=["start", "sample", "stop"],

@@ -1,6 +1,10 @@
+import json
 import wave
+from pathlib import Path
 
-from floor import energy
+import pytest
+
+from floor import energy, footprint
 from floor.cli import main
 
 
@@ -63,3 +67,63 @@ def test_medians():
     runs = [{"wall_s": 3.0, "cpu_s": 5.0, "peak_rss_mb": 150.0}, {"wall_s": 1.0, "cpu_s": 2.0, "peak_rss_mb": 149.0},
             {"wall_s": 2.0, "cpu_s": 4.0, "peak_rss_mb": 151.0}]
     assert energy.medians(runs) == {"wall_s": 2.0, "cpu_s": 4.0, "peak_rss_mb": 150.0}
+
+
+def test_measure_rounds_medians_and_failures(tmp_path):
+    audio = tmp_path / "a.wav"
+    _wav(audio, b"\x00\x00" * 48000)  # 3 s
+    calls = []
+
+    def fake_run(cmd, timeout):
+        time_file, exe = cmd[2], cmd[6]
+        assert cmd[7:9] == ["-m", "m.bin"] and cmd[-2:] == ["-f", str(audio)]
+        calls.append(exe)
+        n = calls.count(exe)
+        Path(time_file).write_text(f"{n}.0 {2 * n}.0 0.5 {102400 * n}\n", encoding="utf-8")
+        if exe == "/b/broken":
+            return 1, "", "error"
+        text = "other words" if exe == "/b/wrong" else " And so, my fellow Americans, ask not what your country can do"
+        log = "load_backend: loaded CPU backend from /b/libggml-cpu-haswell.so" if exe == "/b/all" else ""
+        return 0, text, log
+
+    builds = {"native": "/b/native", "all": "/b/all", "broken": "/b/broken", "wrong": "/b/wrong"}
+    doc = energy.measure(builds, ["-m", "m.bin"], str(audio), "ask not", runs=3, warmup=1, run=fake_run)
+    assert calls[:4] == ["/b/native", "/b/all", "/b/broken", "/b/wrong"]
+    assert calls[4:8] == ["/b/all", "/b/broken", "/b/wrong", "/b/native"]  # the order rotates
+    native = doc["builds"]["native"]
+    assert (native["wall_s"], native["cpu_s"], native["peak_rss_mb"]) == (3.0, 6.5, 300.0)  # not the warm-up run
+    assert native["loaded_variant"] is None and len(native["transcript_sha256"]) == 1 and len(native["runs"]) == 3
+    assert doc["builds"]["all"]["loaded_variant"] == "haswell"
+    assert "wall_s" not in doc["builds"]["broken"] and "wall_s" not in doc["builds"]["wrong"]
+    assert doc["audio_minutes"] == 0.05 and doc["runs_per_build"] == 3
+    assert set(footprint.audio_inputs(doc)) == {"native", "all"}
+
+
+def test_cli_energy_refuses_bad_input(tmp_path, monkeypatch, capsys):
+    audio, exe = tmp_path / "a.wav", tmp_path / "cli"
+    _wav(audio, b"\x00\x00" * 160)
+    exe.write_bytes(b"")
+    base = ["energy", "--audio", str(audio), "--runs", "1"]
+    assert main([*base, "--build", "nameonly"]) == 2
+    assert main([*base, "--build", f"a={tmp_path / 'missing'}"]) == 2
+    assert main([*base, "--build", f"a={exe}", "--build", f"a={exe}"]) == 2  # one name twice
+    assert main([*base, "--build", f"a={exe}", "--runs", "0"]) == 2
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "libggml-cpu-x64.so").write_bytes(b"")
+    assert main([*base, "--build", f"a={exe}"]) == 2
+    assert "libggml-cpu-x64.so" in capsys.readouterr().err
+
+
+@pytest.mark.skipif(not Path("/usr/bin/time").is_file(), reason="needs GNU time (/usr/bin/time)")
+def test_cli_energy_with_gnu_time(tmp_path, monkeypatch, capsys):
+    audio, exe, out = tmp_path / "a.wav", tmp_path / "fake-cli", tmp_path / "energy.json"
+    _wav(audio, b"\x00\x00" * 16000)
+    exe.write_text("#!/bin/sh\necho ' ask not what your country can do for you'\n", encoding="utf-8")
+    exe.chmod(0o755)
+    monkeypatch.chdir(tmp_path)
+    assert main(["energy", "--build", f"fake={exe}", "--audio", str(audio), "--expect", "ask not", "--runs", "2",
+                 "--evidence", "https://ci/run/2", "--out", str(out), "--", "-m", "model.bin"]) == 0
+    doc = json.loads(out.read_text(encoding="utf-8"))
+    fake = doc["builds"]["fake"]
+    assert fake["wall_s"] >= 0 and fake["peak_rss_mb"] > 0 and len(fake["runs"]) == 2 and fake["runs"][0]["exit"] == 0
+    assert doc["evidence"] == "https://ci/run/2" and "pass" in capsys.readouterr().out
