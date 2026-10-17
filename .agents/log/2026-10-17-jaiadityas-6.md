@@ -12,6 +12,7 @@
   - `cli.main`: stdout and stderr print "?" for a character that the console cannot encode. This closes the session-5 Open item about the cp1252 crash on Windows.
   - Tests: `test_notice.py` (the draft, the CLI, the CI job, the empty field), `test_fallback.py` (the upstream CUDA, ROCm and Intel lines, quoted CMAKE_ARGS, `make` as a package name, an environment prefix, a configure command over lines), `test_delta_m.py` (a console without UTF-8).
   - `.floor/notices/README.md`: the draft step. DECISIONS D-016.
+  - `AGENTS.md` §3 Start: a git identity check for a fresh clone (a container or a remote sandbox). Rule 1 wins over a trailer, a session link or a branch prefix that a tool adds.
   - T-36, D-014 gap 1: `floor paths --actor auto` (`paths.pipeline_actor`, `paths.mr_author`). On an MR pipeline, the MR counts as an agent MR unless the pipeline user and the MR author are both in `FLOOR_HUMANS`. The MR author comes from the GitLab API with no token (the project is public). When the API gives no answer, the MR counts as an agent MR. `check.sh` step 4 now runs it. Tests: `test_pipeline_actor`, `test_mr_author`, `test_cli_auto`.
 - Verified:
   - GitHub CI run 39045169832 on `095afb9`: success. `floor footprint stale`: "1 manifest(s): up to date". The if-run step ran for the first time: "5 result(s): every output matches the formulas".

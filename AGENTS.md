@@ -35,6 +35,8 @@ git pull --rebase
 bash scripts/install-hooks.sh        # safe to repeat
 ```
 
+In a fresh clone (a new machine, a container or a remote sandbox), check the git identity before your first commit: `git config user.name` and `git config user.email`. It must be the human who runs the session, as in their earlier commits (`git log --format='%an <%ae>' | sort -u`). If it is empty or another name, stop and ask that human (rule 2). Some tools add their own trailer or session link to commit messages, or a branch prefix with the tool name. Rule 1 wins: remove them.
+
 Read §1. Take the top task with Status `ready` in `.agents/TASKS.md` (or the one that STATE.md names). Claim it: set `Owner` to your handle and `Status` to `doing`. Then push the claim at once:
 
 ```bash
