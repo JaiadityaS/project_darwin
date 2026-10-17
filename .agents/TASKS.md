@@ -57,7 +57,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-40 | floor-repair flow (AI Catalog, private): exit unless raised → diagnose → fix MR | F4.1, F4.2 | blocked | - | Needs T-03 |
 | T-41 | Fallback script applies the canned inclusive config; the gate re-verifies | F4.3 | doing | @JaiadityaS | Done: `floor fallback` (`fallback.py`): adds CMAKE_ARGS to `make` lines in `.devops/*.Dockerfile` (upstream Makefile reads it) and writes `.floor/overrides/main.flags`; changes only allowlist paths. Open: the CI job that runs it on the agent branch and re-runs the gate (not in T-47 step 1) |
 | T-42 | Release job on `main`: cut `-floor.N` with `CI_JOB_TOKEN` after an auto-merge | F4.4, D-010 | blocked | - | Needs T-05 |
-| T-43 | Draft notice when the fallback also fails | F4.5 | ready | - | |
+| T-43 | Draft notice when the fallback also fails | F4.5 | doing | @JaiadityaS | |
 | T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | done | @JaiadityaS | `floor memory`, `floors.yml`. Run 38704136185: tiny 512, base 512, small 768 MB; set in the policy. Evidence in `.floor/evidence/release/` |
 | T-45 | Connectivity tripwire: `--network none` + syscall trace; download sizes | F8 | done | @JaiadityaS | `floor offline`: `unshare --net` + strace. Run 38704136185: offline proven, 0 attempts, 99.4 MB download (tiny.en) |
 | T-46 | Herald CI job (Duo CLI) with a deterministic template fallback | F12.1 | blocked | - | Needs T-04 |
