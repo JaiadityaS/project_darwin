@@ -462,21 +462,44 @@ def _cmd_energy(args: argparse.Namespace) -> int:
 
 
 def _cmd_meter(args: argparse.Namespace) -> int:
+    if args.action == "join":
+        try:
+            if not args.files:
+                raise ValueError("give the floor meter stop --out files, one per job")
+            result = meter.join({Path(path).stem: _read_json(path) for path in args.files})
+        except (OSError, ValueError, KeyError) as exc:
+            print(f"floor: {exc}", file=sys.stderr)
+            return 2
+        if args.evidence:
+            result["evidence"] = args.evidence
+        if args.out:
+            _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+        _print_rows([("JOB", "WALL_S", "CPU_S", "MEMORY_GB_S")] + [
+            (name, str(job["wall_s"]), str(job["cpu_s"]), str(job["memory_gb_s"])) for name, job in result["jobs"].items()])
+        print(f"{len(result['jobs'])} jobs: wall {result['wall_s']} s, busy CPU {result['cpu_s']} s of "
+              f"{result['vcpu_s']} vCPU-s, memory {result['memory_gb_s']} GB-s")
+        return 0
+    if not args.state:
+        print("floor: floor meter start, sample and stop need --state", file=sys.stderr)
+        return 2
     state = Path(args.state)
     if args.action == "sample":
-        meter.sample(state, args.interval)
+        meter.sample(state, args.interval, cgroup=args.cgroup)
         return 0
     if not Path(meter.PROC_STAT).exists():
         print("floor: floor meter needs Linux (/proc/stat)", file=sys.stderr)
         return 2
     if args.action == "start":
+        if args.cgroup and not Path(args.cgroup, "cpu.stat").exists():
+            print(f"floor: not a cgroup v2 folder (no cpu.stat): {args.cgroup}", file=sys.stderr)
+            return 2
         try:
-            doc = meter.start(state, args.interval)
-        except RuntimeError as exc:
+            doc = meter.start(state, args.interval, args.cgroup)
+        except (RuntimeError, OSError, ValueError) as exc:
             print(f"floor: {exc}", file=sys.stderr)
             return 2
         print(f"meter started: sampler PID {doc['pid']}, every {args.interval} s, {doc['vcpus']} vCPUs, "
-              f"{doc['cpu_model']}")
+              f"{doc['cpu_model']}, {'cgroup ' + doc['cgroup'] if doc['cgroup'] else 'whole machine'}")
         return 0
     if not state.exists():
         print(f"floor: no meter state file: {state} (run floor meter start first)", file=sys.stderr)
@@ -671,14 +694,18 @@ def main(argv: list[str] | None = None) -> int:
     en.add_argument("cmd", nargs=argparse.REMAINDER, help="-- the arguments of each build, for example -m MODEL -t 4")
     en.set_defaults(func=_cmd_energy)
 
-    mt = sub.add_parser("meter", help="whole-machine CPU and memory use of one release check (PRD F14.1 R2; Linux)")
-    mt.add_argument("action", choices=["start", "sample", "stop"],
+    mt = sub.add_parser("meter", help="CPU and memory use of one release check (PRD F14.1 R2; Linux)")
+    mt.add_argument("action", choices=["start", "sample", "stop", "join"],
                     help="start: write the state file and start the sampler; sample: the sampler itself; "
-                         "stop: stop the sampler and give the totals")
-    mt.add_argument("--state", required=True, metavar="FILE", help="state file of this meter")
+                         "stop: stop the sampler and give the totals; join: add the totals of the jobs of one "
+                         "release check")
+    mt.add_argument("files", nargs="*", help="floor meter stop --out files, one per job (join)")
+    mt.add_argument("--state", metavar="FILE", help="state file of this meter (start, sample, stop)")
+    mt.add_argument("--cgroup", nargs="?", const=meter.CGROUP, metavar="DIR",
+                    help=f"count one cgroup v2 group, not the whole machine (start; default {meter.CGROUP})")
     mt.add_argument("--interval", type=float, default=5.0, help="seconds between memory samples")
-    mt.add_argument("--evidence", metavar="URL", help="the CI run that measured it (stop)")
-    mt.add_argument("--out", metavar="FILE", help="write the totals as JSON (stop)")
+    mt.add_argument("--evidence", metavar="URL", help="the CI job or pipeline that measured it (stop, join)")
+    mt.add_argument("--out", metavar="FILE", help="write the totals as JSON (stop, join)")
     mt.set_defaults(func=_cmd_meter)
 
     pa = sub.add_parser("paths", help="path allowlist for agent MRs and merge-bot merges (PRD F4.2, §10.1)")

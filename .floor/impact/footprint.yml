@@ -17,7 +17,7 @@ watts_per_vcpu:
     Skylake: {min: 0.6446044454253452, max: 4.193436438541878, table: azure}
     Broadwell: {min: 0.7128342245989304, max: 3.6853275401069516, table: azure}
   provider:
-    # For a host whose CPU platform is not published (Cloud Run, GitLab-hosted runners).
+    # For a host whose CPU platform is not known (Cloud Run, or a runner CPU that is not in the table above).
     source: https://www.cloudcarbonfootprint.org/docs/methodology/
     gcp: {min: 0.71, max: 4.26}
     azure: {min: 0.78, max: 3.76}
@@ -49,8 +49,10 @@ embodied:
     e2-standard: {total_kgco2e: 1255.46, vcpus: 32}
 
 sites:
-  # Where each functional unit is served. Neither Cloud Run nor GitLab-hosted runners publish
-  # their CPU platform, so the GCP provider watts and an n2d-standard host are assumptions.
+  # Where each functional unit is served. Cloud Run does not publish its CPU platform, so the service
+  # uses the GCP provider watts. GitLab does not publish the CPU of its hosted runners either, but
+  # `floor meter` records the CPU of each job: the release check uses its microarchitecture row when
+  # the table has it (DECISIONS D-015). The n2d-standard host is an assumption for both sites.
   service:
     unit: audio-minutes
     provider: gcp

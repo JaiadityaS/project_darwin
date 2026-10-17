@@ -13,6 +13,8 @@
 #   pages   the Rieux page from the committed evidence (default branch only)
 #
 # Evidence: the artifacts below out/ (the judge job keeps all of them).
+# SCI per release check (R2): each job that uses the tools image meters its own container, and
+# the judge job adds the meters into out/judge/meter.json (DECISIONS D-015).
 # Not here yet: attest, herald, release, deploy.
 
 workflow:
@@ -54,8 +56,15 @@ default:
   variables:
     GIT_DEPTH: "1"
   # Editable install: the package finds policy.yml and the evidence through its own path.
+  # Then the R2 meter (D-015): CPU time and memory of this job's cgroup until the job shell ends.
+  # The EXIT trap also runs after a failed command. The meter never changes a floor or a job result.
   before_script:
     - pip install -q -e ./.floor
+    - |
+      meter_state=/tmp/floor-meter/state.json
+      meter_out="$CI_PROJECT_DIR/out/meter/$(echo "$CI_JOB_NAME_SLUG" | sed 's/--*/-/g').json"
+      floor meter start --cgroup --state "$meter_state" || echo "floor meter did not start: R2 has no value for this job"
+      trap 'floor meter stop --state "$meter_state" --evidence "$CI_JOB_URL" --out "$meter_out" || true' EXIT
 
 check:
   stage: check
@@ -161,7 +170,7 @@ scan:
         rootfs/app/build/CMakeCache.txt | tr '\n' ' ' | sed 's/ *$//' > out/scan/cmake-flags.txt
       echo "cmake flags: $(cat out/scan/cmake-flags.txt)"
   artifacts:
-    paths: [out/scan/]
+    paths: [out/scan/, out/meter/]
 
 probe:
   stage: floors
@@ -186,7 +195,7 @@ probe:
         "$PWD/rootfs/app/build/bin/whisper-cli" -m "$PWD/.cache/models/ggml-tiny.en.bin" \
         -f /app/samples/jfk.wav -t 4 -nt | tee "out/probe/$CPU_MODEL.txt"
   artifacts:
-    paths: [out/probe/]
+    paths: [out/probe/, out/meter/]
 
 # The memory and offline jobs run the image's own binaries natively, with chroot into the
 # exported image, so the image's libraries load. The job container runs as root, has cgroup v2
@@ -220,7 +229,7 @@ memory:
           | tee -a out/memory/memory.txt
       done
   artifacts:
-    paths: [out/memory/]
+    paths: [out/memory/, out/meter/]
 
 offline:
   stage: floors
@@ -247,7 +256,7 @@ offline:
         chroot "$PWD/rootfs" /app/build/bin/whisper-cli -m /models/ggml-tiny.en.bin -f /app/samples/jfk.wav -t 4 -nt \
         | tee out/offline/offline.txt
   artifacts:
-    paths: [out/offline/]
+    paths: [out/offline/, out/meter/]
 
 judge:
   stage: judge
@@ -280,6 +289,11 @@ judge:
         --build-cpu "$(cat out/build/cpu.txt)" --evidence "$CI_PIPELINE_URL" "$@" \
         --out out/judge/floor-manifest.json --diff out/judge/diff.md > /dev/null
       cat out/judge/diff.md
+      # R2 (D-015): stop the meter of this job, then add the meters of all the jobs of the release check.
+      trap - EXIT
+      floor meter stop --state "$meter_state" --evidence "$CI_JOB_URL" --out "$meter_out" || true
+      floor meter join out/meter/*.json --evidence "$CI_PIPELINE_URL" --out out/judge/meter.json \
+        || echo "floor meter join: no R2 value for this pipeline"
       exit "$rc"
   artifacts:
     paths: [out/]

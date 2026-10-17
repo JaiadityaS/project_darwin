@@ -61,7 +61,7 @@ def load(path: str | Path = DEFAULT_CONFIG) -> dict:
 
 def microarchitecture(cpu_model: str | None) -> str | None:
     for pattern, name in _ARCH:
-        if cpu_model and re.search(pattern, cpu_model):
+        if cpu_model and re.search(pattern, cpu_model, re.IGNORECASE):  # GCP VMs write "INTEL(R) XEON(R) ..."
             return name
     return None
 
@@ -188,12 +188,20 @@ def write(config: dict, energy: dict | None = None, meter: dict | None = None) -
                                               energy.get("evidence"))
     if meter:
         site = config["sites"]["release-check"]
+        defaults = site_defaults(config, "release-check")
+        # The meter ran on the release-check site itself, so the CPU that it saw gives the watts (D-015).
+        watts, label = watts_for(config, meter.get("cpu_model"), site["provider"])
+        defaults.update({"cpu/watts-min": watts["min"], "cpu/watts-max": watts["max"]})
+        jobs = meter.get("jobs") or {}
+        what = f"the sum of {len(jobs)} jobs ({', '.join(jobs)})" if jobs else "one job"
+        scope = "the cgroup of each job container" if meter.get("scope") == "cgroup" else "the whole machine"
         description = (
-            f"SCI per release check (R2): every Floor probe of one release. CPU time: `floor meter` for the whole "
-            f"machine, on a GitHub-hosted runner ({meter.get('cpu_model')}, {meter['vcpus']} vCPUs). Site: a "
-            f"GitLab-hosted runner in {site['region']}. GitLab does not publish its CPU platform, so the GCP average "
-            f"watts and an {site['host']} host are assumptions. No repair agent ran, so agent tokens add 0.")
-        children = {"release-check": (site_defaults(config, "release-check"), release_inputs(meter))}
+            f"SCI per release check (R2): every Floor probe of one release. CPU time and memory: `floor meter` "
+            f"({scope}), {what}, on {meter.get('cpu_model') or 'more than one CPU model'} with {meter['vcpus']} "
+            f"vCPUs. Watts: {label}. "
+            f"Site: a GitLab-hosted runner in {site['region']}. The {site['host']} host is an assumption. "
+            f"No repair agent ran, so agent tokens add 0.")
+        children = {"release-check": (defaults, release_inputs(meter))}
         files[FILES["release-checks"]] = _dump(_manifest(config, "release-checks", "release-check", children,
                                                          description), meter.get("evidence"))
     return files

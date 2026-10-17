@@ -65,6 +65,7 @@ def test_microarchitecture():
     assert footprint.microarchitecture("Intel(R) Xeon(R) Platinum 8171M CPU @ 2.60GHz") == "Skylake"
     assert footprint.microarchitecture("Intel(R) Xeon(R) CPU E5-2673 v4 @ 2.30GHz") == "Broadwell"
     assert footprint.microarchitecture("Intel(R) Xeon(R) CPU @ 2.20GHz") is None
+    assert footprint.microarchitecture("INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz") == "Emerald Rapids"  # GitLab
     watts, label = footprint.watts_for(footprint.load(), "Apple M2", "gcp")
     assert watts == {"min": 0.71, "max": 4.26} and "average" in label
 
@@ -84,6 +85,19 @@ def test_write_gives_one_child_per_measured_build():
     assert audio["all-variants"]["inputs"][0]["memory/gb-seconds"] == round(300 / 1024 * 30, 3)
     assert docs["sci-release-check.yml"]["tree"]["children"]["release-check"]["inputs"][0]["release-checks"] == 1
     assert footprint.write(footprint.load()) == {}
+
+
+def test_release_check_watts_come_from_the_metered_cpu():
+    config = footprint.load()
+    check = _docs()["sci-release-check.yml"]
+    defaults = check["tree"]["children"]["release-check"]["defaults"]
+    row = config["watts_per_vcpu"]["microarchitecture"]["EPYC 4th Gen"]  # METER ran on an EPYC 9V74
+    assert (defaults["cpu/watts-min"], defaults["cpu/watts-max"]) == (row["min"], row["max"])
+    assert "Watts: EPYC 4th Gen" in check["description"] and "one job" in check["description"]
+    joined = {**METER, "cpu_model": None, "scope": "cgroup", "jobs": {"scan": {}, "probe-qemu64": {}}}
+    doc = yaml.safe_load(footprint.write(config, meter=joined)["sci-release-check.yml"])
+    assert doc["tree"]["children"]["release-check"]["defaults"]["cpu/watts-min"] == 0.71  # the GCP average
+    assert "the cgroup of each job container), the sum of 2 jobs (scan, probe-qemu64)" in doc["description"]
 
 
 def test_check_accepts_correct_outputs_and_gives_sci():
