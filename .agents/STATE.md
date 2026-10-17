@@ -12,7 +12,7 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 - Done in session 2: the #3814 follow-up (H-1 signal 2), function symbols in scan evidence, the T-16 rule, the sampler and timeline (`floor sample`, `floor timeline`) and the sweep workflow (`sweep.yml`).
 - Done in session 3: G-1 (T-12, T-13), the policy and its ratchet (T-30, T-31), the Judge (T-32), the manifest and diff (T-33), memory and offline floors (T-44, T-45). Partly done, the parts that need no GitLab: T-35 notices, T-36 CODEOWNERS and path allowlist, T-41 fallback script, T-60 Floor page.
 - Done in session 4: T-56 (ΔM calculator) and the SCI part of T-54 (`floor footprint`, the Impact Framework manifests, the coefficients in `.floor/impact/footprint.yml`). See `.agents/log/2026-10-16-jaiadityas-4.md`.
-- Done in session 5: T-02 (first GitLab push: `main` is `36521198`), the name (D-013), and T-47 step 1 (`.gitlab-ci.yml`, `.gitlab/ci/`, D-014), checked locally but not run on GitLab yet. See `.agents/log/2026-10-17-jaiadityas-5.md`.
+- Done in session 5: T-02 (first GitLab push: `main` is `36521198`), the name (D-013), and T-47 step 1 (`.gitlab-ci.yml`, `.gitlab/ci/`, D-014). The first GitLab pipeline (2958271425) failed as planned: the CPU floor of upstream's image is x86-64-v4 (see "Facts learned"). See `.agents/log/2026-10-17-jaiadityas-5.md`.
 - CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | notice | paths | fallback | page | manifest | diff | delta-m | footprint`. Run `python -m floor <command> -h`.
 
 ## Gates (PRD §17.1)
@@ -22,13 +22,13 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 | G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
 | G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
-| G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014). Open: the first GitLab pipeline and the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
+| G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014), and the first pipeline ran (2958271425). Open: the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
 | G-4 Release loop | Oct 22 | not started |
 
 ## Next agent: start here
 
-1. T-47, the first GitLab pipeline. A human syncs the T-47 files (see "Needs a human"). Then read the artifacts: `out/build/runner.txt` and `out/build/cpu.txt` (the build machine), `out/scan/runner.txt` (a job container), the judge output and the job times. The judge job must fail with "raised" (D-014). Any other failure is a pipeline bug: fix it first.
-2. T-47 step 2: the memory and offline jobs, designed from the `facts.sh` output (cgroup version, child cgroups, `unshare --net`). Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
+1. T-47 step 2: the memory and offline jobs. Use the runner facts below ("First GitLab pipeline"). The job container has no systemd, so `floor memory` needs a direct cgroup v2 mode: move the job processes into a leaf cgroup, enable `+memory` in the root `cgroup.subtree_control`, then one child cgroup per limit with `memory.max` and `memory.swap.max` = 0. `floor offline --no-sudo` works there as it is (`unshare --net` and strace work). Run the image's binaries with `chroot` into the exported image, so its own libraries load.
+2. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
 3. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
 4. T-90 README: the measured claims are in "Facts learned" below.
 
@@ -41,6 +41,14 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
 ## Facts learned (measured)
+
+- **First GitLab pipeline (2958271425, GitLab `main` `6d9de13d`, whisper.cpp `0c7be696`).** It failed as planned (D-014) in 310 s. Jobs: check 38 s, build 241 s, scan 41 s, probe 39–46 s each, judge 23 s (exit 1), pages 21 s. No job waited in a queue. The page is live at https://showcase-9a1941.gitlab.io/.
+  - Runner `k8s.saas-linux-small-amd64`: Intel Xeon Platinum 8581C, x86-64-v4 with AVX-512 (also BF16, VNNI, FP16), 2 vCPUs, 8 GB RAM, 2 GB swap, kernel 5.15. Docker-in-Docker with TLS works.
+  - Job container: root with all capabilities, no seccomp, no systemd. cgroup v2 in a private namespace (`0::/`), controllers include `memory`, `subtree_control` is empty, a child cgroup can be made. `unshare --net` works.
+  - Static: floor x86-64-v4 + AVX512_BF16, AVX512_VNNI, AVX_VNNI, GFNI, set by `libggml-cpu.so.0.26.0` (`GGML_NATIVE=ON`). Every other ELF file in `/app` is v1.
+  - QEMU: whisper-cli crashes with SIGILL on all four models, EPYC-Milan too. Every control passed. The relink made 202 absolute links relative.
+  - So the same recipe gives v3 on the GitHub runner (G-1) and v4 on the GitLab runner: the build machine sets the floor.
+  - Image `main@sha256:7e756879…` (full digest in the judge job's `floor-manifest.json`), base `ubuntu:22.04@sha256:0a988793…`.
 
 - **Region data (for T-50).** Lowest grid intensity in Google's 2025 region data: northamerica-northeast1, 11.36 gCO2e/kWh. Lowest in Tier 1 pricing: europe-west9, 15.83. us-central1 is 431.95. With the test numbers, SCI per audio-minute is about 6.6 times higher in us-central1, and embodied carbon is about 85% of SCI in northamerica-northeast1.
 - **G-1 met (cpu-proof run 38702242235, whisper.cpp 0c7be696).** Runners (2 vCPUs each): the native and folk-fix jobs ran on an AMD EPYC 9V74 (Zen 4), and the VM hides AVX-512, so `-march=native` gives v3 there. The all-variants job ran on an AMD EPYC 7763 (Zen 3).

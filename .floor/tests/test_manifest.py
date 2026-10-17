@@ -60,6 +60,14 @@ def test_raise_needs_a_scenario():
     assert "No floor moved." in manifest.diff_markdown(old, release("x86-64-v1", previous=old))
 
 
+def test_diff_without_previous_release():
+    text = manifest.diff_markdown(None, release("x86-64-v3"))
+    assert "no previous release → v1-floor.1" in text
+    assert "| cpu | - | x86-64-v3 | raised |" in text
+    assert "the Judge compares each floor with the policy." in text
+    assert "No floor moved." not in text
+
+
 def test_cli_manifest_and_diff(tmp_path, capsys):
     scan_file = tmp_path / "scan.json"
     scan_file.write_text(json.dumps({"summary": scan("x86-64-v1")}), encoding="utf-8")

@@ -14,6 +14,9 @@
     - `floor manifest --build-cpu` writes `predicate.build.host_cpu`.
     - `qemu.relink_sysroot` makes the absolute links in a sysroot relative before a probe. `floor probe` prints the count, and the probe JSON has `sysroot_links_rewritten`.
     - Tests: `test_relink_sysroot` (POSIX only), `test_cli_judge_joins_probe_files`, `--build-cpu` in `test_manifest.py`.
+  - The human sync: GitLab `main` is `6d9de13d` (dev `6047676`). Its pipeline 2958271425 is the first T-47 run (see Verified).
+  - `floor diff` with no previous release: the text now says that the Judge compares each floor with the policy (it said "No floor moved." under a "raised" row). Test: `test_diff_without_previous_release`.
+  - The page title and heading are "Rieux" (D-013, T-60).
 - Verified:
   - `python -m pytest .floor/tests -q`: 149 passed, 6 skipped (Windows). `bash scripts/guard.sh tree`: exit 0.
   - A structure check of `.gitlab-ci.yml` (a local script, not in the repo: YAML parse, `extends` merge, keys, stages, `needs` order): no problems. `bash -n` on every job script. `sh -n` (dash, in WSL) on `.gitlab/ci/*.sh` and the build and judge scripts: no errors.
@@ -21,11 +24,13 @@
   - The judge job script on the G-1 native evidence (split into four probe files, as the matrix makes them): the Judge says "raised" (x86-64-v3, policy v1), the job exits 1, and the manifest has the digest, `host_cpu`, `base_image` and `cmake_flags`.
   - `model.sh` lookup: tiny.en gives `c78c86eb…`, an unknown name gives nothing. The crane hash in the tools recipe matches the release's `checksums.txt`. iced-x86 1.21.0 has an abi3 manylinux wheel, so the job images need no Rust.
   - `facts.sh` in WSL: all sections print; `--cpu` gives "12th Gen Intel(R) Core(TM) i5-12450H (x86-64-v3)".
-  - Not verified: nothing ran on GitLab yet. Docker-in-Docker, the registry push, crane, the QEMU sysroot with a real image, the dotenv report and Pages are untested.
+  - GitLab pipeline 2958271425 (push on `main`): failed as planned in 310 s. check, build, scan, the four probes and pages passed. judge exited 1: "cpu raised x86-64-v4, static, policy NOT met; decision fail". Docker-in-Docker, the registry push, the `BASE_IMAGE` grep, the dotenv report, crane export, the QEMU sysroot with the real image and Pages all work. STATE.md "Facts learned" has the numbers.
+  - Read with the public raw job log (`/-/jobs/<id>/raw`) and the public artifact URL (`/-/jobs/<id>/artifacts/raw/<path>`). The API gives 401 for traces and deployments.
+  - After the two small fixes: `python -m pytest .floor/tests -q`: 150 passed, 6 skipped (Windows).
 - Open:
-  - The exact next step: a human syncs (`scripts/assemble-gitlab.sh --push`). Then read the first pipeline (STATE.md "Next agent", item 1).
-  - T-47 step 2 (memory and offline), the two known gaps of the path allowlist (D-014), T-05.
-  - Small: with no previous release, `floor diff` says "No floor moved." under a "raised" row. Better text: the reference is the policy.
+  - The exact next step: T-47 step 2, the memory and offline jobs (STATE.md "Next agent", item 1). The dev fixes above reach GitLab with the next human sync.
+  - The two known gaps of the path allowlist (D-014), T-05.
+  - The four probe jobs all missed the model cache on the first run, and each one downloaded tiny.en. The cache key has a `-protected` suffix on `main`, so the first MR pipeline downloads the model again.
   - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.
 - Gotchas:
   - Install the package with `pip install -e`. `policy.PACKAGE_ROOT` comes from `__file__`, so a plain install looks for `policy.yml` and the evidence in site-packages. Every GitHub workflow and every GitLab job uses `-e`.

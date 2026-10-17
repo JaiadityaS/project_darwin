@@ -10,6 +10,7 @@ def test_page_from_repo_evidence(tmp_path):
     target = page.build(ROOT / ".floor" / "evidence", tmp_path, ROOT / ".floor" / "notices", generated="2026-10-15")
     html = target.read_text(encoding="utf-8")
     assert html.startswith("<!doctype html>")
+    assert "<title>Rieux</title>" in html and "<h1>Rieux</h1>" in html  # the product name (D-013)
     assert "<script" not in html and "http://" not in html
     assert html.count("<circle") >= 100
     assert "H-1: the build machine sets the floor." in html

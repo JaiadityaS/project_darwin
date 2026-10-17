@@ -13,7 +13,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-02 | `scripts/assemble-gitlab.sh`: clone whisper.cpp at a pinned commit, overlay the product files, push to the GitLab project | §0, D-001, D-012 | done | @JaiadityaS | First push 2026-10-17: GitLab `main` `36521198` (the import merge `c503abf1` plus one sync commit). Later syncs: run the script with `--push` again |
 | T-03 | Trigger-chain test: a human tag push fails the gate; the pipeline-failed trigger starts a flow; record who counts as the actor | F4.1, §9.1 | blocked | - | Needs T-01 (T-02 is done) |
 | T-04 | Duo CLI runs headless in a CI job (Herald, and the floor-repair fallback) | F4.1, F12.1 | blocked | - | Needs T-01 |
-| T-05 | Auto-merge test: the flow opens a non-code-owned MR and sets auto-merge; it merges only after the gate passes; an agent change to a code-owned path cannot merge | F4.4, D-010 | blocked | - | Needs the first T-47 pipeline on GitLab. No project token is possible (D-010) |
+| T-05 | Auto-merge test: the flow opens a non-code-owned MR and sets auto-merge; it merges only after the gate passes; an agent change to a code-owned path cannot merge | F4.4, D-010 | blocked | - | The first T-47 pipeline ran (2958271425). Needs a fix MR that `floor fallback` makes (T-41). No project token is possible (D-010) |
 | T-06 | Cloud Run hello-world with Workload Identity Federation from GitLab CI | F13.1 | human | - | GCP project and billing first |
 
 ## G-1 CPU proof (due Oct 15)
@@ -61,7 +61,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | done | @JaiadityaS | `floor memory`, `floors.yml`. Run 38704136185: tiny 512, base 512, small 768 MB; set in the policy. Evidence in `.floor/evidence/release/` |
 | T-45 | Connectivity tripwire: `--network none` + syscall trace; download sizes | F8 | done | @JaiadityaS | `floor offline`: `unshare --net` + strace. Run 38704136185: offline proven, 0 attempts, 99.4 MB download (tiny.en) |
 | T-46 | Herald CI job (Duo CLI) with a deterministic template fallback | F12.1 | blocked | - | Needs T-04 |
-| T-47 | `.gitlab-ci.yml`: build → static gate → QEMU → judge → attest → herald → release → deploy | §7.1 | doing | @JaiadityaS | Step 1 written and checked locally (D-014): check, build, scan, probe ×4, judge, pages; `.gitlab-ci.yml`, `.gitlab/ci/`. Open: the first GitLab pipeline (sync first), then step 2 (memory and offline, from the `facts.sh` output), then attest, herald, release, deploy (T-34, T-46, T-42, T-51) |
+| T-47 | `.gitlab-ci.yml`: build → static gate → QEMU → judge → attest → herald → release → deploy | §7.1 | doing | @JaiadityaS | Step 1 done (D-014): check, build, scan, probe ×4, judge, pages; `.gitlab-ci.yml`, `.gitlab/ci/`. The first pipeline 2958271425 failed as planned: cpu raised to x86-64-v4. Open: step 2 (memory and offline; the runner has no systemd, so `floor memory` needs a direct cgroup v2 mode), then attest, herald, release, deploy (T-34, T-46, T-42, T-51) |
 
 ## Deploy and sustainability
 
@@ -79,7 +79,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-60 | Floor page (title: Rieux, D-013): backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: energy, SCI and language sections (they wait on T-54 and T-55). The `pages` job publishes it from `main` (T-47, not run yet) |
+| T-60 | Floor page (title: Rieux, D-013): backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: energy, SCI and language sections (they wait on T-54 and T-55). The `pages` job publishes it from `main`: https://showcase-9a1941.gitlab.io/ (first deploy: pipeline 2958271425). Title and heading are "Rieux" from dev `page.py` (live after the next sync) |
 | T-61 | Pinned issue summary | F12.3 | later | - | |
 | T-62 | Language served / not-served table | F9 | later | - | |
 | T-63 | Field triage flow | F11 | later | - | |

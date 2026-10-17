@@ -207,9 +207,9 @@ def collect(evidence: Path, notices_dir: Path | None = None) -> dict:
 def render(data: dict, generated: str) -> str:
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Floor</title><meta name="description" content="Who each whisper.cpp release serves: CPU, memory and offline floors, with proof.">
+<title>Rieux</title><meta name="description" content="Who each whisper.cpp release serves: CPU, memory and offline floors, with proof.">
 <style>{CSS}</style></head><body><main>
-<h1>Floor</h1>
+<h1>Rieux</h1>
 <p class="lead">Every release of whisper.cpp says which machines it still runs on, with proof. If a change would leave
 people behind, the gate stops it, an agent repairs it, and only a human can accept the loss.</p>
 <h2>Does the build machine set the floor?</h2>{_section_h1(data["h1"], data["h1_cuda"])}

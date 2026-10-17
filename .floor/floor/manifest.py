@@ -136,6 +136,8 @@ def diff_markdown(old: dict | None, new: dict) -> str:
     if new_p["changes"]:
         lines += ["", "Changes:"] + [f"- {c['dimension']}: {_cell(c['from'])} → {_cell(c['to'])} ({c['status']})"
                                      for c in new_p["changes"]]
+    elif old is None:
+        lines += ["", "No previous release, so the Judge compares each floor with the policy."]
     else:
         lines += ["", "No floor moved."]
     lines += ["", f"Not measured: {', '.join(new_p['unmeasured'])}."]
