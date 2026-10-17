@@ -350,18 +350,20 @@ def _cmd_diff(args: argparse.Namespace) -> int:
     return 0
 
 
-def _memory_inputs(paths: list[str] | None) -> tuple[dict | None, dict | None]:
+def _memory_inputs(paths: list[str] | None) -> tuple[dict | None, dict | None, dict | None]:
     """Joins `floor memory --out` files (one per model) or plain {"model": MB} files. Gives the smallest
-    passing limit and the peak RSS per model (a plain file has no peak RSS)."""
-    limits, peaks = {}, {}
+    passing limit, the peak RSS and the download size per model (a plain file has only the limit)."""
+    limits, peaks, downloads = {}, {}, {}
     for path in paths or []:
         doc = _read_json(path)
         if "runs" in doc:
             limits[doc["model"]] = doc["smallest_passing_mb"]
             peaks[doc["model"]] = doc.get("peak_rss_mb")
+            if doc.get("download_mb") is not None:
+                downloads[doc["model"]] = doc["download_mb"]
         else:
             limits.update(doc)
-    return limits or None, peaks or None
+    return limits or None, peaks or None, downloads or None
 
 
 def _probe_inputs(paths: list[str] | None) -> dict | None:
@@ -382,9 +384,13 @@ def _cmd_memory(args: argparse.Namespace) -> int:
     if not cmd:
         return 2
     limits = [int(x) for x in args.limits.split(",")]
+    # F8.1: what a user must download to run this model. Measured first, so a wrong path stops the job early.
+    downloads = {"download_mb": offline.download_mb(args.artifact),
+                 "download_bytes": offline.download_bytes(args.artifact)} if args.artifact else {}
     try:
         result = {"model": args.model, **memory.measure(cmd, limits, args.expect, args.timeout, sudo=not args.no_sudo,
-                                                        cgroup_root=memory.CGROUP_ROOT if args.cgroup else None)}
+                                                        cgroup_root=memory.CGROUP_ROOT if args.cgroup else None),
+                  **downloads}
     except OSError as exc:  # --cgroup: not cgroup v2, not root, or no swap accounting
         print(f"floor: cannot set the memory limits in {memory.CGROUP_ROOT}: {exc}", file=sys.stderr)
         return 2
@@ -393,7 +399,8 @@ def _cmd_memory(args: argparse.Namespace) -> int:
     rows = [("LIMIT_MB", "RESULT", "EXIT", "PEAK_RSS_MB")]
     rows += [(str(r["limit_mb"]), r["result"], str(r["exit"]), str(r["peak_rss_mb"])) for r in result["runs"]]
     _print_rows(rows)
-    print(f"{args.model}: smallest passing limit {result['smallest_passing_mb']} MB, peak RSS {result['peak_rss_mb']} MB")
+    print(f"{args.model}: smallest passing limit {result['smallest_passing_mb']} MB, peak RSS {result['peak_rss_mb']} MB"
+          + (f", download {result['download_mb']} MB" if downloads else ""))
     return 0
 
 
@@ -419,10 +426,11 @@ def _cmd_judge(args: argparse.Namespace) -> int:
         return 2
     scan = _read_json(args.scan)
     previous = _read_json(args.previous)
-    limits, peaks = _memory_inputs(args.memory)
+    limits, peaks, downloads = _memory_inputs(args.memory)
     result = judge.judge(doc, scan=scan["summary"] if scan else None, probe=_probe_inputs(args.probe),
-                         memory=limits, peak_rss=peaks, connectivity=_read_json(args.connectivity),
-                         previous=_previous_floors(previous), notices=args.notice)
+                         memory=limits, peak_rss=peaks, model_download_mb=downloads,
+                         connectivity=_read_json(args.connectivity), previous=_previous_floors(previous),
+                         notices=args.notice)
     result["artifact"] = args.artifact
     if args.out:
         _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
@@ -554,6 +562,8 @@ def main(argv: list[str] | None = None) -> int:
     mem.add_argument("--no-sudo", action="store_true", help="do not prefix sudo (already root)")
     mem.add_argument("--cgroup", action="store_true",
                      help="no systemd: one child cgroup of /sys/fs/cgroup per run (cgroup v2, as root)")
+    mem.add_argument("--artifact", action="append", metavar="FILE",
+                     help="file a user must download for this run, for example the model (repeat; F8.1)")
     mem.add_argument("--out", metavar="FILE", help="write the result as JSON")
     mem.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     mem.set_defaults(func=_cmd_memory)

@@ -28,6 +28,7 @@
     - `manifest.py`: per-floor evidence links; the diff lists the Judge notes.
     - `.gitlab-ci.yml`: the scan, memory and offline jobs write `$CI_JOB_URL` to `out/<job>/job-url.txt`. The judge job gives them to `floor manifest`.
     - Tests: `test_memory_peak_rss_rise_is_report_only`, `test_floor_evidence_and_judge_notes`, and more asserts in `test_download_mb`, `test_judge_reads_memory_files` and `test_cli_manifest_and_diff`.
+    - The download size of each model (F8.1): `floor memory --artifact FILE` (repeat) adds `download_mb` and `download_bytes` to its output. `_memory_inputs` and `judge_memory` give the memory floor `download_mb` per model (`judge.judge` takes `model_download_mb`). The memory job gives each run its model, whisper-cli and the libraries. Test: `test_cli_memory_records_the_download`.
 - Verified:
   - `python -m pytest .floor/tests -q`: 149 passed, 6 skipped (Windows). `bash scripts/guard.sh tree`: exit 0.
   - A structure check of `.gitlab-ci.yml` (a local script, not in the repo: YAML parse, `extends` merge, keys, stages, `needs` order): no problems. `bash -n` on every job script. `sh -n` (dash, in WSL) on `.gitlab/ci/*.sh` and the build and judge scripts: no errors.
@@ -42,9 +43,9 @@
   - GitLab pipeline 2958309699: failed as planned in 405 s. memory (181 s): tiny 512, base 512, small 768 MB; peak RSS 177, 284, 750 MB. offline (43 s): proven, 0 attempts, 81.9 MB. The judge: cpu raised, memory held, connectivity held; decision fail. The diff shows the new text for no previous release. So the cgroup setup and chroot work on the runner.
   - AC-F7/F8: `python -m pytest .floor/tests -q`: 154 passed, 7 skipped (Windows). The structure check of `.gitlab-ci.yml`: no problems; `bash -n` on every job. In WSL, `dash -n` on the judge job, and the `--floor-evidence` loop in dash: it gives `cpu=…` and `memory=…` and skips an empty file.
   - End to end on the committed GitHub evidence (`.floor/evidence/release/`): `floor judge` with the three memory files and `offline.json`, then `floor manifest --floor-evidence memory=… --floor-evidence connectivity=…`. The memory floor lists `peak_rss_mb` tiny 179, base 290, small 758. Connectivity lists `download_mb` 99.4 (that old `offline.json` has no `download_bytes`). Each floor has its own link. The diff shows "Judge notes".
+  - The model download sizes: pytest 155 passed, 7 skipped (Windows). The structure check: no problems; `bash -n` on every job. In WSL, `dash -n` on the memory job, and its loop in dash with a fake rootfs: each model run gets its own model file, whisper-cli and the libraries, and the loop skips a symlink.
 - Open:
-  - The exact next step (STATE.md "Next agent", item 1): a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job links per floor, `peak_rss_mb`, `download_bytes`.
-  - F8.1 gap: the manifest lists only the files of the offline run (tiny.en). The download sizes of base.en and small.en are not recorded. The memory job has those files.
+  - The exact next step (STATE.md "Next agent", item 1): a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job link per floor, `peak_rss_mb` and `download_mb` per model, `download_bytes`.
   - The two known gaps of the path allowlist (D-014), T-05.
   - The four probe jobs all missed the model cache on the first run, and each one downloaded tiny.en. The cache key has a `-protected` suffix on `main`, so the first MR pipeline downloads the model again.
   - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.

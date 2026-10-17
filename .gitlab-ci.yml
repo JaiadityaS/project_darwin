@@ -208,10 +208,14 @@ memory:
     - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - crane export "$IMAGE_REF" - | tar -x -C rootfs
     - |
+      # The download size of each model's run (F8.1): the model, whisper-cli and its libraries.
       mkdir -p rootfs/models
+      set -- --artifact rootfs/app/build/bin/whisper-cli
+      for f in $(find rootfs/app/build/bin -name '*.so*' -type f); do set -- "$@" --artifact "$f"; done
       for m in $MEMORY_MODELS; do
         ln -f ".cache/models/ggml-$m.bin" rootfs/models/ 2> /dev/null || cp ".cache/models/ggml-$m.bin" rootfs/models/
-        floor memory --cgroup --model "${m%.en}" --expect "$EXPECT" --timeout 300 --out "out/memory/${m%.en}.json" -- \
+        floor memory --cgroup --model "${m%.en}" --expect "$EXPECT" --timeout 300 --out "out/memory/${m%.en}.json" \
+          --artifact "rootfs/models/ggml-$m.bin" "$@" -- \
           chroot "$PWD/rootfs" /app/build/bin/whisper-cli -m "/models/ggml-$m.bin" -f /app/samples/jfk.wav -t 4 -nt \
           | tee -a out/memory/memory.txt
       done

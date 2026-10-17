@@ -96,12 +96,24 @@ def test_download_mb(tmp_path):
     assert offline.download_bytes([str(a), str(b), str(c)]) == {"a": 1_500_000, "b": 500_000, str(c): 10}
 
 
+def test_cli_memory_records_the_download(tmp_path, monkeypatch, capsys):
+    model = tmp_path / "ggml-tiny.en.bin"
+    model.write_bytes(b"x" * 2_000_000)
+    monkeypatch.setattr(memory, "measure",
+                        lambda *args, **kwargs: {"runs": [], "smallest_passing_mb": 512, "peak_rss_mb": 177})
+    out = tmp_path / "tiny.json"
+    assert main(["memory", "--model", "tiny", "--artifact", str(model), "--out", str(out), "--", "whisper-cli"]) == 0
+    doc = json.loads(out.read_text(encoding="utf-8"))
+    assert doc["download_mb"] == 2.0 and doc["download_bytes"] == {"ggml-tiny.en.bin": 2_000_000}
+    assert "download 2.0 MB" in capsys.readouterr().out
+
+
 def test_judge_reads_memory_files(tmp_path, capsys):
     scan = tmp_path / "scan.json"
     scan.write_text(json.dumps({"summary": {"floor": {"level": "x86-64-v1"}, "files": {"errors": []}}}), encoding="utf-8")
     tiny = tmp_path / "tiny.json"
-    tiny.write_text(json.dumps({"model": "tiny", "runs": [], "smallest_passing_mb": 512, "peak_rss_mb": 177}),
-                    encoding="utf-8")
+    tiny.write_text(json.dumps({"model": "tiny", "runs": [], "smallest_passing_mb": 512, "peak_rss_mb": 177,
+                                "download_mb": 81.9}), encoding="utf-8")
     conn = tmp_path / "offline.json"
     conn.write_text(json.dumps({"offline": True, "network_attempts": 0, "download_mb": 81.9,
                                 "download_bytes": {"ggml-tiny.en.bin": 77704715}}), encoding="utf-8")
@@ -110,6 +122,7 @@ def test_judge_reads_memory_files(tmp_path, capsys):
     doc = json.loads(out.read_text(encoding="utf-8"))
     assert doc["floors"]["memory"]["smallest_passing_mb"] == {"tiny": 512}
     assert doc["floors"]["memory"]["peak_rss_mb"] == {"tiny": 177}  # AC-F7
+    assert doc["floors"]["memory"]["download_mb"] == {"tiny": 81.9}  # F8.1, per model
     assert doc["floors"]["connectivity"]["offline"] == "proven"
     assert doc["floors"]["connectivity"]["download_bytes"] == {"ggml-tiny.en.bin": 77704715}  # AC-F8
     assert doc["unmeasured"] == []

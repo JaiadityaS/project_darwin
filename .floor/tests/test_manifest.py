@@ -70,6 +70,7 @@ def test_diff_without_previous_release():
 
 def test_floor_evidence_and_judge_notes():
     verdict = judge.judge(POLICY, scan=scan("x86-64-v1"), memory={"small": 768}, peak_rss={"small": 830},
+                          model_download_mb={"small": 492.0},
                           connectivity={"offline": True, "network_attempts": 0, "download_mb": 81.9,
                                         "download_bytes": {"ggml-tiny.en.bin": 77704715}},
                           previous={"memory": {"smallest_passing_mb": {"small": 768}, "peak_rss_mb": {"small": 750}}})
@@ -80,6 +81,7 @@ def test_floor_evidence_and_judge_notes():
     assert floors["cpu"]["evidence"] == "https://ci.example/pipelines/1"
     assert floors["memory"]["evidence"] == "https://ci.example/jobs/2"
     assert floors["memory"]["smallest_passing_mb"] == {"small": 768} and floors["memory"]["peak_rss_mb"] == {"small": 830}
+    assert floors["memory"]["download_mb"] == {"small": 492.0}
     assert floors["connectivity"]["evidence"] == "https://ci.example/jobs/3"
     assert floors["connectivity"]["offline"] == "proven" and floors["connectivity"]["download_mb"] == 81.9
     text = manifest.diff_markdown(None, doc)
