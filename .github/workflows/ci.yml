@@ -41,6 +41,23 @@ jobs:
         run: python -m floor page --out site
       - name: Unit tests
         run: python -m pytest .floor/tests -q
+      # SCI (PRD F14.1): the committed Impact Framework manifests must match the evidence, and the
+      # real if-run must give the committed SCI summary (floor footprint check recomputes each output).
+      - name: SCI manifests match the evidence (F14.1)
+        run: python -m floor footprint stale
+      - uses: actions/setup-node@v4
+        if: hashFiles('.floor/impact/sci-*.yml') != ''
+        with:
+          node-version: "22"
+      - name: SCI with Impact Framework (F14.1)
+        if: hashFiles('.floor/impact/sci-*.yml') != ''
+        run: |
+          npm install -g --no-fund --no-audit @grnsft/if@1.1.1
+          mkdir -p out/impact
+          for m in .floor/impact/sci-*.yml; do
+            if-run --manifest "$m" --output "out/impact/$(basename "$m" .yml)"
+          done
+          python -m floor footprint check out/impact/*.yaml --expect .floor/evidence/footprint/sci.json
       - name: Hygiene guard
         env:
           BEFORE: ${{ github.event.before }}
