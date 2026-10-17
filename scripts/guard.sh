@@ -3,6 +3,7 @@
 #   guard.sh msg <file|->   check a commit message (commit-msg hook)
 #   guard.sh staged         check staged paths and added lines (pre-commit hook)
 #   guard.sh tree           check all tracked files (CI)
+#   guard.sh push           check pushed branch names and commits (pre-push hook, refs on stdin)
 set -uo pipefail
 
 rot13() { tr 'A-Za-z' 'N-ZA-Mn-za-m'; }
@@ -79,8 +80,29 @@ case "${1:-}" in
       bad "tracked files contain an AI tool or vendor name"
     fi
     ;;
+  push)
+    # Git gives one line per ref: <local ref> <local sha> <remote ref> <remote sha>.
+    # This also catches commits made before the hooks were installed, and a tool identity.
+    while read -r lref lsha rref rsha; do
+      [ -n "${rref:-}" ] || continue
+      if printf '%s' "$rref" | grep -qiE "$DENY"; then
+        bad "denied name in pushed branch: $rref"
+      fi
+      [[ "$lsha" =~ ^0+$ ]] && continue
+      if [[ "$rsha" =~ ^0+$ ]] || ! git cat-file -e "$rsha^{commit}" 2>/dev/null; then
+        range=("$lsha" --not --remotes)
+      else
+        range=("$rsha..$lsha")
+      fi
+      out="$(git log --format='%an <%ae>%n%cn <%ce>%n%B' "${range[@]}" 2>/dev/null || true)"
+      if printf '%s\n' "$out" | grep -qiE "$DENY|$ATTR"; then
+        printf '%s\n' "$out" | grep -iE "$DENY|$ATTR" | head -5 >&2
+        bad "a pushed commit has an attribution line, or a tool name in its message or identity"
+      fi
+    done
+    ;;
   *)
-    echo "usage: guard.sh msg <file|-> | staged | tree" >&2
+    echo "usage: guard.sh msg <file|-> | staged | tree | push" >&2
     exit 2
     ;;
 esac

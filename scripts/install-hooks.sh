@@ -14,7 +14,11 @@ cat > "$hooks/pre-commit" <<'EOF'
 #!/usr/bin/env bash
 exec bash "$(git rev-parse --show-toplevel)/scripts/guard.sh" staged
 EOF
-chmod +x "$hooks/commit-msg" "$hooks/pre-commit"
+cat > "$hooks/pre-push" <<'EOF'
+#!/usr/bin/env bash
+exec bash "$(git rev-parse --show-toplevel)/scripts/guard.sh" push
+EOF
+chmod +x "$hooks/commit-msg" "$hooks/pre-commit" "$hooks/pre-push"
 
 # Settings and memory files of common agent tools, rot13-encoded so that this file does not name them.
 exclude="$(git rev-parse --git-path info/exclude)"
