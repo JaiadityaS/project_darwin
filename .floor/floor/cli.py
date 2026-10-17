@@ -7,13 +7,14 @@ import json
 import re
 import subprocess
 import sys
+import wave
 from pathlib import Path
 
 import requests
 
 from . import __version__
-from . import (backtest, delta_m, fallback, footprint, h1, judge, manifest, memory, meter, notice, offline, page,
-               paths, policy, qemu, ratchet)
+from . import (backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice, offline,
+               page, paths, policy, qemu, ratchet)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -418,6 +419,16 @@ def _cmd_offline(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_audio(args: argparse.Namespace) -> int:
+    try:
+        seconds = energy.repeat_wav(args.src, args.out, args.copies, args.gap)
+    except (ValueError, EOFError, OSError, wave.Error) as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    print(f"{args.out}: {seconds:.1f} s ({seconds / 60:.3f} audio-minutes), {args.copies} copies, {args.gap} s gaps")
+    return 0
+
+
 def _cmd_meter(args: argparse.Namespace) -> int:
     state = Path(args.state)
     if args.action == "sample":
@@ -605,6 +616,14 @@ def main(argv: list[str] | None = None) -> int:
     off.add_argument("--out", metavar="FILE", help="write the result as JSON")
     off.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     off.set_defaults(func=_cmd_offline)
+
+    au = sub.add_parser("audio", help="repeat a WAV file with silence between the copies: the energy test audio "
+                                      "(PRD F14.2)")
+    au.add_argument("src", help="WAV file, for example samples/jfk.wav")
+    au.add_argument("out", help="output WAV file")
+    au.add_argument("--copies", type=int, default=11, help="number of copies")
+    au.add_argument("--gap", type=float, default=1.0, help="seconds of silence between the copies")
+    au.set_defaults(func=_cmd_audio)
 
     mt = sub.add_parser("meter", help="whole-machine CPU and memory use of one release check (PRD F14.1 R2; Linux)")
     mt.add_argument("action", choices=["start", "sample", "stop"],
