@@ -4,6 +4,7 @@ Last update: 2026-10-16 · @JaiadityaS · session 4
 
 ## Where we are
 
+- Product name: **Rieux** (D-013). Code names (`floor`, `.floor/`) do not change.
 - PRD v3.1 is the go decision (`docs/PRD.md`). Today is build day 2 (PRD §17.2).
 - Done: repo, team-sync system, hooks, CI for tests and hygiene.
 - Done: the static scanner (T-10, T-11) and the ghcr.io client (T-20). `python -m floor scan <path>` and `python -m floor image <ref>` work.

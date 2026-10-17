@@ -79,7 +79,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-60 | Floor page: backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: energy, SCI and language sections (they wait on T-54 and T-55), publish on GitLab Pages (T-47) |
+| T-60 | Floor page (title: Rieux, D-013): backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: energy, SCI and language sections (they wait on T-54 and T-55), publish on GitLab Pages (T-47) |
 | T-61 | Pinned issue summary | F12.3 | later | - | |
 | T-62 | Language served / not-served table | F9 | later | - | |
 | T-63 | Field triage flow | F11 | later | - | |
@@ -89,7 +89,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-90 | Final README: problem, claims, stage table, how to run, sources | §16.2 | ready | - | |
+| T-90 | Final README: problem, claims, stage table, how to run, sources | §16.2 | ready | - | Product name Rieux (D-013) |
 | T-91 | Video, under 3:00 | §16.1 | later | - | |
 | T-92 | Devpost text | §16.2 | later | - | |
 | T-99 | Delete `AGENTS.md` and `.agents/`; final hygiene check (`bash scripts/guard.sh tree`) | - | later | - | Last commit before submission |

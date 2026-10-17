@@ -57,3 +57,11 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Path B Hands-off stays the main target. The special prize is Environmental, and the pitch also uses its creative side.
 - Why: Floor is the only entry with ΔM and CPU floors. The six green rivals all measure the operational SCI of pipelines only. The extra work is small (T-54, T-55, T-56, T-60).
 - If time is short after Oct 22, cut ΔM polish first.
+
+## D-013 (2026-10-17) Product name: Rieux
+- The product name is **Rieux**, after Dr. Bernard Rieux in Camus's *The Plague* (1947). He does the work without heroics, keeps an honest record, and knows that the danger comes back. Our floor came back 15 times in 18 months (T-21).
+- "Floor" stays as the name of what Rieux measures. Tagline: "Rieux watches the floor, so no one is left behind."
+- Use "Rieux" in the README, the page, the video and the Devpost text. Use "Dr. Rieux" only to explain the source. Say the name ("ree-UH") and its source one time, early in the video.
+- No change to code names: the Python package `floor`, the `.floor/` folder and the `floor` commands stay. This saves about a day of rename and test work.
+- The book is still under copyright in many countries: at most one short quote with attribution, or none.
+- PRD impact: §0 "Floor (working title)" is now Rieux. T-60, T-90, T-91, T-92 use the new name.
