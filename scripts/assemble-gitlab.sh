@@ -109,14 +109,15 @@ fi
 
 # 4. Report, then push only on request.
 ahead="$(G rev-list --count "origin/$BRANCH..HEAD")"
-say "work/gitlab is $ahead commit(s) ahead of GitLab $BRANCH:"
-G log --oneline --max-count=5 "origin/$BRANCH..HEAD" | sed 's/^/  /'
-[ "$ahead" -gt 5 ] && say "  (the import brings the upstream history; only the commits above are new work)"
+ours="$(G rev-list --count "origin/$BRANCH..HEAD" "^$UPSTREAM_COMMIT")"
+say "work/gitlab is $ahead commit(s) ahead of GitLab $BRANCH. Floor commits ($ours):"
+G log --oneline "origin/$BRANCH..HEAD" "^$UPSTREAM_COMMIT" | sed 's/^/  /'
+[ "$ahead" -gt "$ours" ] && say "  plus $((ahead - ours)) upstream whisper.cpp commit(s) from the import"
 if [ "$ahead" -eq 0 ]; then
   say "nothing to push"
 elif [ "$PUSH" -eq 1 ]; then
   G push -u origin "HEAD:$BRANCH"
   say "pushed to $GITLAB_URL ($BRANCH) as $(git config user.name)"
 else
-  say "dry run: nothing pushed. Check work/gitlab, then run: bash scripts/assemble-gitlab.sh --push"
+  say "dry run: nothing pushed. Check work/gitlab, then run the same command with --push"
 fi
