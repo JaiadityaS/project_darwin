@@ -19,12 +19,14 @@ def predicate_type(project_url: str | None = None) -> str:
     return f"{url}/floor-manifest/{PREDICATE_VERSION}" if url else f"urn:floor:floor-manifest:{PREDICATE_VERSION}"
 
 
-def _floors(verdict: dict, evidence: str | None) -> dict:
+def _floors(verdict: dict, evidence: str | None, floor_evidence: dict | None = None) -> dict:
+    """``floor_evidence`` maps a floor to the job that measured it. ``evidence`` is the link for the others."""
     floors = {}
     for name, floor in verdict["floors"].items():
         kept = {key: value for key, value in floor.items() if name != "cpu" or key in _CPU_FIELDS}
-        if evidence:
-            kept["evidence"] = evidence
+        link = (floor_evidence or {}).get(name) or evidence
+        if link:
+            kept["evidence"] = link
         floors[name] = kept
     return floors
 
@@ -62,10 +64,10 @@ def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str
           scan: dict | None = None, cmake_flags: str | None = None, base_image: str | None = None,
           build_cpu: str | None = None, previous: dict | None = None, evidence: str | None = None, fixed_by: str | None = None,
           notices: list[str] | None = None, project_url: str | None = None, delta_m: dict | None = None,
-          footprint: dict | None = None) -> dict:
+          footprint: dict | None = None, floor_evidence: dict | None = None) -> dict:
     """``verdict`` is `floor judge` output, ``scan`` a scan summary, ``previous`` the previous manifest,
-    ``footprint`` `floor footprint check --out` output."""
-    floors = _floors(verdict, evidence)
+    ``footprint`` `floor footprint check --out` output, ``floor_evidence`` {floor: job URL}."""
+    floors = _floors(verdict, evidence, floor_evidence)
     previous_predicate = (previous or {}).get("predicate") or {}
     raised = [name for name, floor in floors.items() if floor["status"] == "raised"]
     unmeasured = list(ALWAYS_UNMEASURED) + verdict.get("unmeasured", [])
@@ -140,5 +142,8 @@ def diff_markdown(old: dict | None, new: dict) -> str:
         lines += ["", "No previous release, so the Judge compares each floor with the policy."]
     else:
         lines += ["", "No floor moved."]
+    notes = [f"- {d}: {note}" for d in sorted(new_floors) for note in new_floors[d].get("notes") or []]
+    if notes:
+        lines += ["", "Judge notes:"] + notes
     lines += ["", f"Not measured: {', '.join(new_p['unmeasured'])}."]
     return "\n".join(lines) + "\n"

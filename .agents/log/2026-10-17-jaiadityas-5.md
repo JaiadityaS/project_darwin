@@ -1,5 +1,5 @@
 # 2026-10-17 @JaiadityaS session 5
-- Tasks: T-02 (done), T-47 steps 1 and 2 (done; T-47 is still doing), the name (D-013), the CI parts of T-35, T-36 and T-60.
+- Tasks: T-02 (done), T-47 steps 1 and 2 (done; T-47 is still doing) and its AC-F7/F8 manifest fields, the name (D-013), the CI parts of T-35, T-36 and T-60.
 - Done:
   - T-02: the first push to the Showcase project. GitLab `main` is `36521198`: the import merge `c503abf1` (whisper.cpp `0c7be696` with its history) plus one sync commit of dev `3c68121`. The assemble report now counts only Floor commits (`9d6190c`).
   - D-013: the product name is Rieux. D-012 (the import) was not in DECISIONS.md (commit `5ff75f7` changed only STATE and TASKS). It is back now, before D-013.
@@ -21,6 +21,13 @@
     - `memory.py`: the cgroup v2 mode (`cgroup_setup`, `cgroup_wrapper`, `_cgroup_remove`; `run` and `measure` take `cgroup_root`). `floor memory --cgroup` uses `/sys/fs/cgroup`.
     - `.gitlab-ci.yml`: the `memory` job (tiny.en, base.en, small.en) and the `offline` job (tiny.en). Both use chroot into the exported image. The judge job needs both and passes `--memory` and `--connectivity`.
     - Tests: `test_cgroup_setup_moves_the_processes_first`, `test_cgroup_run_sets_the_limit_and_no_swap`, `test_cgroup_wrapper_moves_the_command_itself` (POSIX only).
+  - AC-F7 and AC-F8 (D-014 addendum; not on GitLab yet):
+    - `judge.py`: `judge_memory` takes the peak RSS per model and the previous release's, and gives `peak_rss_mb`. A rise over `RSS_RISE_PCT` (10) is a note, report only. `judge_connectivity` copies `download_mb` and `download_bytes`. `judge.judge` takes `peak_rss`.
+    - `offline.py`: `download_bytes` gives the size of each file. `floor offline --out` now has it.
+    - `cli.py`: `_memory_inputs` gives the limits and the peak RSS. `floor judge` prints the notes of each floor. `floor manifest --floor-evidence FLOOR=URL` (repeat) sets the job link of one floor.
+    - `manifest.py`: per-floor evidence links; the diff lists the Judge notes.
+    - `.gitlab-ci.yml`: the scan, memory and offline jobs write `$CI_JOB_URL` to `out/<job>/job-url.txt`. The judge job gives them to `floor manifest`.
+    - Tests: `test_memory_peak_rss_rise_is_report_only`, `test_floor_evidence_and_judge_notes`, and more asserts in `test_download_mb`, `test_judge_reads_memory_files` and `test_cli_manifest_and_diff`.
 - Verified:
   - `python -m pytest .floor/tests -q`: 149 passed, 6 skipped (Windows). `bash scripts/guard.sh tree`: exit 0.
   - A structure check of `.gitlab-ci.yml` (a local script, not in the repo: YAML parse, `extends` merge, keys, stages, `needs` order): no problems. `bash -n` on every job script. `sh -n` (dash, in WSL) on `.gitlab/ci/*.sh` and the build and judge scripts: no errors.
@@ -33,8 +40,11 @@
   - After the two small fixes: `python -m pytest .floor/tests -q`: 150 passed, 6 skipped (Windows).
   - Step 2: pytest 152 passed, 7 skipped (Windows). The structure check of `.gitlab-ci.yml`: no problems. `bash -n` on every job, and `dash -n` (WSL) on the memory, offline and judge scripts: no errors. In WSL dash, the wrapper shell writes the same PID that the command then prints (290 = 290). The human sync made GitLab `main` `84388f56` (dev `034ca32`).
   - GitLab pipeline 2958309699: failed as planned in 405 s. memory (181 s): tiny 512, base 512, small 768 MB; peak RSS 177, 284, 750 MB. offline (43 s): proven, 0 attempts, 81.9 MB. The judge: cpu raised, memory held, connectivity held; decision fail. The diff shows the new text for no previous release. So the cgroup setup and chroot work on the runner.
+  - AC-F7/F8: `python -m pytest .floor/tests -q`: 154 passed, 7 skipped (Windows). The structure check of `.gitlab-ci.yml`: no problems; `bash -n` on every job. In WSL, `dash -n` on the judge job, and the `--floor-evidence` loop in dash: it gives `cpu=…` and `memory=…` and skips an empty file.
+  - End to end on the committed GitHub evidence (`.floor/evidence/release/`): `floor judge` with the three memory files and `offline.json`, then `floor manifest --floor-evidence memory=… --floor-evidence connectivity=…`. The memory floor lists `peak_rss_mb` tiny 179, base 290, small 758. Connectivity lists `download_mb` 99.4 (that old `offline.json` has no `download_bytes`). Each floor has its own link. The diff shows "Judge notes".
 - Open:
-  - The exact next step (STATE.md "Next agent", item 1) is the AC-F7 and AC-F8 gap: no peak RSS and no download sizes in the manifest, and no report of a peak-RSS rise over 10% (F7.1).
+  - The exact next step (STATE.md "Next agent", item 1): a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job links per floor, `peak_rss_mb`, `download_bytes`.
+  - F8.1 gap: the manifest lists only the files of the offline run (tiny.en). The download sizes of base.en and small.en are not recorded. The memory job has those files.
   - The two known gaps of the path allowlist (D-014), T-05.
   - The four probe jobs all missed the model cache on the first run, and each one downloaded tiny.en. The cache key has a `-protected` suffix on `main`, so the first MR pipeline downloads the model again.
   - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.

@@ -68,6 +68,24 @@ def test_diff_without_previous_release():
     assert "No floor moved." not in text
 
 
+def test_floor_evidence_and_judge_notes():
+    verdict = judge.judge(POLICY, scan=scan("x86-64-v1"), memory={"small": 768}, peak_rss={"small": 830},
+                          connectivity={"offline": True, "network_attempts": 0, "download_mb": 81.9,
+                                        "download_bytes": {"ggml-tiny.en.bin": 77704715}},
+                          previous={"memory": {"smallest_passing_mb": {"small": 768}, "peak_rss_mb": {"small": 750}}})
+    doc = manifest.build(verdict, subject="s", digest="sha256:" + "a" * 64, release="r", commit="c",
+                         evidence="https://ci.example/pipelines/1",
+                         floor_evidence={"memory": "https://ci.example/jobs/2", "connectivity": "https://ci.example/jobs/3"})
+    floors = doc["predicate"]["floors"]
+    assert floors["cpu"]["evidence"] == "https://ci.example/pipelines/1"
+    assert floors["memory"]["evidence"] == "https://ci.example/jobs/2"
+    assert floors["memory"]["smallest_passing_mb"] == {"small": 768} and floors["memory"]["peak_rss_mb"] == {"small": 830}
+    assert floors["connectivity"]["evidence"] == "https://ci.example/jobs/3"
+    assert floors["connectivity"]["offline"] == "proven" and floors["connectivity"]["download_mb"] == 81.9
+    text = manifest.diff_markdown(None, doc)
+    assert "Judge notes:\n- memory: small: peak RSS 830 MB, 10.7% more than 750 MB" in text
+
+
 def test_cli_manifest_and_diff(tmp_path, capsys):
     scan_file = tmp_path / "scan.json"
     scan_file.write_text(json.dumps({"summary": scan("x86-64-v1")}), encoding="utf-8")
@@ -76,8 +94,12 @@ def test_cli_manifest_and_diff(tmp_path, capsys):
     first, second = tmp_path / "m1.json", tmp_path / "m2.json"
     common = ["--judge", str(verdict), "--subject", "img", "--digest", "sha256:" + "b" * 64, "--commit", "abc",
               "--scan", str(scan_file)]
-    assert main(["manifest", *common, "--release", "r1", "--build-cpu", "AMD EPYC 7B13", "--out", str(first)]) == 0
-    assert json.loads(first.read_text(encoding="utf-8"))["predicate"]["build"]["host_cpu"] == "AMD EPYC 7B13"
+    assert main(["manifest", *common, "--release", "r1", "--build-cpu", "AMD EPYC 7B13", "--evidence", "https://ci/p/1",
+                 "--floor-evidence", "cpu=https://ci/j/2", "--out", str(first)]) == 0
+    predicate = json.loads(first.read_text(encoding="utf-8"))["predicate"]
+    assert predicate["build"]["host_cpu"] == "AMD EPYC 7B13"
+    assert predicate["floors"]["cpu"]["evidence"] == "https://ci/j/2"
+    assert main(["manifest", *common, "--release", "r1", "--floor-evidence", "cpu", "--out", str(first)]) == 2
     assert main(["judge", "--scan", str(scan_file), "--previous", str(first), "--out", str(verdict)]) == 0
     diff = tmp_path / "diff.md"
     assert main(["manifest", *common, "--release", "r2", "--previous", str(first), "--out", str(second),

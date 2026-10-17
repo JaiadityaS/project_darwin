@@ -34,6 +34,16 @@ def download_mb(paths: list[str]) -> float:
     return round(total / 1_000_000, 1)
 
 
+def download_bytes(paths: list[str]) -> dict:
+    """The size of each file in ``paths`` (F8.1), by file name. Two files with the same name: the second
+    one is listed by its path."""
+    sizes = {}
+    for path in paths:
+        name = os.path.basename(path)
+        sizes[path if name in sizes else name] = os.path.getsize(path)
+    return sizes
+
+
 def check(cmd: list[str], expect: str | None = None, artifacts: list[str] | None = None, timeout: float = 900,
           sudo: bool = True) -> dict:
     with tempfile.TemporaryDirectory() as folder:
@@ -57,5 +67,6 @@ def check(cmd: list[str], expect: str | None = None, artifacts: list[str] | None
         "attempts": attempts[:20],
         "traced": traced,
         "download_mb": download_mb(artifacts) if artifacts else None,
+        "download_bytes": download_bytes(artifacts) if artifacts else None,
         "stderr_tail": err[-_TAIL:],
     }

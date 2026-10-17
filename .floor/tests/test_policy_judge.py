@@ -95,6 +95,21 @@ def test_memory_and_connectivity(doc):
     assert conn["status"] == "raised" and conn["meets_policy"] is False
 
 
+def test_memory_peak_rss_rise_is_report_only(doc):
+    mem = judge.judge_memory(doc["memory_mb"], {"small": 768, "tiny": 512}, {"small": 768, "tiny": 512},
+                             {"small": 830, "tiny": 190}, {"small": 750, "tiny": 177})
+    assert mem["status"] == "held" and mem["meets_policy"] is True
+    assert mem["peak_rss_mb"] == {"small": 830, "tiny": 190}
+    assert mem["notes"] == ["small: peak RSS 830 MB, 10.7% more than 750 MB in the previous release (report only)"]
+    assert judge.judge_memory({}, {"tiny": 512}, None, {"tiny": 110}, {"tiny": 100})["notes"] == []  # 10% is not over 10%
+    assert judge.judge_memory({}, {"tiny": 512}, None, {"tiny": 400})["notes"] == []  # no previous release
+    result = judge.judge(doc, scan=scan("x86-64-v1"), memory={"small": 768}, peak_rss={"small": 830},
+                         connectivity={"offline": True, "network_attempts": 0, "download_mb": 81.9},
+                         previous={"memory": {"smallest_passing_mb": {"small": 768}, "peak_rss_mb": {"small": 750}}})
+    assert result["floors"]["memory"]["notes"] and result["decision"] == "pass"
+    assert result["floors"]["connectivity"]["download_mb"] == 81.9
+
+
 @pytest.mark.parametrize("statuses, outcome", [
     (["held", "held"], "held"),
     (["lowered", "held"], "inclusive"),

@@ -1,7 +1,7 @@
 """The Judge (PRD F5.1, F5.2): marks each floor held, lowered, raised or inconclusive.
 
 Only this script sets a floor status (PRD §9.2). Inputs are measurements from the
-scanner, the QEMU probe and later the memory and offline jobs; the previous release
+scanner, the QEMU probe, and the memory and offline jobs; the previous release
 and the policy are the references.
 
 - A floor is compared with the previous release. With no previous release, the policy
@@ -19,6 +19,7 @@ from .isa.levels import LEVEL_NAMES, level_name, parse_level
 LEVEL_BY_NAME = {name: level for level, name in LEVEL_NAMES.items()}
 
 STATUSES = ("held", "lowered", "raised", "inconclusive")
+RSS_RISE_PCT = 10  # F7.1: report a peak-RSS rise over 10%
 
 
 def _compare(current: int, reference: int) -> str:
@@ -88,8 +89,11 @@ def _cpu_result(status, level, proof, limit, notes, runs, coverage_limited) -> d
     }
 
 
-def judge_memory(policy_mb: dict, current: dict | None, previous: dict | None = None) -> dict | None:
-    """``current`` and ``previous`` map model -> smallest passing memory limit in MB. None = unmeasured."""
+def judge_memory(policy_mb: dict, current: dict | None, previous: dict | None = None,
+                 peak_rss: dict | None = None, previous_peak_rss: dict | None = None) -> dict | None:
+    """``current`` and ``previous`` map model -> smallest passing memory limit in MB. None = unmeasured.
+    ``peak_rss`` and ``previous_peak_rss`` map model -> peak RSS in MB. A peak-RSS rise over
+    RSS_RISE_PCT goes into the notes. It does not change the status (F7.1)."""
     if not current:
         return None
     statuses, failures = [], []
@@ -102,12 +106,19 @@ def judge_memory(policy_mb: dict, current: dict | None, previous: dict | None = 
             failures.append(f"{model}: {value} MB > policy {limit} MB")
         reference = (previous or {}).get(model) or limit
         statuses.append(_compare(value, reference) if reference is not None else "held")
-    return {"status": _worst(statuses), "smallest_passing_mb": current, "meets_policy": not failures,
-            "notes": failures}
+    rises = []
+    for model, value in sorted((peak_rss or {}).items()):
+        old = (previous_peak_rss or {}).get(model)
+        if value is not None and old and value * 100 > old * (100 + RSS_RISE_PCT):
+            rises.append(f"{model}: peak RSS {value} MB, {100 * (value - old) / old:.1f}% more than "
+                         f"{old} MB in the previous release (report only)")
+    return {"status": _worst(statuses), "smallest_passing_mb": current, "peak_rss_mb": peak_rss,
+            "meets_policy": not failures, "notes": failures + rises}
 
 
 def judge_connectivity(policy: dict, current: dict | None, previous: dict | None = None) -> dict | None:
-    """``current``: {"offline": bool, "network_attempts": int}. None = unmeasured."""
+    """``current``: `floor offline` output, at least {"offline": bool, "network_attempts": int}.
+    The download sizes ("download_mb", "download_bytes") are copied as they are. None = unmeasured."""
     if current is None:
         return None
     offline = bool(current.get("offline")) and not current.get("network_attempts")
@@ -122,7 +133,8 @@ def judge_connectivity(policy: dict, current: dict | None, previous: dict | None
         status = "held"
     meets = offline or not policy.get("offline_required")
     return {"status": status, "offline": "proven" if offline else "not proven",
-            "network_attempts": current.get("network_attempts"), "meets_policy": meets,
+            "network_attempts": current.get("network_attempts"), "download_mb": current.get("download_mb"),
+            "download_bytes": current.get("download_bytes"), "meets_policy": meets,
             "notes": [] if meets else ["the policy needs offline use"]}
 
 
@@ -175,11 +187,14 @@ def decide(floors: dict, notices: list[str] | None = None) -> dict:
 
 
 def judge(policy: dict, *, scan: dict | None = None, probe: dict | None = None, memory: dict | None = None,
-          connectivity: dict | None = None, previous: dict | None = None, notices: list[str] | None = None) -> dict:
+          peak_rss: dict | None = None, connectivity: dict | None = None, previous: dict | None = None,
+          notices: list[str] | None = None) -> dict:
     """Judges one release. ``previous`` is the "floors" object of the previous manifest."""
     previous = previous or {}
     floors = {"cpu": judge_cpu(policy["cpu"], scan, probe, (previous.get("cpu") or {}).get("x86_64"))}
-    mem = judge_memory(policy.get("memory_mb") or {}, memory, (previous.get("memory") or {}).get("smallest_passing_mb"))
+    previous_memory = previous.get("memory") or {}
+    mem = judge_memory(policy.get("memory_mb") or {}, memory, previous_memory.get("smallest_passing_mb"),
+                       peak_rss, previous_memory.get("peak_rss_mb"))
     if mem is not None:
         floors["memory"] = mem
     conn = judge_connectivity(policy.get("connectivity") or {}, connectivity,

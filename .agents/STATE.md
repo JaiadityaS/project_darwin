@@ -27,7 +27,9 @@ Last update: 2026-10-17 · @JaiadityaS · session 5
 
 ## Next agent: start here
 
-1. The AC-F7 and AC-F8 gap (T-47 step 2 itself is done: pipeline 2958309699 in "Facts learned"): the manifest has no peak RSS and no download sizes, and the Judge does not report a peak-RSS rise over 10% (F7.1). `cli._memory_inputs` gives `judge_memory` only the smallest passing limit per model.
+1. AC-F7 and AC-F8 are written and tested locally (dev, not on GitLab yet; see `.agents/log/2026-10-17-jaiadityas-5.md`): the manifest lists the peak RSS per model, `download_mb` and `download_bytes` (each file), and one job link per floor (`floor manifest --floor-evidence`). A peak-RSS rise over 10% is a Judge note (report only). Next:
+   - A human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: each floor must link its own job, and connectivity must list `download_bytes`.
+   - F8.1 gap: the manifest lists only the model of the offline run (tiny.en). The download sizes of base.en and small.en are not recorded yet. The memory job has those files.
 2. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
 3. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
 4. T-90 README: the measured claims are in "Facts learned" below.

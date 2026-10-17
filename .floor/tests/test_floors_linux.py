@@ -90,20 +90,28 @@ def test_download_mb(tmp_path):
     a.write_bytes(b"x" * 1_500_000)
     b.write_bytes(b"x" * 500_000)
     assert offline.download_mb([str(a), str(b)]) == 2.0
+    (tmp_path / "lib").mkdir()
+    c = tmp_path / "lib" / "a"
+    c.write_bytes(b"x" * 10)
+    assert offline.download_bytes([str(a), str(b), str(c)]) == {"a": 1_500_000, "b": 500_000, str(c): 10}
 
 
 def test_judge_reads_memory_files(tmp_path, capsys):
     scan = tmp_path / "scan.json"
     scan.write_text(json.dumps({"summary": {"floor": {"level": "x86-64-v1"}, "files": {"errors": []}}}), encoding="utf-8")
     tiny = tmp_path / "tiny.json"
-    tiny.write_text(json.dumps({"model": "tiny", "runs": [], "smallest_passing_mb": 512}), encoding="utf-8")
+    tiny.write_text(json.dumps({"model": "tiny", "runs": [], "smallest_passing_mb": 512, "peak_rss_mb": 177}),
+                    encoding="utf-8")
     conn = tmp_path / "offline.json"
-    conn.write_text(json.dumps({"offline": True, "network_attempts": 0}), encoding="utf-8")
+    conn.write_text(json.dumps({"offline": True, "network_attempts": 0, "download_mb": 81.9,
+                                "download_bytes": {"ggml-tiny.en.bin": 77704715}}), encoding="utf-8")
     out = tmp_path / "judge.json"
     assert main(["judge", "--scan", str(scan), "--memory", str(tiny), "--connectivity", str(conn), "--out", str(out)]) == 0
     doc = json.loads(out.read_text(encoding="utf-8"))
     assert doc["floors"]["memory"]["smallest_passing_mb"] == {"tiny": 512}
+    assert doc["floors"]["memory"]["peak_rss_mb"] == {"tiny": 177}  # AC-F7
     assert doc["floors"]["connectivity"]["offline"] == "proven"
+    assert doc["floors"]["connectivity"]["download_bytes"] == {"ggml-tiny.en.bin": 77704715}  # AC-F8
     assert doc["unmeasured"] == []
 
 

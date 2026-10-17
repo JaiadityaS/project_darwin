@@ -150,6 +150,7 @@ scan:
   needs: [build]
   script:
     - mkdir -p out/scan rootfs
+    - echo "$CI_JOB_URL" > out/scan/job-url.txt
     - sh .gitlab/ci/facts.sh > out/scan/runner.txt 2>&1
     - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - crane export "$IMAGE_REF" - | tar -x -C rootfs
@@ -202,6 +203,7 @@ memory:
     paths: [.cache/models/]
   script:
     - mkdir -p out/memory rootfs
+    - echo "$CI_JOB_URL" > out/memory/job-url.txt
     - for m in $MEMORY_MODELS; do sh .gitlab/ci/model.sh "$m"; done
     - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - crane export "$IMAGE_REF" - | tar -x -C rootfs
@@ -227,6 +229,7 @@ offline:
     policy: pull
   script:
     - mkdir -p out/offline rootfs
+    - echo "$CI_JOB_URL" > out/offline/job-url.txt
     - sh .gitlab/ci/model.sh tiny.en
     - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - crane export "$IMAGE_REF" - | tar -x -C rootfs
@@ -260,11 +263,17 @@ judge:
       rc=0
       floor judge --scan out/scan/scan.json "$@" --out out/judge/judge.json > out/judge/judge.txt || rc=$?
       cat out/judge/judge.txt
+      # Each floor links the job that measured it (PRD §11.1). The pipeline is the link for the others.
+      set --
+      for pair in scan=cpu memory=memory offline=connectivity; do
+        f="out/${pair%%=*}/job-url.txt"
+        if [ -s "$f" ]; then set -- "$@" --floor-evidence "${pair#*=}=$(cat "$f")"; fi
+      done
       floor manifest --judge out/judge/judge.json --scan out/scan/scan.json \
         --subject "$IMAGE_REPO" --digest "$IMAGE_DIGEST" \
         --release "${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA}" --commit "$CI_COMMIT_SHA" \
         --cmake-flags "$(cat out/scan/cmake-flags.txt)" ${BASE_IMAGE:+--base-image "$BASE_IMAGE"} \
-        --build-cpu "$(cat out/build/cpu.txt)" --evidence "$CI_PIPELINE_URL" \
+        --build-cpu "$(cat out/build/cpu.txt)" --evidence "$CI_PIPELINE_URL" "$@" \
         --out out/judge/floor-manifest.json --diff out/judge/diff.md > /dev/null
       cat out/judge/diff.md
       exit "$rc"

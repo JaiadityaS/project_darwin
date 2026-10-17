@@ -321,6 +321,13 @@ def _previous_floors(doc: dict | None) -> dict | None:
 
 
 def _cmd_manifest(args: argparse.Namespace) -> int:
+    floor_evidence = {}
+    for item in args.floor_evidence or []:
+        name, _, url = item.partition("=")
+        if not name or not url:
+            print(f"floor: --floor-evidence needs FLOOR=URL, not {item!r}", file=sys.stderr)
+            return 2
+        floor_evidence[name] = url
     verdict = _read_json(args.judge)
     scan = _read_json(args.scan)
     previous = _read_json(args.previous)
@@ -328,7 +335,8 @@ def _cmd_manifest(args: argparse.Namespace) -> int:
                          scan=scan["summary"] if scan else None, cmake_flags=args.cmake_flags,
                          base_image=args.base_image, build_cpu=args.build_cpu, previous=previous, evidence=args.evidence,
                          fixed_by=args.fixed_by, notices=args.notice, project_url=args.project_url,
-                         delta_m=_read_json(args.delta_m), footprint=_read_json(args.footprint))
+                         delta_m=_read_json(args.delta_m), footprint=_read_json(args.footprint),
+                         floor_evidence=floor_evidence)
     _write_json(Path(args.out), doc)
     text = manifest.diff_markdown(previous, doc)
     if args.diff:
@@ -342,16 +350,18 @@ def _cmd_diff(args: argparse.Namespace) -> int:
     return 0
 
 
-def _memory_inputs(paths: list[str] | None) -> dict | None:
-    """Joins `floor memory --out` files (one per model) or plain {"model": MB} files."""
-    joined = {}
+def _memory_inputs(paths: list[str] | None) -> tuple[dict | None, dict | None]:
+    """Joins `floor memory --out` files (one per model) or plain {"model": MB} files. Gives the smallest
+    passing limit and the peak RSS per model (a plain file has no peak RSS)."""
+    limits, peaks = {}, {}
     for path in paths or []:
         doc = _read_json(path)
         if "runs" in doc:
-            joined[doc["model"]] = doc["smallest_passing_mb"]
+            limits[doc["model"]] = doc["smallest_passing_mb"]
+            peaks[doc["model"]] = doc.get("peak_rss_mb")
         else:
-            joined.update(doc)
-    return joined or None
+            limits.update(doc)
+    return limits or None, peaks or None
 
 
 def _probe_inputs(paths: list[str] | None) -> dict | None:
@@ -409,8 +419,9 @@ def _cmd_judge(args: argparse.Namespace) -> int:
         return 2
     scan = _read_json(args.scan)
     previous = _read_json(args.previous)
+    limits, peaks = _memory_inputs(args.memory)
     result = judge.judge(doc, scan=scan["summary"] if scan else None, probe=_probe_inputs(args.probe),
-                         memory=_memory_inputs(args.memory), connectivity=_read_json(args.connectivity),
+                         memory=limits, peak_rss=peaks, connectivity=_read_json(args.connectivity),
                          previous=_previous_floors(previous), notices=args.notice)
     result["artifact"] = args.artifact
     if args.out:
@@ -421,6 +432,9 @@ def _cmd_judge(args: argparse.Namespace) -> int:
         proof = (floor.get("proof") or "-") + (" (coverage-limited)" if floor.get("coverage_limited") else "")
         rows.append((name, floor["status"], str(value), proof, {True: "met", False: "NOT met", None: "-"}[floor["meets_policy"]]))
     _print_rows(rows)
+    for name, floor in result["floors"].items():
+        for note in floor.get("notes") or []:
+            print(f"{name}: {note}")
     for name in result["unmeasured"]:
         print(f"{name}: not measured")
     print(f"Pareto: {result['pareto']}. Decision: {result['decision']}.")
@@ -513,7 +527,8 @@ def main(argv: list[str] | None = None) -> int:
     jd.add_argument("--scan", metavar="FILE", help="floor scan --json output")
     jd.add_argument("--probe", action="append", metavar="FILE", help="floor probe --out output (repeat per CPU model)")
     jd.add_argument("--memory", action="append", metavar="FILE", help="floor memory --out output (repeat per model)")
-    jd.add_argument("--connectivity", metavar="FILE", help='JSON {"offline": bool, "network_attempts": int}')
+    jd.add_argument("--connectivity", metavar="FILE",
+                    help='floor offline --out output, or JSON {"offline": bool, "network_attempts": int}')
     jd.add_argument("--previous", metavar="FILE", help="manifest (or judge output) of the previous release")
     jd.add_argument("--notice", action="append", metavar="FLOOR", help="a floor with a merged Leave-Behind Notice (repeat)")
     jd.add_argument("--out", metavar="FILE", help="write the result as JSON")
@@ -588,6 +603,8 @@ def main(argv: list[str] | None = None) -> int:
     mf.add_argument("--build-cpu", help="CPU model of the machine that ran the build (H-1: it can set the floor)")
     mf.add_argument("--previous", metavar="FILE", help="floor-manifest.json of the previous release")
     mf.add_argument("--evidence", metavar="URL", help="job URL to record as evidence")
+    mf.add_argument("--floor-evidence", action="append", metavar="FLOOR=URL",
+                    help="the job that measured one floor, for example memory=<job URL> (repeat; default --evidence)")
     mf.add_argument("--fixed-by", choices=["agent", "fallback"], help="what lowered a floor in this release")
     mf.add_argument("--notice", action="append", metavar="REF", help="a merged Leave-Behind Notice (repeat)")
     mf.add_argument("--project-url", help="project URL for predicateType (default: $CI_PROJECT_URL)")
