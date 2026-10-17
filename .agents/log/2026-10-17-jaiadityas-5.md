@@ -1,0 +1,40 @@
+# 2026-10-17 @JaiadityaS session 5
+- Tasks: T-02 (done), T-47 step 1 (doing), the name (D-013), the CI parts of T-35, T-36 and T-60.
+- Done:
+  - T-02: the first push to the Showcase project. GitLab `main` is `36521198`: the import merge `c503abf1` (whisper.cpp `0c7be696` with its history) plus one sync commit of dev `3c68121`. The assemble report now counts only Floor commits (`9d6190c`).
+  - D-013: the product name is Rieux. D-012 (the import) was not in DECISIONS.md (commit `5ff75f7` changed only STATE and TASKS). It is back now, before D-013.
+  - T-47 step 1 (D-014):
+    - `.gitlab-ci.yml`: check, build, scan, probe (matrix: qemu64, Nehalem, SandyBridge, EPYC-Milan), judge, pages.
+    - `.gitlab/ci/check.sh`: the tools image tag, `floor notice`, `floor ratchet` (base: the MR target, or `CI_COMMIT_BEFORE_SHA` on a push), and on MR pipelines `floor paths --actor agent` when the pipeline user is not in `FLOOR_HUMANS`.
+    - `.gitlab/ci/facts.sh`: CPU and x86-64 level, memory, cgroups, privileges, tools. `--cpu` gives one line for the manifest.
+    - `.gitlab/ci/model.sh`: gets a ggml model into the CI cache and checks the SHA-1 from upstream's `models/README.md`.
+    - `.gitlab/ci/tools.Dockerfile`: the image of the scan, probe and judge jobs (Ubuntu 24.04, QEMU 8.2, crane 0.22.1, strace, time, a venv).
+  - `floor` changes for the pipeline:
+    - `floor judge --probe` can repeat. `cli._probe_inputs` joins the files of the probe jobs.
+    - `floor manifest --build-cpu` writes `predicate.build.host_cpu`.
+    - `qemu.relink_sysroot` makes the absolute links in a sysroot relative before a probe. `floor probe` prints the count, and the probe JSON has `sysroot_links_rewritten`.
+    - Tests: `test_relink_sysroot` (POSIX only), `test_cli_judge_joins_probe_files`, `--build-cpu` in `test_manifest.py`.
+- Verified:
+  - `python -m pytest .floor/tests -q`: 149 passed, 6 skipped (Windows). `bash scripts/guard.sh tree`: exit 0.
+  - A structure check of `.gitlab-ci.yml` (a local script, not in the repo: YAML parse, `extends` merge, keys, stages, `needs` order): no problems. `bash -n` on every job script. `sh -n` (dash, in WSL) on `.gitlab/ci/*.sh` and the build and judge scripts: no errors.
+  - `check.sh` in seven cases: push with and without `CI_COMMIT_BEFORE_SHA`, a wrong `TOOLS_TAG`, an agent MR on an allowed path, an agent MR on `.gitlab/CODEOWNERS`, a human MR, an MR with no pipeline user. The MR cases ran in a throwaway clone. Each result is as designed: the wrong tag and the two agent MRs on a code-owned path fail.
+  - The judge job script on the G-1 native evidence (split into four probe files, as the matrix makes them): the Judge says "raised" (x86-64-v3, policy v1), the job exits 1, and the manifest has the digest, `host_cpu`, `base_image` and `cmake_flags`.
+  - `model.sh` lookup: tiny.en gives `c78c86eb…`, an unknown name gives nothing. The crane hash in the tools recipe matches the release's `checksums.txt`. iced-x86 1.21.0 has an abi3 manylinux wheel, so the job images need no Rust.
+  - `facts.sh` in WSL: all sections print; `--cpu` gives "12th Gen Intel(R) Core(TM) i5-12450H (x86-64-v3)".
+  - Not verified: nothing ran on GitLab yet. Docker-in-Docker, the registry push, crane, the QEMU sysroot with a real image, the dotenv report and Pages are untested.
+- Open:
+  - The exact next step: a human syncs (`scripts/assemble-gitlab.sh --push`). Then read the first pipeline (STATE.md "Next agent", item 1).
+  - T-47 step 2 (memory and offline), the two known gaps of the path allowlist (D-014), T-05.
+  - Small: with no previous release, `floor diff` says "No floor moved." under a "raised" row. Better text: the reference is the policy.
+  - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.
+- Gotchas:
+  - Install the package with `pip install -e`. `policy.PACKAGE_ROOT` comes from `__file__`, so a plain install looks for `policy.yml` and the evidence in site-packages. Every GitHub workflow and every GitLab job uses `-e`.
+  - QEMU `-L`: QEMU uses `<sysroot>/<path>` when `access()` finds it, and the host kernel resolves an absolute link from the host root. So an absolute link in an image can load a host file. Hence `relink_sysroot`.
+  - BuildKit reads the build context during the build, so the build log goes to `/tmp` first, not into `out/` in the context.
+  - BuildKit prints one FROM step for stages with the same base image, so the `BASE_IMAGE` grep has a fallback.
+  - Write no empty value into a dotenv report: the build job writes `BASE_IMAGE=` only when it has a digest.
+  - The GitLab runner shell runs with `set -eo pipefail`. The `docker` image is Alpine (busybox `sh`). Use YAML `|` blocks for script lines that have ": " or " #".
+  - `wsl.exe` joins its arguments into one command line for the Linux shell, so a quoted `sh -c '…'` script breaks. Give it a script file, with `MSYS_NO_PATHCONV=1`, and keep the files under `/mnt/d/…` (WSL cannot read the 8.3 temp path).
+  - In PowerShell, plain `bash` is WSL. Use `& "C:\Program Files\Git\bin\bash.exe" …`.
+  - The upstream Makefile builds with `--parallel $(nproc)`. The upstream `.dockerignore` leaves out only `build*/`, `.github/` and `.devops/`.
+- Branch: main

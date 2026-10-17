@@ -68,7 +68,8 @@ def test_cli_manifest_and_diff(tmp_path, capsys):
     first, second = tmp_path / "m1.json", tmp_path / "m2.json"
     common = ["--judge", str(verdict), "--subject", "img", "--digest", "sha256:" + "b" * 64, "--commit", "abc",
               "--scan", str(scan_file)]
-    assert main(["manifest", *common, "--release", "r1", "--out", str(first)]) == 0
+    assert main(["manifest", *common, "--release", "r1", "--build-cpu", "AMD EPYC 7B13", "--out", str(first)]) == 0
+    assert json.loads(first.read_text(encoding="utf-8"))["predicate"]["build"]["host_cpu"] == "AMD EPYC 7B13"
     assert main(["judge", "--scan", str(scan_file), "--previous", str(first), "--out", str(verdict)]) == 0
     diff = tmp_path / "diff.md"
     assert main(["manifest", *common, "--release", "r2", "--previous", str(first), "--out", str(second),

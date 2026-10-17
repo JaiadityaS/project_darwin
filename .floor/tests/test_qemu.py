@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
 from floor.controls import LEVEL_INSTRUCTION, control_elf
 from floor.isa.scan import scan_file
-from floor.qemu import CPU_MODELS, controls, judge, loaded_variant, normalise, qemu_binary
+from floor.qemu import CPU_MODELS, controls, judge, loaded_variant, normalise, qemu_binary, relink_sysroot
 
 
 @pytest.mark.parametrize("level", sorted(LEVEL_INSTRUCTION))
@@ -41,6 +43,25 @@ def test_loaded_variant():
     log = "load_backend: loaded CPU backend from /app/build/bin/libggml-cpu-sandybridge.so\n"
     assert loaded_variant(log) == "sandybridge"
     assert loaded_variant("whisper_init_from_file_with_params_no_state: loading model") is None
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX symbolic links (the sysroot is a Linux image)")
+def test_relink_sysroot(tmp_path):
+    root = tmp_path / "rootfs"
+    (root / "usr/lib/x86_64-linux-gnu").mkdir(parents=True)
+    (root / "usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2").write_text("image loader", encoding="utf-8")
+    (root / "lib").symlink_to("usr/lib")  # relative: kept as it is
+    (root / "lib64").mkdir()
+    (root / "lib64/ld-linux-x86-64.so.2").symlink_to("/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2")
+    (root / "etc").mkdir()
+    (root / "etc/missing").symlink_to("/no/such/file")
+    assert relink_sysroot(root) == 2
+    loader = root / "lib64/ld-linux-x86-64.so.2"
+    assert os.readlink(loader) == os.path.join("..", "lib", "x86_64-linux-gnu", "ld-linux-x86-64.so.2")
+    assert loader.read_text(encoding="utf-8") == "image loader"  # the image's file, not the host's
+    assert os.readlink(root / "lib") == "usr/lib"
+    assert os.readlink(root / "etc/missing") == os.path.join("..", "no", "such", "file")
+    assert relink_sysroot(root) == 0
 
 
 def test_cpu_models_have_levels():

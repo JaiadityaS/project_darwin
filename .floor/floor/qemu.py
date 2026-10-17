@@ -46,6 +46,30 @@ def loaded_variant(log: str) -> str | None:
     return None
 
 
+def relink_sysroot(root: str | os.PathLike) -> int:
+    """Rewrites every absolute symbolic link below ``root`` as a relative link inside ``root``.
+
+    qemu -L looks for an absolute path in the sysroot first, but the host follows an absolute
+    link target on the host. An extracted image has /lib64/ld-linux-x86-64.so.2 ->
+    /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2, so without this step the host's loader would
+    start the image's libraries. Returns the number of links rewritten.
+    """
+    root = Path(root).resolve()
+    count = 0
+    for folder, dirs, files in os.walk(root):  # does not enter linked folders
+        for name in dirs + files:
+            link = Path(folder) / name
+            if not link.is_symlink():
+                continue
+            target = os.readlink(link)
+            if not target.startswith("/"):
+                continue
+            link.unlink()
+            link.symlink_to(os.path.relpath(root / target.lstrip("/"), link.parent))
+            count += 1
+    return count
+
+
 def _signal_name(number: int) -> str:
     try:
         return signal.Signals(number).name
@@ -105,10 +129,14 @@ def _tail(text: str, lines: int = 12) -> str:
 
 def probe(cmd: list[str], models: tuple[str, ...] = DEFAULT_MODELS, *, expect: str | None = None,
           sysroot: str | None = None, timeout: float = 900, env: dict | None = None) -> dict:
-    """Runs ``cmd`` on every CPU model, with the controls. Returns one entry per model."""
+    """Runs ``cmd`` on every CPU model, with the controls. Returns one entry per model.
+
+    With ``sysroot`` (an extracted image), absolute links in it are made relative first (relink_sysroot).
+    """
     qemu = qemu_binary()
     if qemu is None:
         raise FileNotFoundError("qemu-x86_64 is not installed")
+    relinked = relink_sysroot(sysroot) if sysroot else None
     rows = []
     with tempfile.TemporaryDirectory() as tmp:
         for cpu in models:
@@ -129,4 +157,4 @@ def probe(cmd: list[str], models: tuple[str, ...] = DEFAULT_MODELS, *, expect: s
                 "stdout_tail": _tail(result["stdout"]),
                 "stderr_tail": _tail(result["stderr"]),
             })
-    return {"command": cmd, "expect": expect, "runs": rows}
+    return {"command": cmd, "expect": expect, "sysroot": sysroot, "sysroot_links_rewritten": relinked, "runs": rows}

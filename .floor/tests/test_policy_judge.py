@@ -140,3 +140,20 @@ def test_cli_judge(tmp_path, capsys):
     assert main(["judge", "--scan", str(path), "--out", str(out)]) == 0
     assert json.loads(out.read_text(encoding="utf-8"))["decision"] == "pass"
     assert "Decision: pass" in capsys.readouterr().out
+
+
+def test_cli_judge_joins_probe_files(tmp_path, capsys):
+    """Parallel CI jobs write one probe file per CPU model; the Judge reads all of them."""
+    import json
+    path = tmp_path / "scan.json"
+    path.write_text(json.dumps({"summary": scan("x86-64-v3")}), encoding="utf-8")
+    files = []
+    for cpu, level, result in (("Nehalem", 2, "fail"), ("EPYC-Milan", 3, "pass")):
+        files += ["--probe", str(tmp_path / f"probe-{cpu}.json")]
+        (tmp_path / f"probe-{cpu}.json").write_text(json.dumps(probe(run(cpu, level, result))), encoding="utf-8")
+    out = tmp_path / "judge.json"
+    assert main(["judge", "--scan", str(path), *files, "--out", str(out)]) == 1
+    cpu = json.loads(out.read_text(encoding="utf-8"))["floors"]["cpu"]
+    assert cpu["status"] == "raised" and cpu["x86_64"] == "x86-64-v3"
+    assert cpu["dispatch"] == {"Nehalem": None, "EPYC-Milan": None}
+    assert "Decision: fail" in capsys.readouterr().out

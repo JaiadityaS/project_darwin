@@ -158,6 +158,8 @@ def _cmd_probe(args: argparse.Namespace) -> int:
     result["label"] = args.label
     if args.out:
         _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+    if args.sysroot:
+        print(f"sysroot {args.sysroot}: {result['sysroot_links_rewritten']} absolute link(s) made relative")
     rows = [("CPU", "LEVEL", "RESULT", "EXIT", "SIGNAL", "VARIANT", "CONTROLS")]
     for run in result["runs"]:
         ctl = run["controls"]
@@ -324,7 +326,7 @@ def _cmd_manifest(args: argparse.Namespace) -> int:
     previous = _read_json(args.previous)
     doc = manifest.build(verdict, subject=args.subject, digest=args.digest, release=args.release, commit=args.commit,
                          scan=scan["summary"] if scan else None, cmake_flags=args.cmake_flags,
-                         base_image=args.base_image, previous=previous, evidence=args.evidence,
+                         base_image=args.base_image, build_cpu=args.build_cpu, previous=previous, evidence=args.evidence,
                          fixed_by=args.fixed_by, notices=args.notice, project_url=args.project_url,
                          delta_m=_read_json(args.delta_m), footprint=_read_json(args.footprint))
     _write_json(Path(args.out), doc)
@@ -350,6 +352,12 @@ def _memory_inputs(paths: list[str] | None) -> dict | None:
         else:
             joined.update(doc)
     return joined or None
+
+
+def _probe_inputs(paths: list[str] | None) -> dict | None:
+    """Joins `floor probe --out` files, for example one per CPU model from parallel CI jobs."""
+    runs = [run for path in paths or [] for run in _read_json(path)["runs"]]
+    return {"runs": runs} if paths else None
 
 
 def _command(args: argparse.Namespace) -> list[str] | None:
@@ -396,7 +404,7 @@ def _cmd_judge(args: argparse.Namespace) -> int:
         return 2
     scan = _read_json(args.scan)
     previous = _read_json(args.previous)
-    result = judge.judge(doc, scan=scan["summary"] if scan else None, probe=_read_json(args.probe),
+    result = judge.judge(doc, scan=scan["summary"] if scan else None, probe=_probe_inputs(args.probe),
                          memory=_memory_inputs(args.memory), connectivity=_read_json(args.connectivity),
                          previous=_previous_floors(previous), notices=args.notice)
     result["artifact"] = args.artifact
@@ -498,7 +506,7 @@ def main(argv: list[str] | None = None) -> int:
     jd.add_argument("--policy", default=str(policy.DEFAULT_POLICY), help="policy file")
     jd.add_argument("--artifact", help="artifact name, for per-artifact floors")
     jd.add_argument("--scan", metavar="FILE", help="floor scan --json output")
-    jd.add_argument("--probe", metavar="FILE", help="floor probe --out output")
+    jd.add_argument("--probe", action="append", metavar="FILE", help="floor probe --out output (repeat per CPU model)")
     jd.add_argument("--memory", action="append", metavar="FILE", help="floor memory --out output (repeat per model)")
     jd.add_argument("--connectivity", metavar="FILE", help='JSON {"offline": bool, "network_attempts": int}')
     jd.add_argument("--previous", metavar="FILE", help="manifest (or judge output) of the previous release")
@@ -570,6 +578,7 @@ def main(argv: list[str] | None = None) -> int:
     mf.add_argument("--scan", metavar="FILE", help="floor scan --json output")
     mf.add_argument("--cmake-flags", help="the CMake flags of the build")
     mf.add_argument("--base-image", help="base image digest")
+    mf.add_argument("--build-cpu", help="CPU model of the machine that ran the build (H-1: it can set the floor)")
     mf.add_argument("--previous", metavar="FILE", help="floor-manifest.json of the previous release")
     mf.add_argument("--evidence", metavar="URL", help="job URL to record as evidence")
     mf.add_argument("--fixed-by", choices=["agent", "fallback"], help="what lowered a floor in this release")

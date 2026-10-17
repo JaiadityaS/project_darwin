@@ -10,10 +10,10 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
 | T-01 | Confirm GitLab hackathon group access and tier (Premium or Ultimate) and the Duo credit pool for service-account flows | §9.1, §19 | human | - | Access confirmed 2026-10-16 (D-010). Open: the credit pool |
-| T-02 | `scripts/assemble-gitlab.sh`: clone whisper.cpp at a pinned commit, overlay the product files, push to the GitLab project | §0, D-001, D-012 | doing | @JaiadityaS | Script done and tested on local repos. Open: the first real run with `--push` (a human, in their own terminal) |
-| T-03 | Trigger-chain test: a human tag push fails the gate; the pipeline-failed trigger starts a flow; record who counts as the actor | F4.1, §9.1 | blocked | - | Needs T-01, T-02 |
+| T-02 | `scripts/assemble-gitlab.sh`: clone whisper.cpp at a pinned commit, overlay the product files, push to the GitLab project | §0, D-001, D-012 | done | @JaiadityaS | First push 2026-10-17: GitLab `main` `36521198` (the import merge `c503abf1` plus one sync commit). Later syncs: run the script with `--push` again |
+| T-03 | Trigger-chain test: a human tag push fails the gate; the pipeline-failed trigger starts a flow; record who counts as the actor | F4.1, §9.1 | blocked | - | Needs T-01 (T-02 is done) |
 | T-04 | Duo CLI runs headless in a CI job (Herald, and the floor-repair fallback) | F4.1, F12.1 | blocked | - | Needs T-01 |
-| T-05 | Auto-merge test: the flow opens a non-code-owned MR and sets auto-merge; it merges only after the gate passes; an agent change to a code-owned path cannot merge | F4.4, D-010 | blocked | - | Needs T-02. No project token is possible (D-010) |
+| T-05 | Auto-merge test: the flow opens a non-code-owned MR and sets auto-merge; it merges only after the gate passes; an agent change to a code-owned path cannot merge | F4.4, D-010 | blocked | - | Needs the first T-47 pipeline on GitLab. No project token is possible (D-010) |
 | T-06 | Cloud Run hello-world with Workload Identity Federation from GitLab CI | F13.1 | human | - | GCP project and billing first |
 
 ## G-1 CPU proof (due Oct 15)
@@ -47,21 +47,21 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-32 | Judge: held / lowered / raised / inconclusive; Pareto rule; unit tests | F5.1, F5.2 | done | @JaiadityaS | `floor judge` (`judge.py`). Memory and connectivity inputs are JSON stubs until T-44 and the offline job give real files |
 | T-33 | Manifest writer + diff against the previous release | F5.3, §11.1 | done | @JaiadityaS | `floor manifest`, `floor diff` (`manifest.py`). In-toto Statement only; signing is T-34 (F5.4). Footprint values stay null until measured |
 | T-34 | `cosign attest` (keyless, GitLab OIDC) and `verify-attestation` | F5.4 | blocked | - | Needs GitLab |
-| T-35 | Leave-Behind Notice template and MR check (agents cannot approve) | F6, §11.2 | doing | @JaiadityaS | Done: MR template `.gitlab/merge_request_templates/Leave-Behind-Notice.md`, `.floor/notices/`, `floor notice`, `notice.approval_problems` (tested on fixed data). Open: the GitLab job that reads the MR approvals API and calls it (needs T-01) |
-| T-36 | CODEOWNERS, protected branch and tag settings, path-allowlist job | F1.2, §10.1 | doing | @JaiadityaS | Done: `.gitlab/CODEOWNERS` (owner handle to confirm on GitLab), `floor paths` (`paths.py`, kept in sync with CODEOWNERS by a test). Open: protected branch and tag settings and the CI job in `.gitlab-ci.yml` (need T-01) |
+| T-35 | Leave-Behind Notice template and MR check (agents cannot approve) | F6, §11.2 | doing | @JaiadityaS | Done: MR template `.gitlab/merge_request_templates/Leave-Behind-Notice.md`, `.floor/notices/`, `floor notice`, `notice.approval_problems` (tested on fixed data). The GitLab check job runs `floor notice` (`.gitlab/ci/check.sh`, T-47). Open: the GitLab job that reads the MR approvals API and calls it |
+| T-36 | CODEOWNERS, protected branch and tag settings, path-allowlist job | F1.2, §10.1 | doing | @JaiadityaS | Done: `.gitlab/CODEOWNERS` (owner handle to confirm on GitLab), `floor paths` (`paths.py`, kept in sync with CODEOWNERS by a test). The path-allowlist check runs in the check job of every MR pipeline, deny by default (`.gitlab/ci/check.sh`, D-014). Open: protected branch and tag settings (our role cannot change them, D-010) |
 
 ## Release loop (Oct 19–22)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
 | T-40 | floor-repair flow (AI Catalog, private): exit unless raised → diagnose → fix MR | F4.1, F4.2 | blocked | - | Needs T-03 |
-| T-41 | Fallback script applies the canned inclusive config; the gate re-verifies | F4.3 | doing | @JaiadityaS | Done: `floor fallback` (`fallback.py`): adds CMAKE_ARGS to `make` lines in `.devops/*.Dockerfile` (upstream Makefile reads it) and writes `.floor/overrides/main.flags`; changes only allowlist paths. Open: the CI job that runs it on the agent branch and re-runs the gate (T-47) |
+| T-41 | Fallback script applies the canned inclusive config; the gate re-verifies | F4.3 | doing | @JaiadityaS | Done: `floor fallback` (`fallback.py`): adds CMAKE_ARGS to `make` lines in `.devops/*.Dockerfile` (upstream Makefile reads it) and writes `.floor/overrides/main.flags`; changes only allowlist paths. Open: the CI job that runs it on the agent branch and re-runs the gate (not in T-47 step 1) |
 | T-42 | Release job on `main`: cut `-floor.N` with `CI_JOB_TOKEN` after an auto-merge | F4.4, D-010 | blocked | - | Needs T-05 |
 | T-43 | Draft notice when the fallback also fails | F4.5 | ready | - | |
 | T-44 | Memory floor: cgroup limits 512–4096 MB, peak RSS | F7 | done | @JaiadityaS | `floor memory`, `floors.yml`. Run 38704136185: tiny 512, base 512, small 768 MB; set in the policy. Evidence in `.floor/evidence/release/` |
 | T-45 | Connectivity tripwire: `--network none` + syscall trace; download sizes | F8 | done | @JaiadityaS | `floor offline`: `unshare --net` + strace. Run 38704136185: offline proven, 0 attempts, 99.4 MB download (tiny.en) |
 | T-46 | Herald CI job (Duo CLI) with a deterministic template fallback | F12.1 | blocked | - | Needs T-04 |
-| T-47 | `.gitlab-ci.yml`: build → static gate → QEMU → judge → attest → herald → release → deploy | §7.1 | ready | - | |
+| T-47 | `.gitlab-ci.yml`: build → static gate → QEMU → judge → attest → herald → release → deploy | §7.1 | doing | @JaiadityaS | Step 1 written and checked locally (D-014): check, build, scan, probe ×4, judge, pages; `.gitlab-ci.yml`, `.gitlab/ci/`. Open: the first GitLab pipeline (sync first), then step 2 (memory and offline, from the `facts.sh` output), then attest, herald, release, deploy (T-34, T-46, T-42, T-51) |
 
 ## Deploy and sustainability
 
@@ -79,7 +79,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-60 | Floor page (title: Rieux, D-013): backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: energy, SCI and language sections (they wait on T-54 and T-55), publish on GitLab Pages (T-47) |
+| T-60 | Floor page (title: Rieux, D-013): backtest timeline, side-by-side runs, SCI, notices | F12.2 | doing | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. Open: energy, SCI and language sections (they wait on T-54 and T-55). The `pages` job publishes it from `main` (T-47, not run yet) |
 | T-61 | Pinned issue summary | F12.3 | later | - | |
 | T-62 | Language served / not-served table | F9 | later | - | |
 | T-63 | Field triage flow | F11 | later | - | |

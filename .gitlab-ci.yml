@@ -1,0 +1,223 @@
+# Rieux release gate for whisper.cpp (PRD §7.1, task T-47, DECISIONS D-014).
+# Every pipeline proves the CPU floor of the image that .devops/main.Dockerfile builds: a static
+# scan of every ELF file (the proof) and whisper-cli runs under QEMU on old CPU models (the
+# corroboration). The Judge, a script, decides. No LLM output sets a floor status.
+#
+#   check   policy, notices, ratchet, agent path allowlist (merge requests), unit tests
+#   build   builds and pushes the image with upstream's recipe; records the build machine
+#   scan    static CPU-floor scan of /app in the pushed image
+#   probe   whisper-cli from the pushed image under QEMU, one job per CPU model, with controls
+#   judge   floor judge and floor manifest; fails the pipeline when a floor rises
+#   pages   the Rieux page from the committed evidence (default branch only)
+#
+# Evidence: the artifacts below out/ (the judge job keeps all of them).
+# Not here yet: the memory and connectivity floors (step 2), attest, herald, release, deploy.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+stages: [check, build, floors, judge, publish]
+
+variables:
+  IMAGE_REPO: $CI_REGISTRY_IMAGE/main
+  # The first 12 hex digits of the SHA-256 of .gitlab/ci/tools.Dockerfile (check.sh compares them).
+  TOOLS_TAG: "348395c3ee88"
+  # GitLab usernames of the humans, space-separated. Every other pipeline user counts as an agent.
+  FLOOR_HUMANS: "jaiadityasinghr"
+  # Reference transcript of samples/jfk.wav.
+  EXPECT: "ask not what your country can do for you"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_ROOT_USER_ACTION: "ignore"
+  PIP_PROGRESS_BAR: "off"
+
+default:
+  interruptible: true
+  retry:
+    max: 1
+    when: [runner_system_failure, scheduler_failure, api_failure]
+
+.evidence:
+  artifacts:
+    when: always
+    expire_in: 90 days
+
+.tools:
+  image: $CI_REGISTRY_IMAGE/tools:$TOOLS_TAG
+  variables:
+    GIT_DEPTH: "1"
+  # Editable install: the package finds policy.yml and the evidence through its own path.
+  before_script:
+    - pip install -q -e ./.floor
+
+check:
+  stage: check
+  extends: .evidence
+  image: python:3.12-slim
+  needs: []
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends git > /dev/null
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - pip install -q -e "./.floor[dev]"
+    - floor policy
+    - sh .gitlab/ci/check.sh
+    - python -m pytest .floor/tests -q --junitxml=out/check/junit.xml
+  artifacts:
+    paths: [out/check/]
+    reports:
+      junit: out/check/junit.xml
+
+build:
+  stage: build
+  extends: .evidence
+  image: docker:27.5.1
+  services:
+    - name: docker:27.5.1-dind
+      alias: docker
+      command: ["--registry-mirror", "https://mirror.gcr.io"]
+  needs: []
+  timeout: 75m
+  variables:
+    GIT_DEPTH: "1"
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: /certs
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: /certs/client
+  script:
+    - |
+      for i in $(seq 1 30); do docker info > /dev/null 2>&1 && break; sleep 2; done
+      docker info --format 'docker {{.ServerVersion}}, {{.NCPU}} CPUs'
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - |
+      # The tools image, once per recipe.
+      tools="$CI_REGISTRY_IMAGE/tools:$TOOLS_TAG"
+      if docker manifest inspect "$tools" > /dev/null 2>&1; then
+        echo "tools image $tools exists"
+      else
+        docker build --pull -f .gitlab/ci/tools.Dockerfile -t "$tools" .gitlab/ci
+        docker push "$tools"
+      fi
+    - |
+      # The release image, with upstream's recipe. Nothing may write into the build context
+      # while it builds, so the log goes to /tmp first.
+      ref="$IMAGE_REPO:$CI_COMMIT_SHA"
+      if ! docker build --pull --progress=plain -f .devops/main.Dockerfile -t "$ref" . > /tmp/build.log 2>&1; then
+        mkdir -p out/build && cp /tmp/build.log out/build/build.log
+        tail -n 60 /tmp/build.log
+        exit 1
+      fi
+      tail -n 15 /tmp/build.log
+      docker push "$ref"
+    - |
+      # Evidence: the image digest, the base image digest (from the build log), the build machine.
+      mkdir -p out/build
+      cp /tmp/build.log out/build/build.log
+      digest="$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE_REPO:$CI_COMMIT_SHA")"
+      digest="${digest#*@}"
+      case "$digest" in sha256:*) ;; *) echo "no registry digest for $IMAGE_REPO:$CI_COMMIT_SHA"; exit 1 ;; esac
+      stage="$(grep -iE '^FROM ' .devops/main.Dockerfile | tail -n 1 | awk 'tolower($(NF-1)) == "as" { print $NF }')"
+      base="$(grep -E "\[${stage:-[^]]+} 1/[0-9]+\] FROM " /tmp/build.log | grep -oE '[^ ]+@sha256:[0-9a-f]{64}' | tail -n 1 || true)"
+      if [ -z "$base" ]; then
+        # BuildKit prints one FROM step for stages with the same base image.
+        base="$(grep -oE 'FROM [^ ]+@sha256:[0-9a-f]{64}' /tmp/build.log | tail -n 1 | cut -d ' ' -f 2 || true)"
+      fi
+      sh .gitlab/ci/facts.sh > out/build/runner.txt 2>&1
+      sh .gitlab/ci/facts.sh --cpu > out/build/cpu.txt
+      {
+        echo "IMAGE_REF=$IMAGE_REPO@$digest"
+        echo "IMAGE_DIGEST=$digest"
+        if [ -n "$base" ]; then echo "BASE_IMAGE=$base"; fi
+      } > out/build/image.env
+      cat out/build/image.env
+      echo "build machine: $(cat out/build/cpu.txt)"
+  artifacts:
+    paths: [out/build/]
+    reports:
+      dotenv: out/build/image.env
+
+scan:
+  stage: floors
+  extends: [.tools, .evidence]
+  needs: [build]
+  script:
+    - mkdir -p out/scan rootfs
+    - sh .gitlab/ci/facts.sh > out/scan/runner.txt 2>&1
+    - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - crane export "$IMAGE_REF" - | tar -x -C rootfs
+    - floor scan rootfs/app --json out/scan/scan.json | tee out/scan/scan.txt
+    - |
+      # The CMake flags in effect (the cache records defaults too, for example GGML_NATIVE).
+      sed -n -E 's/^(GGML_NATIVE|GGML_BACKEND_DL|GGML_CPU_ALL_VARIANTS|BUILD_SHARED_LIBS|CMAKE_BUILD_TYPE|GGML_SSE42|GGML_AVX[A-Z0-9_]*|GGML_FMA|GGML_F16C|GGML_BMI2):[A-Z]+=(.*)$/-D\1=\2/p' \
+        rootfs/app/build/CMakeCache.txt | tr '\n' ' ' | sed 's/ *$//' > out/scan/cmake-flags.txt
+      echo "cmake flags: $(cat out/scan/cmake-flags.txt)"
+  artifacts:
+    paths: [out/scan/]
+
+probe:
+  stage: floors
+  extends: [.tools, .evidence]
+  needs: [build]
+  timeout: 50m
+  parallel:
+    matrix:
+      - CPU_MODEL: [qemu64, Nehalem, SandyBridge, EPYC-Milan]
+  cache:
+    key: models-tiny.en-c78c86eb
+    paths: [.cache/models/]
+  script:
+    - mkdir -p out/probe rootfs
+    - sh .gitlab/ci/model.sh tiny.en
+    - echo "$CI_REGISTRY_PASSWORD" | crane auth login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - crane export "$IMAGE_REF" - | tar -x -C rootfs
+    - |
+      # The image is the sysroot (qemu -L). Paths that exist in it, such as /app/samples, come from it.
+      floor probe --cpu "$CPU_MODEL" --sysroot "$PWD/rootfs" --expect "$EXPECT" --timeout 1800 \
+        --label "$CI_COMMIT_SHORT_SHA" --out "out/probe/$CPU_MODEL.json" -- \
+        "$PWD/rootfs/app/build/bin/whisper-cli" -m "$PWD/.cache/models/ggml-tiny.en.bin" \
+        -f /app/samples/jfk.wav -t 4 -nt | tee "out/probe/$CPU_MODEL.txt"
+  artifacts:
+    paths: [out/probe/]
+
+judge:
+  stage: judge
+  extends: [.tools, .evidence]
+  needs: [build, scan, probe]
+  script:
+    - |
+      mkdir -p out/judge
+      set --
+      for f in out/probe/*.json; do
+        if [ -e "$f" ]; then set -- "$@" --probe "$f"; fi
+      done
+      rc=0
+      floor judge --scan out/scan/scan.json "$@" --out out/judge/judge.json > out/judge/judge.txt || rc=$?
+      cat out/judge/judge.txt
+      floor manifest --judge out/judge/judge.json --scan out/scan/scan.json \
+        --subject "$IMAGE_REPO" --digest "$IMAGE_DIGEST" \
+        --release "${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA}" --commit "$CI_COMMIT_SHA" \
+        --cmake-flags "$(cat out/scan/cmake-flags.txt)" ${BASE_IMAGE:+--base-image "$BASE_IMAGE"} \
+        --build-cpu "$(cat out/build/cpu.txt)" --evidence "$CI_PIPELINE_URL" \
+        --out out/judge/floor-manifest.json --diff out/judge/diff.md > /dev/null
+      cat out/judge/diff.md
+      exit "$rc"
+  artifacts:
+    paths: [out/]
+
+pages:
+  stage: publish
+  image: python:3.12-slim
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - pip install -q -e ./.floor
+    - floor page --out public
+  artifacts:
+    paths: [public]

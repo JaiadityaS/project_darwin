@@ -60,7 +60,7 @@ def changes(previous: dict | None, floors: dict, fixed_by: str | None = None) ->
 
 def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str,
           scan: dict | None = None, cmake_flags: str | None = None, base_image: str | None = None,
-          previous: dict | None = None, evidence: str | None = None, fixed_by: str | None = None,
+          build_cpu: str | None = None, previous: dict | None = None, evidence: str | None = None, fixed_by: str | None = None,
           notices: list[str] | None = None, project_url: str | None = None, delta_m: dict | None = None,
           footprint: dict | None = None) -> dict:
     """``verdict`` is `floor judge` output, ``scan`` a scan summary, ``previous`` the previous manifest,
@@ -77,6 +77,7 @@ def build(verdict: dict, *, subject: str, digest: str, release: str, commit: str
         "build": {
             "cmake_flags": cmake_flags,
             "base_image": base_image,
+            "host_cpu": build_cpu,
             "source_date_epoch": bool(os.environ.get("SOURCE_DATE_EPOCH")),
             "highest_level_found": (scan or {}).get("highest_level_found"),
             "baseline_variant": (scan or {}).get("baseline_variant"),

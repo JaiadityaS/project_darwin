@@ -58,6 +58,13 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Why: Floor is the only entry with ΔM and CPU floors. The six green rivals all measure the operational SCI of pipelines only. The extra work is small (T-54, T-55, T-56, T-60).
 - If time is short after Oct 22, cut ΔM polish first.
 
+## D-012 (2026-10-16) GitLab import: full upstream history, pinned at 0c7be696
+- `scripts/assemble-gitlab.sh` (T-02) merges whisper.cpp at `0c7be696371069e0baa2515ed7aa08d5a5473aa6` (the G-1 commit, 2026-10-15) into the Showcase `main`, with the full upstream history (about 50 MB). The pin lives in `.floor/upstream.env`.
+- Why: Path B judges can see in `git log` where upstream ends and Floor starts. The Showcase `main` already has a template commit and force push is off, so the import is a merge, not a reset.
+- whisper.cpp's README and LICENSE stay at the top level. The Floor README is T-90 (it can move the upstream README).
+- Each later run adds one sync commit with the product files of dev HEAD. It never overwrites or deletes files that the agent may change (`.floor/overrides/`, `deploy/`). It never touches upstream files such as `.devops/*.Dockerfile` after the import.
+- `.gitlab/CODEOWNERS` now names the GitLab handle `@jaiadityasinghr`.
+
 ## D-013 (2026-10-17) Product name: Rieux
 - The product name is **Rieux**, after Dr. Bernard Rieux in Camus's *The Plague* (1947). He does the work without heroics, keeps an honest record, and knows that the danger comes back. Our floor came back 15 times in 18 months (T-21).
 - "Floor" stays as the name of what Rieux measures. Tagline: "Rieux watches the floor, so no one is left behind."
@@ -65,3 +72,25 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - No change to code names: the Python package `floor`, the `.floor/` folder and the `floor` commands stay. This saves about a day of rename and test work.
 - The book is still under copyright in many countries: at most one short quote with attribution, or none.
 - PRD impact: §0 "Floor (working title)" is now Rieux. T-60, T-90, T-91, T-92 use the new name.
+
+## D-014 (2026-10-17) GitLab pipeline, step 1: the CPU floor of upstream's image
+- `.gitlab-ci.yml` (T-47) has these jobs: check, build, scan, probe (one job per CPU model), judge and pages. Step 1 gates the CPU floor only. Memory and connectivity come in step 2 (see below). Attest, herald, release and deploy come later (T-34, T-46, T-42, T-51).
+- The build job builds upstream's `.devops/main.Dockerfile` with no change and pushes the image to the project registry (`$CI_REGISTRY_IMAGE/main:<commit>`). The later jobs use the image by its digest (a dotenv artifact: `IMAGE_REF`, `IMAGE_DIGEST`, `BASE_IMAGE`). So the gate checks the bytes that ship.
+- The first `main` pipelines are red, and that is the honest start. Upstream's recipe keeps `GGML_NATIVE` ON, so the floor is the CPU of the runner (v3 or v4). With no earlier release, the reference is the policy (v1). So the Judge says "raised" and the judge job fails. The repair loop (T-40, T-41) must make it green.
+- check: `floor policy`, then `.gitlab/ci/check.sh` (the tools image tag, the notices, the ratchet, and the path allowlist on merge requests), then the unit tests. The ratchet base is the MR target branch, or `CI_COMMIT_BEFORE_SHA` on a push.
+- scan: `crane export` writes the image to `rootfs/`, and `floor scan rootfs/app` scans it. `cmake_flags` in the manifest come from `/app/build/CMakeCache.txt` in the image (the values in effect, defaults included), not from the Dockerfile text.
+- probe: `floor probe --sysroot rootfs` runs `whisper-cli` from the image under `qemu-x86_64 -cpu <model> -L rootfs`, with the controls of T-13, on qemu64, Nehalem, SandyBridge and EPYC-Milan. QEMU uses `<sysroot>/<path>` when `access()` finds it, and the host kernel resolves an absolute link from the host root. So an absolute link in the image can load a host file. `relink_sysroot` first makes these links relative (`sysroot_links_rewritten` in the probe JSON). The model file stays outside the sysroot, so QEMU opens it from the host.
+- The probe uses tiny.en, as in G-1. `.gitlab/ci/model.sh` gets it from upstream's Hugging Face URL, checks the SHA-1 in upstream's `models/README.md`, and keeps it in the CI cache. (The image also has base.en, because the recipe runs `make base.en`.)
+- judge: `floor judge` takes one `--probe` file per CPU model (new: `--probe` can repeat). `floor manifest` has a new option `--build-cpu` (the CPU model and x86-64 level of the build machine, from `.gitlab/ci/facts.sh --cpu`). It goes to `predicate.build.host_cpu`. This field is not in PRD §11.1. It records the H-1 cause: with `GGML_NATIVE` ON, the build machine sets the floor.
+- Tools image: `.gitlab/ci/tools.Dockerfile` (Ubuntu 24.04 with QEMU 8.2, crane 0.22.1 with a SHA-256 check, strace, GNU time, a venv). QEMU 7.2 and later emulate AVX2, so EPYC-Milan can run. The tag is the first 12 hex digits of the recipe's SHA-256. The build job builds the image only when the tag is missing. `check.sh` fails when `TOOLS_TAG` does not match the recipe.
+- The build job uses Docker-in-Docker with TLS. The daemon uses the registry mirror `mirror.gcr.io`, because Docker Hub limits anonymous pulls. The base image digest comes from the BuildKit log, so no extra registry request is necessary.
+- Path allowlist (F4.2, §10.1, D-010): deny by default. On a merge request pipeline, a pipeline user (`GITLAB_USER_LOGIN`) who is not in `FLOOR_HUMANS` counts as an agent. Then `floor paths --actor agent` fails the pipeline when the MR changes a path outside the agent allowlist. Known gaps:
+  1. When a human runs the pipeline of an agent MR again, the pipeline user is the human, so the allowlist check does not run. A possible fix: read the MR author from the API (the project is public).
+  2. An MR pipeline runs the `.gitlab-ci.yml` of the MR, so an agent MR can change the gate itself. Only code-owner approval or a pipeline execution policy can stop this, and our role cannot set either (D-010). The main control is the tool limits of the flow (T-40). The MR diff shows every such change.
+- Step 2, memory and connectivity: the build and scan jobs keep the output of `.gitlab/ci/facts.sh` (`out/build/runner.txt`, `out/scan/runner.txt`): the cgroup version, whether a job can make a child cgroup, and whether `unshare --net` works. The memory and offline jobs are designed from these facts. Until then the Judge lists both floors as unmeasured.
+- Costs and risks:
+  - NFR-3 (MR pipeline under 10 min) is at risk. Docker-in-Docker has no layer cache, so each build compiles whisper.cpp and installs ffmpeg again. EPYC-Milan runs AVX2 code in QEMU TCG. The first pipeline gives the real times.
+  - Every pipeline pushes a new image (the `/app` layer is about 150 MB, T-15). A cleanup policy needs a Maintainer, so delete old tags by hand when storage gets near the limit.
+  - The base images are not pinned by digest (`ubuntu:22.04` in upstream's recipe, `ubuntu:24.04` in the tools recipe). The manifest records the base image digest of each build.
+  - The image includes `.git`, `.floor` and `.gitlab`, because upstream's `.dockerignore` leaves out only `build*/`, `.github/` and `.devops/`.
+- PRD impact: §7.1 (the pipeline comes in steps), §11.1 (`host_cpu`), F4.2 and §10.1 (deny by default, with the gaps above), NFR-3.

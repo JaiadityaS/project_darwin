@@ -1,17 +1,18 @@
 # STATE: the baton
 
-Last update: 2026-10-16 · @JaiadityaS · session 4
+Last update: 2026-10-17 · @JaiadityaS · session 5
 
 ## Where we are
 
 - Product name: **Rieux** (D-013). Code names (`floor`, `.floor/`) do not change.
-- PRD v3.1 is the go decision (`docs/PRD.md`). Today is build day 2 (PRD §17.2).
+- PRD v3.1 is the go decision (`docs/PRD.md`). The plan for Oct 17–18 is G-3 (PRD §17.2).
 - Done: repo, team-sync system, hooks, CI for tests and hygiene.
 - Done: the static scanner (T-10, T-11) and the ghcr.io client (T-20). `python -m floor scan <path>` and `python -m floor image <ref>` work.
 - Done: T-15 static part (the first H-1 signal) and T-24 for one commit. See "Facts learned".
 - Done in session 2: the #3814 follow-up (H-1 signal 2), function symbols in scan evidence, the T-16 rule, the sampler and timeline (`floor sample`, `floor timeline`) and the sweep workflow (`sweep.yml`).
 - Done in session 3: G-1 (T-12, T-13), the policy and its ratchet (T-30, T-31), the Judge (T-32), the manifest and diff (T-33), memory and offline floors (T-44, T-45). Partly done, the parts that need no GitLab: T-35 notices, T-36 CODEOWNERS and path allowlist, T-41 fallback script, T-60 Floor page.
 - Done in session 4: T-56 (ΔM calculator) and the SCI part of T-54 (`floor footprint`, the Impact Framework manifests, the coefficients in `.floor/impact/footprint.yml`). See `.agents/log/2026-10-16-jaiadityas-4.md`.
+- Done in session 5: T-02 (first GitLab push: `main` is `36521198`), the name (D-013), and T-47 step 1 (`.gitlab-ci.yml`, `.gitlab/ci/`, D-014), checked locally but not run on GitLab yet. See `.agents/log/2026-10-17-jaiadityas-5.md`.
 - CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | notice | paths | fallback | page | manifest | diff | delta-m | footprint`. Run `python -m floor <command> -h`.
 
 ## Gates (PRD §17.1)
@@ -21,19 +22,21 @@ Last update: 2026-10-16 · @JaiadityaS · session 4
 | G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
 | G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
-| G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`); the GitLab settings and the proof MRs wait on T-01 |
+| G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014). Open: the first GitLab pipeline and the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
 | G-4 Release loop | Oct 22 | not started |
 
 ## Next agent: start here
 
-1. T-02 script is ready (`scripts/assemble-gitlab.sh`, D-012). After the first real push, do T-47 (`.gitlab-ci.yml`), then T-05 (auto-merge test, D-010). Every gate step exists as a `floor` command; `floors.yml` and `cpu-proof.yml` show the order and the flags. T-47 also wires the open parts of T-35, T-36 and T-41.
-2. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
-3. T-90 README: the measured claims are in "Facts learned" below.
+1. T-47, the first GitLab pipeline. A human syncs the T-47 files (see "Needs a human"). Then read the artifacts: `out/build/runner.txt` and `out/build/cpu.txt` (the build machine), `out/scan/runner.txt` (a job container), the judge output and the job times. The judge job must fail with "raised" (D-014). Any other failure is a pipeline bug: fix it first.
+2. T-47 step 2: the memory and offline jobs, designed from the `facts.sh` output (cgroup version, child cgroups, `unshare --net`). Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
+3. No access needed: finish T-54 and T-55 with the design in `.agents/log/2026-10-16-jaiadityas-4.md` ("Next steps"): `meter.py`, `energy.py`, `energy.yml`, and the new steps in `floors.yml` and `ci.yml`. Then the energy, SCI and language sections of the Floor page (T-60).
+4. T-90 README: the measured claims are in "Facts learned" below.
 
 ## Needs a human (agents cannot do these)
 
 - [ ] T-01: access is confirmed (D-010). Still open: the Duo credit pool.
-- [ ] Run `scripts/assemble-gitlab.sh` one time when T-02 is ready. Git Credential Manager signs you in to GitLab in the browser, so the push is in your name. Never push this repo itself to GitLab: the Showcase project is public.
+- [ ] Sync to GitLab after each finished step. In PowerShell, from `project_darwin`: `& "C:\Program Files\Git\bin\bash.exe" scripts/assemble-gitlab.sh --push` (plain `bash` there is WSL). The push is in your name. The Showcase project is public, so a push is publishing: an agent pushes there only after a clear yes in that session. Never push this repo itself to GitLab.
+- [ ] Add the GitLab usernames of teammates to `FLOOR_HUMANS` in `.gitlab-ci.yml`. Every other pipeline user counts as an agent (D-014).
 - [ ] T-06: Google Cloud project with billing and a budget alert, for Cloud Run and WIF.
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
