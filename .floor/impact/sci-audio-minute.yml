@@ -1,0 +1,274 @@
+# Made by `python -m floor footprint write` from https://github.com/JaiadityaS/project_darwin/actions/runs/39033747472.
+# Do not edit. Change the evidence or .floor/impact/footprint.yml, then run the command again.
+# CI runs if-run (@grnsft/if@1.1.1) on this file and checks every output (PRD F14.1).
+name: floor-sci-audio-minute
+description: 'SCI per audio-minute (R1) for each whisper.cpp build. CPU time: `floor energy` on a GitHub-hosted
+  runner (AMD EPYC 7763 64-Core Processor, 2 vCPUs), median of 5 runs. Site: Cloud Run in northamerica-northeast1
+  (F13.1). Cloud Run does not publish its CPU platform, so the GCP average watts and an n2d-standard host are assumptions.
+  The ''all-variants'' child is the shipped build; ''all-variants-us-central1'' is the same work in us-central1
+  (PRD §13.2, lever 5).'
+tags:
+  kind: sci
+  category: audio-minutes
+initialize:
+  plugins:
+    vcpu-seconds:
+      method: Multiply
+      path: builtin
+      config:
+        input-parameters:
+        - cpu/vcpus
+        - duration
+        output-parameter: cpu/vcpu-seconds
+    watts-delta:
+      method: Subtract
+      path: builtin
+      config:
+        input-parameters:
+        - cpu/watts-max
+        - cpu/watts-min
+        output-parameter: cpu/watts-delta
+    cpu-idle:
+      method: Multiply
+      path: builtin
+      config:
+        input-parameters:
+        - cpu/vcpu-seconds
+        - cpu/watts-min
+        output-parameter: cpu/idle-joules
+    cpu-load:
+      method: Multiply
+      path: builtin
+      config:
+        input-parameters:
+        - cpu/busy-seconds
+        - cpu/watts-delta
+        output-parameter: cpu/load-joules
+    memory:
+      method: Multiply
+      path: builtin
+      config:
+        input-parameters:
+        - memory/gb-seconds
+        - memory/watts-per-gb
+        output-parameter: memory/joules
+    it-energy:
+      method: Sum
+      path: builtin
+      config:
+        input-parameters:
+        - cpu/idle-joules
+        - cpu/load-joules
+        - memory/joules
+        output-parameter: it/joules
+    facility-energy:
+      method: Multiply
+      path: builtin
+      config:
+        input-parameters:
+        - it/joules
+        - pue
+        output-parameter: facility/joules
+    energy-kwh:
+      method: Divide
+      path: builtin
+      config:
+        numerator: facility/joules
+        denominator: 3600000
+        output: energy
+    operational-carbon:
+      method: Multiply
+      path: builtin
+      config:
+        input-parameters:
+        - energy
+        - grid/carbon-intensity
+        output-parameter: carbon-operational
+    host-share:
+      method: Divide
+      path: builtin
+      config:
+        numerator: cpu/vcpus
+        denominator: host/vcpus
+        output: usage-ratio
+    embodied-carbon:
+      method: SciEmbodied
+      path: builtin
+      config:
+        baseline-emissions: 2321460.0
+        lifespan: 126144000
+    carbon:
+      method: Sum
+      path: builtin
+      config:
+        input-parameters:
+        - carbon-operational
+        - embodied-carbon
+        output-parameter: carbon
+    sci:
+      method: Sci
+      path: builtin
+      config:
+        functional-unit: audio-minutes
+tree:
+  children:
+    native:
+      pipeline:
+        compute:
+        - vcpu-seconds
+        - watts-delta
+        - cpu-idle
+        - cpu-load
+        - memory
+        - it-energy
+        - facility-energy
+        - energy-kwh
+        - operational-carbon
+        - host-share
+        - embodied-carbon
+        - carbon
+        - sci
+      defaults:
+        cloud/provider: gcp
+        cloud/region: northamerica-northeast1
+        cpu/watts-min: 0.71
+        cpu/watts-max: 4.26
+        memory/watts-per-gb: 0.392
+        pue: 1.1
+        grid/carbon-intensity: 11.36
+        host/vcpus: 224
+      inputs:
+      - timestamp: '2026-10-17T12:55:15+00:00'
+        duration: 22.12
+        cpu/vcpus: 2
+        cpu/busy-seconds: 43.94
+        memory/gb-seconds: 8.336
+        audio-minutes: 2.1833
+    folk-fix:
+      pipeline:
+        compute:
+        - vcpu-seconds
+        - watts-delta
+        - cpu-idle
+        - cpu-load
+        - memory
+        - it-energy
+        - facility-energy
+        - energy-kwh
+        - operational-carbon
+        - host-share
+        - embodied-carbon
+        - carbon
+        - sci
+      defaults:
+        cloud/provider: gcp
+        cloud/region: northamerica-northeast1
+        cpu/watts-min: 0.71
+        cpu/watts-max: 4.26
+        memory/watts-per-gb: 0.392
+        pue: 1.1
+        grid/carbon-intensity: 11.36
+        host/vcpus: 224
+      inputs:
+      - timestamp: '2026-10-17T12:55:15+00:00'
+        duration: 22.17
+        cpu/vcpus: 2
+        cpu/busy-seconds: 43.91
+        memory/gb-seconds: 8.353
+        audio-minutes: 2.1833
+    all-variants:
+      pipeline:
+        compute:
+        - vcpu-seconds
+        - watts-delta
+        - cpu-idle
+        - cpu-load
+        - memory
+        - it-energy
+        - facility-energy
+        - energy-kwh
+        - operational-carbon
+        - host-share
+        - embodied-carbon
+        - carbon
+        - sci
+      defaults:
+        cloud/provider: gcp
+        cloud/region: northamerica-northeast1
+        cpu/watts-min: 0.71
+        cpu/watts-max: 4.26
+        memory/watts-per-gb: 0.392
+        pue: 1.1
+        grid/carbon-intensity: 11.36
+        host/vcpus: 224
+      inputs:
+      - timestamp: '2026-10-17T12:55:15+00:00'
+        duration: 22.03
+        cpu/vcpus: 2
+        cpu/busy-seconds: 43.73
+        memory/gb-seconds: 8.304
+        audio-minutes: 2.1833
+    x64-only:
+      pipeline:
+        compute:
+        - vcpu-seconds
+        - watts-delta
+        - cpu-idle
+        - cpu-load
+        - memory
+        - it-energy
+        - facility-energy
+        - energy-kwh
+        - operational-carbon
+        - host-share
+        - embodied-carbon
+        - carbon
+        - sci
+      defaults:
+        cloud/provider: gcp
+        cloud/region: northamerica-northeast1
+        cpu/watts-min: 0.71
+        cpu/watts-max: 4.26
+        memory/watts-per-gb: 0.392
+        pue: 1.1
+        grid/carbon-intensity: 11.36
+        host/vcpus: 224
+      inputs:
+      - timestamp: '2026-10-17T12:55:15+00:00'
+        duration: 331.24
+        cpu/vcpus: 2
+        cpu/busy-seconds: 659.19
+        memory/gb-seconds: 132.237
+        audio-minutes: 2.1833
+    all-variants-us-central1:
+      pipeline:
+        compute:
+        - vcpu-seconds
+        - watts-delta
+        - cpu-idle
+        - cpu-load
+        - memory
+        - it-energy
+        - facility-energy
+        - energy-kwh
+        - operational-carbon
+        - host-share
+        - embodied-carbon
+        - carbon
+        - sci
+      defaults:
+        cloud/provider: gcp
+        cloud/region: us-central1
+        cpu/watts-min: 0.71
+        cpu/watts-max: 4.26
+        memory/watts-per-gb: 0.392
+        pue: 1.1
+        grid/carbon-intensity: 431.95
+        host/vcpus: 224
+      inputs:
+      - timestamp: '2026-10-17T12:55:15+00:00'
+        duration: 22.03
+        cpu/vcpus: 2
+        cpu/busy-seconds: 43.73
+        memory/gb-seconds: 8.304
+        audio-minutes: 2.1833

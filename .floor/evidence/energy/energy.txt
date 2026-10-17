@@ -1,0 +1,6 @@
+BUILD         WALL_S  CPU_S   PEAK_RSS_MB  VARIANT  RESULT
+native        22.12   43.94   385.9        -        pass
+folk-fix      22.17   43.91   385.8        -        pass
+all-variants  22.03   43.73   386.0        haswell  pass
+x64-only      331.24  659.19  408.8        x64      pass
+2.1833 audio-minutes, median of 5 runs per build, 2 vCPUs, AMD EPYC 7763 64-Core Processor

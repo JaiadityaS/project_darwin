@@ -1,0 +1,200 @@
+{
+  "tool": "floor 0.1.0",
+  "measured_at": "2026-10-17T12:55:15+00:00",
+  "vcpus": 2,
+  "cpu_model": "AMD EPYC 7763 64-Core Processor",
+  "runs_per_build": 5,
+  "warmup_rounds": 1,
+  "audio_minutes": 2.1833,
+  "builds": {
+    "native": {
+      "exe": "/home/runner/work/project_darwin/project_darwin/w/build-native/bin/whisper-cli",
+      "runs": [
+        {
+          "wall_s": 22.69,
+          "cpu_s": 44.92,
+          "peak_rss_mb": 385.9,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.23,
+          "cpu_s": 44.12,
+          "peak_rss_mb": 385.7,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.12,
+          "cpu_s": 43.94,
+          "peak_rss_mb": 385.9,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 21.92,
+          "cpu_s": 43.5,
+          "peak_rss_mb": 385.9,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 21.75,
+          "cpu_s": 43.18,
+          "peak_rss_mb": 386.1,
+          "exit": 0,
+          "ok": true
+        }
+      ],
+      "loaded_variant": null,
+      "wall_s": 22.12,
+      "cpu_s": 43.94,
+      "peak_rss_mb": 385.9,
+      "transcript_sha256": [
+        "1a712267439afba2a7c14ce273427ad369e3016be3fdcb82f8640765e61d3534"
+      ]
+    },
+    "folk-fix": {
+      "exe": "/home/runner/work/project_darwin/project_darwin/w/build-folk-fix/bin/whisper-cli",
+      "runs": [
+        {
+          "wall_s": 22.94,
+          "cpu_s": 45.52,
+          "peak_rss_mb": 389.0,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.18,
+          "cpu_s": 43.91,
+          "peak_rss_mb": 385.6,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.17,
+          "cpu_s": 43.96,
+          "peak_rss_mb": 385.8,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.03,
+          "cpu_s": 43.61,
+          "peak_rss_mb": 385.6,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 21.79,
+          "cpu_s": 43.26,
+          "peak_rss_mb": 387.7,
+          "exit": 0,
+          "ok": true
+        }
+      ],
+      "loaded_variant": null,
+      "wall_s": 22.17,
+      "cpu_s": 43.91,
+      "peak_rss_mb": 385.8,
+      "transcript_sha256": [
+        "1a712267439afba2a7c14ce273427ad369e3016be3fdcb82f8640765e61d3534"
+      ]
+    },
+    "all-variants": {
+      "exe": "/home/runner/work/project_darwin/project_darwin/w/build-all-variants/bin/whisper-cli",
+      "runs": [
+        {
+          "wall_s": 23.16,
+          "cpu_s": 45.81,
+          "peak_rss_mb": 385.8,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.52,
+          "cpu_s": 44.74,
+          "peak_rss_mb": 386.0,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.01,
+          "cpu_s": 43.71,
+          "peak_rss_mb": 386.5,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 22.03,
+          "cpu_s": 43.73,
+          "peak_rss_mb": 386.1,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 21.97,
+          "cpu_s": 43.64,
+          "peak_rss_mb": 385.8,
+          "exit": 0,
+          "ok": true
+        }
+      ],
+      "loaded_variant": "haswell",
+      "wall_s": 22.03,
+      "cpu_s": 43.73,
+      "peak_rss_mb": 386.0,
+      "transcript_sha256": [
+        "1a712267439afba2a7c14ce273427ad369e3016be3fdcb82f8640765e61d3534"
+      ]
+    },
+    "x64-only": {
+      "exe": "/home/runner/work/project_darwin/project_darwin/w/x64-only/whisper-cli",
+      "runs": [
+        {
+          "wall_s": 331.32,
+          "cpu_s": 659.65,
+          "peak_rss_mb": 411.6,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 332.43,
+          "cpu_s": 661.29,
+          "peak_rss_mb": 408.6,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 331.24,
+          "cpu_s": 659.19,
+          "peak_rss_mb": 408.6,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 330.74,
+          "cpu_s": 658.61,
+          "peak_rss_mb": 411.9,
+          "exit": 0,
+          "ok": true
+        },
+        {
+          "wall_s": 329.89,
+          "cpu_s": 657.01,
+          "peak_rss_mb": 408.8,
+          "exit": 0,
+          "ok": true
+        }
+      ],
+      "loaded_variant": "x64",
+      "wall_s": 331.24,
+      "cpu_s": 659.19,
+      "peak_rss_mb": 408.8,
+      "transcript_sha256": [
+        "1a712267439afba2a7c14ce273427ad369e3016be3fdcb82f8640765e61d3534"
+      ]
+    }
+  },
+  "evidence": "https://github.com/JaiadityaS/project_darwin/actions/runs/39033747472"
+}

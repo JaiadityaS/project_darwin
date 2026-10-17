@@ -1,0 +1,81 @@
+{
+  "tool": "floor 0.1.0",
+  "method": "GSF Impact Framework (@grnsft/if@1.1.1, if-run) with Cloud Carbon Footprint coefficients",
+  "sci_gco2e_per_audio_minute": 0.0019596936511420246,
+  "sci_gco2e_per_release_check": null,
+  "regions": {
+    "audio-minutes": "northamerica-northeast1"
+  },
+  "rows": [
+    {
+      "manifest": "floor-sci-audio-minute",
+      "child": "native",
+      "unit": "audio-minutes",
+      "headline": false,
+      "region": "northamerica-northeast1",
+      "grid_gco2e_per_kwh": 11.36,
+      "energy_kwh": 5.8258784222222226e-05,
+      "operational_gco2e": 0.0006618197887644445,
+      "embodied_gco2e": 0.003634642551369863,
+      "carbon_gco2e": 0.004296462340134307,
+      "functional_units": 2.1833,
+      "sci_gco2e": 0.001967875390525492
+    },
+    {
+      "manifest": "floor-sci-audio-minute",
+      "child": "folk-fix",
+      "unit": "audio-minutes",
+      "headline": false,
+      "region": "northamerica-northeast1",
+      "grid_gco2e_per_kwh": 11.36,
+      "energy_kwh": 5.8249973222222223e-05,
+      "operational_gco2e": 0.0006617196958044444,
+      "embodied_gco2e": 0.003642858289505871,
+      "carbon_gco2e": 0.0043045779853103155,
+      "functional_units": 2.1833,
+      "sci_gco2e": 0.0019715925366694067
+    },
+    {
+      "manifest": "floor-sci-audio-minute",
+      "child": "all-variants",
+      "unit": "audio-minutes",
+      "headline": true,
+      "region": "northamerica-northeast1",
+      "grid_gco2e_per_kwh": 11.36,
+      "energy_kwh": 5.798810966666666e-05,
+      "operational_gco2e": 0.0006587449258133332,
+      "embodied_gco2e": 0.003619854222725049,
+      "carbon_gco2e": 0.004278599148538382,
+      "functional_units": 2.1833,
+      "sci_gco2e": 0.0019596936511420246
+    },
+    {
+      "manifest": "floor-sci-audio-minute",
+      "child": "x64-only",
+      "unit": "audio-minutes",
+      "headline": false,
+      "region": "northamerica-northeast1",
+      "grid_gco2e_per_kwh": 11.36,
+      "energy_kwh": 0.0008745984512222222,
+      "operational_gco2e": 0.009935438405884444,
+      "embodied_gco2e": 0.05442762200342466,
+      "carbon_gco2e": 0.0643630604093091,
+      "functional_units": 2.1833,
+      "sci_gco2e": 0.029479714381582513
+    },
+    {
+      "manifest": "floor-sci-audio-minute",
+      "child": "all-variants-us-central1",
+      "unit": "audio-minutes",
+      "headline": false,
+      "region": "us-central1",
+      "grid_gco2e_per_kwh": 431.95,
+      "energy_kwh": 5.798810966666666e-05,
+      "operational_gco2e": 0.025047963970516663,
+      "embodied_gco2e": 0.003619854222725049,
+      "carbon_gco2e": 0.028667818193241712,
+      "functional_units": 2.1833,
+      "sci_gco2e": 0.013130498874750016
+    }
+  ]
+}
