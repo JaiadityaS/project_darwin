@@ -12,8 +12,8 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import (backtest, delta_m, fallback, footprint, h1, judge, manifest, memory, notice, offline, page, paths,
-               policy, qemu, ratchet)
+from . import (backtest, delta_m, fallback, footprint, h1, judge, manifest, memory, meter, notice, offline, page,
+               paths, policy, qemu, ratchet)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -418,6 +418,35 @@ def _cmd_offline(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_meter(args: argparse.Namespace) -> int:
+    state = Path(args.state)
+    if args.action == "sample":
+        meter.sample(state, args.interval)
+        return 0
+    if not Path(meter.PROC_STAT).exists():
+        print("floor: floor meter needs Linux (/proc/stat)", file=sys.stderr)
+        return 2
+    if args.action == "start":
+        try:
+            doc = meter.start(state, args.interval)
+        except RuntimeError as exc:
+            print(f"floor: {exc}", file=sys.stderr)
+            return 2
+        print(f"meter started: sampler PID {doc['pid']}, every {args.interval} s, {doc['vcpus']} vCPUs, "
+              f"{doc['cpu_model']}")
+        return 0
+    if not state.exists():
+        print(f"floor: no meter state file: {state} (run floor meter start first)", file=sys.stderr)
+        return 2
+    result = meter.stop(state)
+    if args.evidence:
+        result["evidence"] = args.evidence
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **result})
+    print(f"wall {result['wall_s']} s, busy CPU {result['cpu_s']} s of {result['vcpu_s']} vCPU-s, "
+          f"memory {result['memory_gb_s']} GB-s (peak {result['memory_peak_gb']} GB), {result['samples']} samples")
+    return 0
+
 def _cmd_judge(args: argparse.Namespace) -> int:
     try:
         doc = policy.for_artifact(policy.load(args.policy), args.artifact)
@@ -576,6 +605,16 @@ def main(argv: list[str] | None = None) -> int:
     off.add_argument("--out", metavar="FILE", help="write the result as JSON")
     off.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     off.set_defaults(func=_cmd_offline)
+
+    mt = sub.add_parser("meter", help="whole-machine CPU and memory use of one release check (PRD F14.1 R2; Linux)")
+    mt.add_argument("action", choices=["start", "sample", "stop"],
+                    help="start: write the state file and start the sampler; sample: the sampler itself; "
+                         "stop: stop the sampler and give the totals")
+    mt.add_argument("--state", required=True, metavar="FILE", help="state file of this meter")
+    mt.add_argument("--interval", type=float, default=5.0, help="seconds between memory samples")
+    mt.add_argument("--evidence", metavar="URL", help="the CI run that measured it (stop)")
+    mt.add_argument("--out", metavar="FILE", help="write the totals as JSON (stop)")
+    mt.set_defaults(func=_cmd_meter)
 
     pa = sub.add_parser("paths", help="path allowlist for agent MRs and merge-bot merges (PRD F4.2, §10.1)")
     pa.add_argument("--actor", required=True, choices=["agent", "merge-bot"], help="who will change or merge")

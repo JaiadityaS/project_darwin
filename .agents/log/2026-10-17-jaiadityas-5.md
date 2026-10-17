@@ -1,5 +1,5 @@
 # 2026-10-17 @JaiadityaS session 5
-- Tasks: T-02 (done), T-47 steps 1 and 2 (done; T-47 is still doing) and its AC-F7/F8 manifest fields, the name (D-013), the CI parts of T-35, T-36 and T-60.
+- Tasks: T-02 (done), T-47 steps 1 and 2 (done; T-47 is still doing) and its AC-F7/F8 manifest fields, the name (D-013), the CI parts of T-35, T-36 and T-60, T-54 step 1 (`meter.py`).
 - Done:
   - T-02: the first push to the Showcase project. GitLab `main` is `36521198`: the import merge `c503abf1` (whisper.cpp `0c7be696` with its history) plus one sync commit of dev `3c68121`. The assemble report now counts only Floor commits (`9d6190c`).
   - D-013: the product name is Rieux. D-012 (the import) was not in DECISIONS.md (commit `5ff75f7` changed only STATE and TASKS). It is back now, before D-013.
@@ -29,6 +29,7 @@
     - `.gitlab-ci.yml`: the scan, memory and offline jobs write `$CI_JOB_URL` to `out/<job>/job-url.txt`. The judge job gives them to `floor manifest`.
     - Tests: `test_memory_peak_rss_rise_is_report_only`, `test_floor_evidence_and_judge_notes`, and more asserts in `test_download_mb`, `test_judge_reads_memory_files` and `test_cli_manifest_and_diff`.
     - The download size of each model (F8.1): `floor memory --artifact FILE` (repeat) adds `download_mb` and `download_bytes` to its output. `_memory_inputs` and `judge_memory` give the memory floor `download_mb` per model (`judge.judge` takes `model_download_mb`). The memory job gives each run its model, whisper-cli and the libraries. Test: `test_cli_memory_records_the_download`.
+  - T-54 step 1 (the design in the session-4 log, "Next steps" 1): `.floor/floor/meter.py` and `floor meter start|sample|stop`. `start` writes a state file and starts a sampler in a new session. The sampler adds the used memory (MemTotal minus MemAvailable) every `--interval` seconds with the trapezoid rule, and writes its file atomically. `stop` stops only a process that runs `meter sample` for that state file (a reused PID or a zombie gets no signal), adds the last interval, and gives `measured_at`, `wall_s`, `cpu_s` (user, nice, system, irq and softirq of `/proc/stat`), `vcpus`, `vcpu_s`, `memory_gb_s`, `memory_peak_gb`, `cpu_model`, `samples`, and `evidence` (`--evidence`). A sampler that nobody stops ends after 6 hours. Tests: `.floor/tests/test_meter.py` (two of them need Linux).
 - Verified:
   - `python -m pytest .floor/tests -q`: 149 passed, 6 skipped (Windows). `bash scripts/guard.sh tree`: exit 0.
   - A structure check of `.gitlab-ci.yml` (a local script, not in the repo: YAML parse, `extends` merge, keys, stages, `needs` order): no problems. `bash -n` on every job script. `sh -n` (dash, in WSL) on `.gitlab/ci/*.sh` and the build and judge scripts: no errors.
@@ -44,12 +45,15 @@
   - AC-F7/F8: `python -m pytest .floor/tests -q`: 154 passed, 7 skipped (Windows). The structure check of `.gitlab-ci.yml`: no problems; `bash -n` on every job. In WSL, `dash -n` on the judge job, and the `--floor-evidence` loop in dash: it gives `cpu=…` and `memory=…` and skips an empty file.
   - End to end on the committed GitHub evidence (`.floor/evidence/release/`): `floor judge` with the three memory files and `offline.json`, then `floor manifest --floor-evidence memory=… --floor-evidence connectivity=…`. The memory floor lists `peak_rss_mb` tiny 179, base 290, small 758. Connectivity lists `download_mb` 99.4 (that old `offline.json` has no `download_bytes`). Each floor has its own link. The diff shows "Judge notes".
   - The model download sizes: pytest 155 passed, 7 skipped (Windows). The structure check: no problems; `bash -n` on every job. In WSL, `dash -n` on the memory job, and its loop in dash with a fake rootfs: each model run gets its own model file, whisper-cli and the libraries, and the loop skips a symlink.
+  - `meter.py`: `python -m pytest .floor/tests -q`: 158 passed, 9 skipped (Windows). In WSL (see Gotchas): `test_meter.py` 5 passed. A real run in WSL around about 2 s of busy loop and a 512 MB buffer: wall 6.0 s, busy CPU 3.65 s, memory 4.3 GB-s, peak 1.09 GB, 10 samples, and no sampler left after `stop`.
 - Open:
   - The exact next step (STATE.md "Next agent", item 1): a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job link per floor, `peak_rss_mb` and `download_mb` per model, `download_bytes`.
+  - Where R2 is measured (STATE.md "Next agent" item 3): `floors.yml` runs no probes, and `/proc/stat` on the GitLab runner counts the shared node.
   - The two known gaps of the path allowlist (D-014), T-05.
   - The four probe jobs all missed the model cache on the first run, and each one downloaded tiny.en. The cache key has a `-protected` suffix on `main`, so the first MR pipeline downloads the model again.
   - Small: on Windows, `floor manifest` crashes when stdout is a pipe or a file (cp1252 cannot encode "→"). Linux is not affected. On Windows, set `PYTHONUTF8=1`.
 - Gotchas:
+  - WSL has Python 3.12 with `yaml`, `requests` and `jsonschema`, but no pip, venv or pytest. To run the Linux-only tests there, link the pure-Python packages of the Windows venv (`_pytest`, `pytest`, `pluggy`, `iniconfig`, `packaging`, `py.py`, `elftools`) into a `/tmp` folder on `PYTHONPATH`, and put a stub `iced_x86.py` there (the real one is compiled for Windows). The meter tests do not use the decoder.
   - Install the package with `pip install -e`. `policy.PACKAGE_ROOT` comes from `__file__`, so a plain install looks for `policy.yml` and the evidence in site-packages. Every GitHub workflow and every GitLab job uses `-e`.
   - QEMU `-L`: QEMU uses `<sysroot>/<path>` when `access()` finds it, and the host kernel resolves an absolute link from the host root. So an absolute link in an image can load a host file. Hence `relink_sysroot`.
   - BuildKit reads the build context during the build, so the build log goes to `/tmp` first, not into `out/` in the context.
