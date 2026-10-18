@@ -1,6 +1,11 @@
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
 import pytest
 
-from floor import fallback, paths
+from floor import fallback, paths, policy
 from floor.cli import main
 
 UPSTREAM = """FROM ubuntu:22.04 AS build
@@ -118,3 +123,68 @@ def test_cli(tmp_path, capsys):
     (tmp_path / ".devops" / "main.Dockerfile").write_text(UPSTREAM, encoding="utf-8")
     assert main(["fallback", "--root", str(tmp_path)]) == 0
     assert ".devops/main.Dockerfile" in capsys.readouterr().out
+
+
+def _branch(tmp_path, text=UPSTREAM):
+    root = tmp_path / "branch"
+    (root / ".devops").mkdir(parents=True)
+    (root / ".devops" / "main.Dockerfile").write_bytes(text.encode("utf-8"))
+    return root
+
+
+def test_patch_changes_nothing_and_git_applies_it(tmp_path):
+    root = _branch(tmp_path, UPSTREAM + "RUN make tiny.en")  # no newline at the end
+    text = fallback.patch(root)
+    assert "diff --git a/.devops/main.Dockerfile b/.devops/main.Dockerfile\n" in text
+    assert "--- /dev/null\n+++ b/.floor/overrides/main.flags\n" in text and "\\ No newline at end of file\n" in text
+    assert not (root / ".floor").exists()
+    if not shutil.which("git"):
+        pytest.skip("git is not installed")
+    patch_file = tmp_path / "fallback.patch"
+    patch_file.write_bytes(text.encode("utf-8"))
+    # Its own repository: in a folder below another repository, git apply skips the paths outside the folder.
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "-c", "core.autocrlf=false", "apply", str(patch_file)], cwd=root, check=True)
+    assert fallback.pending(root) == []
+    expected = _branch(tmp_path / "x", UPSTREAM + "RUN make tiny.en")
+    fallback.apply(expected)
+    for rel in (".devops/main.Dockerfile", ".floor/overrides/main.flags"):
+        assert (root / rel).read_bytes() == (expected / rel).read_bytes()
+    assert fallback.patch(root) == ""
+
+
+def test_cli_patch_only_after_a_failed_gate(tmp_path, capsys):
+    root = _branch(tmp_path)
+    verdict, patch_file = tmp_path / "judge.json", tmp_path / "out" / "fallback.patch"
+    args = ["fallback", "--root", str(root), "--judge", str(verdict), "--patch", str(patch_file)]
+    verdict.write_text(json.dumps({"decision": "pass"}), encoding="utf-8")
+    assert main(args) == 0 and not patch_file.exists()
+    assert "no fallback: the gate did not fail (decision: pass)" in capsys.readouterr().out
+    verdict.write_text(json.dumps({"decision": "fail"}), encoding="utf-8")
+    assert main(args) == 0 and patch_file.read_text(encoding="utf-8") == fallback.patch(root)
+    assert "commit it to the branch" in capsys.readouterr().out
+    assert not (root / ".floor").exists()
+    fallback.apply(root)
+    patch_file.unlink()
+    assert main(args) == 0 and not patch_file.exists()
+    assert "canned config already applied: no patch" in capsys.readouterr().out
+    none_policy = tmp_path / "policy.yml"
+    none_policy.write_text(Path(policy.DEFAULT_POLICY).read_text(encoding="utf-8")
+                           .replace("fallback: canned_inclusive_config", "fallback: none"), encoding="utf-8")
+    assert main(args + ["--policy", str(none_policy)]) == 0
+    assert "no fallback: the policy has no canned config" in capsys.readouterr().out
+    assert main(args[:4] + [str(tmp_path / "missing.json")] + args[5:]) == 2
+
+
+def test_fallback_ci_job():
+    """F4.3, D-018: after a failed judge, the job keeps the patch; it never pushes."""
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    ci = yaml.safe_load((root / ".gitlab-ci.yml").read_text(encoding="utf-8"))
+    job = ci["fallback"]
+    assert job["stage"] == ci["notice-draft"]["stage"] == "repair"
+    assert job["needs"] == ["judge"] and job["when"] == "on_failure"
+    assert job["artifacts"]["paths"] == ["out/fallback/"]
+    script = job["script"][0]
+    assert "floor fallback --judge out/judge/judge.json --patch out/fallback/fallback.patch" in script
+    assert "git push" not in script

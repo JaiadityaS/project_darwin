@@ -142,3 +142,14 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - whisper.cpp's `LICENSE` stays. The Rieux README states that both parts are MIT.
 - The README is the same file in this repo and on GitLab. Its links point only to files that are on GitLab (product files and whisper.cpp files). The dev-only files (`docs/PRD.md`, `.github/workflows/`) are not linked. The GitHub run IDs stay in the evidence files.
 - The stage table has a status column with a date. Update it before submission (T-90 stays open until then).
+
+## D-018 (2026-10-19) F4.3: the fallback job keeps a patch; the flow or a human commits it
+- F4.3 says that a CI script applies the canned inclusive config "to the same branch". CI cannot push to the branch:
+  1. We have no project access token and no personal token in CI (D-010).
+  2. A push with `CI_JOB_TOKEN` needs the project setting "Allow Git push requests to the repository". Only a Maintainer or Owner can turn it on, and our role is Developer+ (GitLab docs, `ci/jobs/ci_job_token`, read 2026-10-19).
+  3. A push with `CI_JOB_TOKEN` starts no pipeline, so the gate would not re-verify the branch anyway (the same docs).
+- Decision: the `fallback` job (stage `repair`, `needs: [judge]`, `when: on_failure`) runs `floor fallback --judge out/judge/judge.json --patch out/fallback/fallback.patch`. The patch is an artifact in the MR widget ("Canned config patch"). The flow or a human commits it with `git apply`. The push starts the next MR pipeline, and that pipeline is the gate's re-check.
+- The patch is script output. The commit copies it as it is, so no LLM output decides the config (F5.1). The patch changes only allowlist paths (`.devops/*.Dockerfile`, `.floor/overrides/`), so `floor paths` passes it for an agent too.
+- The order stays: the agent's fix, then the fallback, then the draft notice. When the branch already has the canned config, `floor fallback --patch` writes no patch, and `floor notice-draft` writes the draft (D-016).
+- Gap: one more push is needed (by the flow or a human). The Hands-off claim holds only when the flow does it (T-40). If the flow cannot, a human commits the patch, and the demo says so.
+- PRD impact: F4.3 ("applies … to the same branch" now means "makes the patch for the same branch").

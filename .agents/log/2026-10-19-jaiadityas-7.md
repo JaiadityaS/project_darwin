@@ -28,3 +28,18 @@
 - Test: `test_judge_job_reads_the_committed_footprint` (the CI script has the flag; a manifest made with the committed file has both SCI values above 0).
 - Verified: 194 passed, 11 skipped. The guard passed.
 - Open: `.gitlab-ci.yml` goes to GitLab only with a human sync. Then check the manifest footprint fields in the judge job's artifacts.
+
+## T-41: the fallback CI job (D-018)
+- Fact: CI cannot push to the branch. A `CI_JOB_TOKEN` push needs a project setting that only a Maintainer can turn on, and such a push starts no pipeline (GitLab docs, `ci/jobs/ci_job_token`).
+- Done:
+  - `fallback.patch` (`fallback.py`): the changes of `apply` as a patch for `git apply` (new file mode for the override, the "No newline" marker). It changes no file.
+  - `floor fallback --judge FILE --policy FILE --patch FILE` (`cli.py`): with `--judge`, it acts only when the decision is `fail` and the policy has `repair.fallback: canned_inclusive_config`. When the branch has the canned config, it writes no patch.
+  - The `fallback` job in `.gitlab-ci.yml`: stage `repair`, `needs: [judge]`, `when: on_failure`, artifact `out/fallback/` ("Canned config patch").
+  - D-018 in DECISIONS.md.
+- Tests: `test_patch_changes_nothing_and_git_applies_it` (git applies the patch, and the result is byte-equal to `apply`), `test_cli_patch_only_after_a_failed_gate`, `test_fallback_ci_job`.
+- Verified: 197 passed, 11 skipped.
+- Open: the first GitLab run after the next human sync. Then T-05 with an MR that commits the patch.
+- Gotchas:
+  - The user's home folder is a git repo. In a temp folder below it, `git apply` skips the paths outside the folder and still exits 0. The test runs `git init` first.
+  - Git on this PC has `core.autocrlf=true`, so `git apply` writes CRLF. The test uses `-c core.autocrlf=false`.
+  - Heredocs in this shell halve backslashes, also in quoted heredocs. Write code with backslashes through the Write or Edit tool.

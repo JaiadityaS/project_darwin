@@ -13,6 +13,7 @@ run on the branch: if the gate still fails, `floor notice-draft` writes a draft 
 
 from __future__ import annotations
 
+import difflib
 import re
 from pathlib import Path
 
@@ -230,3 +231,29 @@ def apply(root: str | Path = ".", dockerfiles: list[str] | None = None, artifact
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8", newline="\n")
     return list(changes)
+
+
+def _diff_lines(lines) -> str:
+    out = []
+    for line in lines:
+        out.append(line if line.endswith("\n") else line + "\n\\ No newline at end of file\n")
+    return "".join(out)
+
+
+def patch(root: str | Path = ".", dockerfiles: list[str] | None = None, artifact: str = "main") -> str:
+    """The changes of `apply` as a patch for `git apply`. Changes no file. Empty = nothing to change.
+
+    CI has no token that can push to the branch (D-010, D-018), so the fallback job keeps this patch as an
+    artifact, and the flow or a human commits it. The next pipeline of the branch is the gate's re-check.
+    """
+    root = Path(root)
+    out = []
+    for rel, new in _changes(root, dockerfiles, artifact).items():
+        old_path = root / rel
+        old = old_path.read_text(encoding="utf-8") if old_path.exists() else None
+        out.append(f"diff --git a/{rel} b/{rel}\n")
+        if old is None:
+            out.append("new file mode 100644\n")
+        out.append(_diff_lines(difflib.unified_diff((old or "").splitlines(keepends=True), new.splitlines(keepends=True),
+                                                    "/dev/null" if old is None else f"a/{rel}", f"b/{rel}")))
+    return "".join(out)

@@ -293,6 +293,29 @@ def _cmd_paths(args: argparse.Namespace) -> int:
 
 
 def _cmd_fallback(args: argparse.Namespace) -> int:
+    if args.judge:
+        try:
+            verdict = _read_json(args.judge)
+            doc = policy.for_artifact(policy.load(args.policy), verdict.get("artifact"))
+        except (OSError, ValueError, policy.PolicyError) as exc:
+            print(f"floor: {exc}", file=sys.stderr)
+            return 2
+        if verdict.get("decision") != "fail":
+            print(f"no fallback: the gate did not fail (decision: {verdict.get('decision')})")
+            return 0
+        if (doc.get("repair") or {}).get("fallback", "canned_inclusive_config") != "canned_inclusive_config":
+            print("no fallback: the policy has no canned config (repair.fallback)")
+            return 0
+    if args.patch:
+        text = fallback.patch(args.root, args.dockerfile, args.artifact)
+        if not text:
+            print("canned config already applied: no patch. floor notice-draft runs next (F4.5)")
+            return 0
+        out = Path(args.patch)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text, encoding="utf-8", newline="\n")
+        print(f"wrote {out.as_posix()}: commit it to the branch with git apply (F4.3). Canned config: {fallback.flags_text()}")
+        return 0
     changed = fallback.apply(args.root, args.dockerfile, args.artifact)
     for path in changed:
         print(f"changed {path}")
@@ -792,6 +815,9 @@ def main(argv: list[str] | None = None) -> int:
     fb.add_argument("--root", default=".", help="repository root")
     fb.add_argument("--dockerfile", action="append", help="Dockerfile path relative to root (default: .devops/*.Dockerfile)")
     fb.add_argument("--artifact", default="main", help="override file name in .floor/overrides/")
+    fb.add_argument("--judge", metavar="FILE", help="floor judge output: act only when the gate failed")
+    fb.add_argument("--policy", default=str(policy.DEFAULT_POLICY), help="policy file (repair.fallback)")
+    fb.add_argument("--patch", metavar="FILE", help="write the changes as a patch for git apply; change no file")
     fb.set_defaults(func=_cmd_fallback)
 
     pg = sub.add_parser("page", help="build the Floor page from the evidence files (PRD F12.2)")

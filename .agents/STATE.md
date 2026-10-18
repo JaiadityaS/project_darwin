@@ -25,12 +25,12 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 | G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
 | G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014), and the first pipeline ran (2958271425). Open: the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
-| G-4 Release loop | Oct 22 | started: `floor fallback` (T-41) and `floor notice-draft` with its CI job (T-43, D-016), both tested locally. Open: the T-41 CI job, the flow (T-40), auto-merge (T-05), the release job (T-42) |
+| G-4 Release loop | Oct 22 | started: `floor fallback` (T-41) and `floor notice-draft` with its CI job (T-43, D-016), both tested locally. T-41 CI job done (D-018; not on GitLab yet). Open: the flow (T-40), auto-merge (T-05), the release job (T-42) |
 
 ## Next agent: start here
 
 1. Done on GitLab (pipeline 2960804030, GitLab `main` `64329927` = dev `a26571f`): AC-F7 and AC-F8 fields, the `notice-draft` job, the R2 meter and the README front page. See "Facts learned". Nothing in item 1 is open now.
-2. T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes. First the T-41 CI job: run `floor fallback` on an agent branch and run the gate again.
+2. T-41: the `fallback` job is done (D-018: CI cannot push, so the job keeps `out/fallback/fallback.patch`, and the flow or a human commits it). After the next human sync, the main pipeline fails at the judge, so check that the job writes the patch. Then T-05 (auto-merge test, D-010): an MR that commits the patch.
 3. T-54: R2 is done (`.floor/evidence/release/meter.json`, `sci-release-check.yml`, `sci.json`). The judge job now passes `--footprint` (on GitHub main; not on GitLab yet). Open: after the next human sync, check that the GitLab manifest footprint fields are not null.
 4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
 5. T-52 (upload page) needs no GitLab.

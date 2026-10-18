@@ -10,6 +10,7 @@
 #   memory  whisper-cli from the pushed image under cgroup memory limits, no swap, per model size
 #   offline whisper-cli from the pushed image with no network, under strace
 #   judge   floor judge and floor manifest; fails the pipeline when a floor rises
+#   fallback      only after a failed judge: the canned inclusive config as a patch for the branch (F4.3)
 #   notice-draft  only after a failed judge: drafts the Leave-Behind Notice for a code owner (F4.5)
 #   pages   the Rieux page from the committed evidence (default branch only)
 #
@@ -301,6 +302,27 @@ judge:
       exit "$rc"
   artifacts:
     paths: [out/]
+
+# F4.3: the gate failed, so a script (not the agent) makes the canned inclusive config for this branch.
+# CI has no token that can push (D-010, D-018): the patch is an artifact in the MR widget. The flow or a
+# human commits it with git apply, and the next pipeline of the branch is the gate's re-check. When the
+# branch already has the canned config, the job writes no patch, and notice-draft writes the draft.
+fallback:
+  stage: repair
+  extends: .evidence
+  image: python:3.12-slim
+  needs: [judge]
+  when: on_failure
+  variables:
+    GIT_DEPTH: "1"
+  script:
+    - |
+      if [ ! -s out/judge/judge.json ]; then echo "no fallback: the judge wrote no result"; exit 0; fi
+      pip install -q -e ./.floor
+      floor fallback --judge out/judge/judge.json --patch out/fallback/fallback.patch
+  artifacts:
+    expose_as: Canned config patch
+    paths: [out/fallback/]
 
 # F4.5: the fix and the canned config (F4.3) did not hold a floor, so the repair loop stops.
 # A script drafts the Leave-Behind Notice from the judge result and the MR description. CI has
