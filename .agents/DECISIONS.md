@@ -164,3 +164,17 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - Privacy (NFR-7): no file, and the log has the method, the path and the status only.
 - The gateway is code-owned (`.floor/`), so the repair agent cannot weaken the limits. `deploy/service.Dockerfile` (agent allowlist) builds FROM the held image and only adds python3 and the gateway files.
 - Max instances: a Cloud Run setting in `infra/` (T-50).
+
+## D-020 (2026-10-19) T-03: the trigger chain works; flows live in `.floor/flows/`
+- Test: a person started a pipeline on `main` (UI "New pipeline", pipeline 2960962126). It failed at the judge as planned. The project trigger "Pipeline events: Failed" started the private AI Catalog flow "Rieux trigger probe" (item 1018639, session 9657595, CI job 17269341490) in about 30 s.
+- The actor is the person: the session says "Triggered by @jaiadityasinghr". The flow runs as its own service account (`@ai-rieux-trigger-probe-gitlab-ai-hackathon`, Developer role, a composite identity with the person). Git commits by the flow show the flow name as the author.
+- `context:goal` is the full pipeline webhook payload. The probe copied `object_attributes` (id, status, ref, sha, source `web`), `user.username` and the status of the `judge` build. So the first step of T-40 can read "judge failed" from the event, with no tool call.
+- PRD §9.1 says the pipeline trigger came "behind an experimental flag, removed in 19.1". The flag was removed, not the trigger: "Pipeline events" is in the trigger list (Running, Passed, Failed, Canceled). The design of PRD §9 holds.
+- Catalog limits found (GitLab.com, 2026-10-19):
+  1. The create form puts an example flow in the YAML editor. Our first save kept that example below our YAML. YAML keeps the last value of a repeated key, so session 9657365 ran the example, not the probe. Check the stored definition (GraphQL `aiCatalogItem { latestVersion { ... on AiCatalogFlowVersion { definition } } }`) after each save.
+  2. The catalog schema refuses `max_cycles` on a component ("a disallowed additional property"), although the runtime docs list it. The example hid this error.
+  3. The editor indents typed lines again, so typed YAML breaks. A clipboard paste keeps the text, but it did not always arrive. For v1.1.0 the save request of the form (the `updateAiCatalogFlow` mutation) carried the file text, and the stored definition equals the file byte for byte.
+  4. Each save makes a new version (v1.1.0 now). The project uses the latest version.
+- Decision: every flow definition is a file in `.floor/flows/`, code-owned (CODEOWNERS and `paths.CODE_OWNED`), with a test. The catalog copy must equal the file. The repair agent cannot change a flow.
+- Not tested yet: a human tag push (T-42). It is also an action by a person, so it should start the flow in the same way.
+- PRD impact: none to the design. §9.1 wording only (see above).

@@ -21,7 +21,7 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 
 | Gate | Due | Status |
 |---|---|---|
-| G-0 Access and trigger chain | Oct 14 | waits on humans (T-01, T-06) |
+| G-0 Access and trigger chain | Oct 14 | **trigger chain met** (T-03, D-020): a failed pipeline started by a person starts a flow, and the person is the actor. Open: T-06 (GCP, parked by the user) and the size of the credit pool |
 | G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
 | G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014), and the first pipeline ran (2958271425). Open: the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
@@ -30,7 +30,7 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 ## Next agent: start here
 
 1. Done on GitLab (pipeline 2960804030, GitLab `main` `64329927` = dev `a26571f`): AC-F7 and AC-F8 fields, the `notice-draft` job, the R2 meter and the README front page. See "Facts learned". Nothing in item 1 is open now.
-2. T-41 is done on GitLab: pipeline 2960896128 failed at the judge as planned, and the `fallback` job wrote `out/fallback/fallback.patch`. Next: T-03 (does a failed pipeline start a flow?), then T-40 and T-05 (an MR that commits the patch).
+2. T-41 is done on GitLab: pipeline 2960896128 failed at the judge as planned, and the `fallback` job wrote `out/fallback/fallback.patch`. T-03 is done (D-020): the "Pipeline events: Failed" trigger starts a flow. Next: T-40 (the floor-repair flow, in `.floor/flows/`), then T-05 (its MR commits the patch, with auto-merge).
 3. T-54 is done: the GitLab judge manifest (pipeline 2960896128) has both SCI fields.
 4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
 5. T-52: the `service` job passed on GitLab (pipeline 2960909623): jfk.wav gave the reference text in 3.31 s; a non-WAV body got 400. Gotcha: BusyBox wget cuts a binary POST body at the first zero byte, so the job uses curl. Open: max instances in `infra/` (T-50, needs T-06; the user parked GCP on 2026-10-19).
@@ -44,6 +44,8 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
 ## Facts learned (measured)
+
+- **T-03 trigger chain (pipeline 2960962126, session 9657595, 2026-10-19).** The project trigger "Pipeline events: Failed" started the flow about 30 s after the pipeline failed. "Triggered by" is the person who started the pipeline. The flow runs as its service account. `context:goal` is the pipeline webhook payload (object_attributes, user, builds). The catalog refuses `max_cycles`, and the create form can keep its example YAML below yours: read the stored definition back after each save (D-020).
 
 - **Energy run (energy.yml run 39033747472, whisper.cpp `0c7be696`, `base.en`).** One GitHub runner: AMD EPYC 7763 (Zen 3), 2 vCPUs, AVX2, no AVX-512. Each run transcribes 2.1833 audio-minutes (11 copies of the JFK sample). Median of 5 runs per build after 1 warm-up round. All four builds give the same transcript (one SHA-256).
   - CPU s per audio-minute: native 20.1, folk-fix 20.1, all-variants 20.0 (it loads haswell), x64-only 301.9 (it loads x64). Peak RSS: 386 MB, x64-only 409 MB.

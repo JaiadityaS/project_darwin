@@ -14,7 +14,6 @@ components:
       - from: "context:goal"
         as: "event"
     toolset: []
-    max_cycles: 2
     ui_log_events: ["on_agent_final_answer"]
 prompts:
   - prompt_id: "trigger_probe"

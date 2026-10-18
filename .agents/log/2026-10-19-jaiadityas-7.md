@@ -72,3 +72,12 @@
 - Open: the next GitLab run of `service`.
 - Verified: pipeline 2960909623 (GitLab `main` `3c576ef4` = dev `be54960`), `service` job 17268972447 passed: jfk.wav gave "And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country." (11.0 s audio, 3.31 s on the server); a non-WAV body got 400.
 - T-54 done: the judge manifest of pipeline 2960896128 has both SCI fields (0.00196 g CO2e per audio-minute, 0.362 g per release check).
+
+## T-03: the trigger chain (D-020)
+- Done: `.floor/flows/trigger-probe.yml` (no tools, no clone; it copies fields of the pipeline event), code-owned (`paths.CODE_OWNED`, `.gitlab/CODEOWNERS`), test `test_flows.py`. AI Catalog item 1018639 (private), trigger "Pipeline events: Failed".
+- Run 1: pipeline 2960926378 (UI "New pipeline") failed at the judge, and session 9657365 started ("Triggered by @jaiadityasinghr"). But it ran the example flow of the create form: the form had kept the example YAML below ours, and YAML keeps the last value of a repeated key. The example posted nothing.
+- Fix: the stored definition now equals the file (v1.1.0). The catalog schema refused `max_cycles`, so the file has no `max_cycles` now, and the test checks it.
+- Run 2: pipeline 2960962126 failed at the judge; session 9657595 (CI job 17269341490) replied `pipeline_id: 2960962126 status: failed ref: main sha: 3c576ef4… source: web user: jaiadityasinghr judge_job: failed floor_raised: yes`.
+- Verified: 209 passed, 11 skipped.
+- Open: T-40 (the floor-repair flow), then T-05. A tag push is not tested yet (T-42).
+- Gotchas: read the stored definition back with GraphQL after every save. The editor indents typed YAML again. The default conditions of the "Enable flow" dialog (Mention, Assign, Assign reviewer) must be removed.

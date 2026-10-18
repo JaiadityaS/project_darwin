@@ -15,6 +15,7 @@ def test_trigger_probe_flow():
         assert key not in flow  # custom flows reject these top-level keys
     [probe] = flow["components"]
     assert probe["toolset"] == [] and probe["inputs"] == [{"from": "context:goal", "as": "event"}]
+    assert "max_cycles" not in probe  # the catalog schema rejects it (a disallowed additional property)
     [prompt] = flow["prompts"]
     assert prompt["prompt_id"] == probe["prompt_id"] and "model" not in prompt
     assert "{{event}}" in prompt["prompt_template"]["user"]
