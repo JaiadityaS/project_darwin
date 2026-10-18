@@ -89,7 +89,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-90 | Final README: problem, claims, stage table, how to run, sources | §16.2 | ready | - | Product name Rieux (D-013) |
+| T-90 | Final README: problem, claims, stage table, how to run, sources | §16.2 | doing | @JaiadityaS | Product name Rieux (D-013) |
 | T-91 | Video, under 3:00 | §16.1 | later | - | |
 | T-92 | Devpost text | §16.2 | later | - | |
 | T-99 | Delete `AGENTS.md` and `.agents/`; final hygiene check (`bash scripts/guard.sh tree`) | - | later | - | Last commit before submission |
