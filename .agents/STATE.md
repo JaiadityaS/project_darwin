@@ -30,15 +30,15 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 ## Next agent: start here
 
 1. Done on GitLab (pipeline 2960804030, GitLab `main` `64329927` = dev `a26571f`): AC-F7 and AC-F8 fields, the `notice-draft` job, the R2 meter and the README front page. See "Facts learned". Nothing in item 1 is open now.
-2. T-41: the `fallback` job is done (D-018: CI cannot push, so the job keeps `out/fallback/fallback.patch`, and the flow or a human commits it). After the next human sync, the main pipeline fails at the judge, so check that the job writes the patch. Then T-05 (auto-merge test, D-010): an MR that commits the patch.
-3. T-54: R2 is done (`.floor/evidence/release/meter.json`, `sci-release-check.yml`, `sci.json`). The judge job now passes `--footprint` (on GitHub main; not on GitLab yet). Open: after the next human sync, check that the GitLab manifest footprint fields are not null.
+2. T-41 is done on GitLab: pipeline 2960896128 failed at the judge as planned, and the `fallback` job wrote `out/fallback/fallback.patch`. Next: T-03 (does a failed pipeline start a flow?), then T-40 and T-05 (an MR that commits the patch).
+3. T-54 is done: the GitLab judge manifest (pipeline 2960896128) has both SCI fields.
 4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
-5. T-52: the gateway and the upload page are done (D-019). The `service` job (GitLab CI) runs the service image with the real whisper-server. Open: its first GitLab run after the next human sync (check `out/service/transcribe.json`), and max instances in `infra/` (T-50, needs T-06).
+5. T-52: the `service` job passed on GitLab (pipeline 2960909623): jfk.wav gave the reference text in 3.31 s; a non-WAV body got 400. Gotcha: BusyBox wget cuts a binary POST body at the first zero byte, so the job uses curl. Open: max instances in `infra/` (T-50, needs T-06; the user parked GCP on 2026-10-19).
 
 ## Needs a human (agents cannot do these)
 
 - [ ] T-01: access is confirmed (D-010). Still open: the Duo credit pool.
-- [ ] Sync to GitLab after each finished step. In PowerShell, from `project_darwin`: `& "C:\Program Files\Git\bin\bash.exe" scripts/assemble-gitlab.sh --push` (plain `bash` there is WSL). The push is in your name. The Showcase project is public, so a push is publishing: an agent pushes there only after a clear yes in that session. Never push this repo itself to GitLab.
+- [ ] Sync to GitLab after each finished step. In PowerShell, from `project_darwin`: `& "C:\Program Files\Git\bin\bash.exe" scripts/assemble-gitlab.sh --push` (plain `bash` there is WSL). The push is in your name. The Showcase project is public, so a push is publishing. On 2026-10-19 the user gave a standing yes for the sync script only, after a dry run and a residue check (author and committer are the user; no trailer; no tool or vendor names in the diff or the paths). Never push this repo itself to GitLab.
 - [ ] Add the GitLab usernames of teammates to `FLOOR_HUMANS` in `.gitlab-ci.yml`. Every other pipeline user counts as an agent (D-014).
 - [ ] T-06: Google Cloud project with billing and a budget alert, for Cloud Run and WIF.
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.

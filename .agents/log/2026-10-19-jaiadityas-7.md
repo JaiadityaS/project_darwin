@@ -70,3 +70,5 @@
   - Cause: BusyBox wget sets Content-Length with strlen() for its post-file option, so it cut the WAV at the first zero byte. Locally `wav_seconds(jfk.wav)` = 11.0.
   - Fix: the job installs curl and posts with `--data-binary`; it checks the HTTP code (200, then 400 for a non-WAV body) and prints the service log on a failure. Test: `test_service_ci_job` refuses the post-file option.
 - Open: the next GitLab run of `service`.
+- Verified: pipeline 2960909623 (GitLab `main` `3c576ef4` = dev `be54960`), `service` job 17268972447 passed: jfk.wav gave "And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country." (11.0 s audio, 3.31 s on the server); a non-WAV body got 400.
+- T-54 done: the judge manifest of pipeline 2960896128 has both SCI fields (0.00196 g CO2e per audio-minute, 0.362 g per release check).
