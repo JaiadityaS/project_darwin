@@ -8,6 +8,7 @@
 /.floor/floor/ @jaiadityasinghr
 /.floor/pyproject.toml @jaiadityasinghr
 /.floor/notices/ @jaiadityasinghr
+/.floor/flows/ @jaiadityasinghr
 /CODEOWNERS @jaiadityasinghr
 /.gitlab/CODEOWNERS @jaiadityasinghr
 /.gitlab-ci.yml @jaiadityasinghr

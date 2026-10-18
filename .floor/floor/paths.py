@@ -20,6 +20,7 @@ CODE_OWNED = (
     ".floor/floor/**",          # the Judge and the gate scripts
     ".floor/pyproject.toml",
     ".floor/notices/**",
+    ".floor/flows/**",          # the flow definitions (AI Catalog, T-03, T-40)
     "CODEOWNERS",
     ".gitlab/CODEOWNERS",
     ".gitlab-ci.yml",
