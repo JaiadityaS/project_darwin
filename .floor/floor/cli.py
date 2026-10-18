@@ -14,8 +14,8 @@ from pathlib import Path
 import requests
 
 from . import __version__
-from . import (backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice, offline,
-               page, paths, policy, qemu, ratchet)
+from . import (attest, backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice,
+               offline, page, paths, policy, qemu, ratchet)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -426,6 +426,38 @@ def _cmd_manifest(args: argparse.Namespace) -> int:
 
 def _cmd_diff(args: argparse.Namespace) -> int:
     print(manifest.diff_markdown(_read_json(args.old), _read_json(args.new)), end="")
+    return 0
+
+
+def _cmd_attest(args: argparse.Namespace) -> int:
+    try:
+        if args.action == "identity":
+            token = os.environ.get(args.token_env)
+            if not token:
+                raise ValueError(f"no ID token in ${args.token_env} (id_tokens in .gitlab-ci.yml)")
+            print(attest.identity(token))
+            return 0
+        if not args.manifest:
+            raise ValueError(f"floor attest {args.action} needs --manifest")
+        statement = _read_json(args.manifest)
+        if args.action == "predicate":
+            if not args.out:
+                raise ValueError("floor attest predicate needs --out")
+            kind, pred = attest.predicate(statement)
+            _write_json(Path(args.out), pred)
+            print(kind)
+            return 0
+        if not args.verified:
+            raise ValueError("floor attest check needs --verified")
+        problem = attest.check(statement, Path(args.verified).read_text(encoding="utf-8"))
+    except (OSError, ValueError, KeyError) as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    if problem:
+        print(f"attestation: FAIL: {problem}")
+        return 1
+    print(f"attestation: verified, same predicate as the manifest on {statement['subject'][0]['name']}@sha256:"
+          f"{statement['subject'][0]['digest']['sha256']}")
     return 0
 
 
@@ -872,6 +904,18 @@ def main(argv: list[str] | None = None) -> int:
     df.add_argument("old", help="previous floor-manifest.json")
     df.add_argument("new", help="new floor-manifest.json")
     df.set_defaults(func=_cmd_diff)
+
+    at = sub.add_parser("attest", help="inputs and check of the signed floor manifest (PRD F5.4; cosign signs)")
+    at.add_argument("action", choices=["predicate", "identity", "check"],
+                    help="predicate: write the predicate for cosign attest and print its type; identity: print the "
+                         "certificate identity of this CI job; check: compare cosign verify-attestation output "
+                         "with the manifest")
+    at.add_argument("--manifest", metavar="FILE", help="floor-manifest.json (predicate, check)")
+    at.add_argument("--out", metavar="FILE", help="where to write the predicate (predicate)")
+    at.add_argument("--verified", metavar="FILE", help="the output of cosign verify-attestation (check)")
+    at.add_argument("--token-env", default="SIGSTORE_ID_TOKEN", metavar="NAME",
+                    help="the variable with the GitLab ID token (identity; default SIGSTORE_ID_TOKEN)")
+    at.set_defaults(func=_cmd_attest)
 
     args = parser.parse_args(argv)
     return args.func(args)

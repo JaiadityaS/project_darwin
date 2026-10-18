@@ -208,3 +208,13 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - `probe` runs with `-t 2` and a run limit of 2400 s. The job limit stays 50 min.
   - `memory` and `offline` keep `-t 4`; they run natively.
 - No PRD impact: the measures and the floors do not change. The next MR pipeline (from the flow, on the fixed CI) is the check.
+
+## D-023 (2026-10-19) T-34: the `attest` job signs the manifest after a passed judge
+- PRD F5.4: sign the manifest as an in-toto attestation (`cosign attest`, keyless with GitLab OIDC) on the image digest. AC-F5: `cosign verify-attestation` passes.
+- Decision (`.gitlab-ci.yml` job `attest`, `floor attest`, tested in `test_attest.py`):
+  - The job runs after `build` and `judge` and only when the judge passed (no `when`). That is each pipeline where the gate holds: merge requests, `main` and tags. The fix MR of the flow (T-40) is the first place where it can run.
+  - Keyless: the job asks GitLab for an ID token with the audience `sigstore`. cosign trades it for a short-lived Sigstore certificate, and the public Rekor log records the signature. The certificate identity is the pipeline definition at the ref (`https://` and the `ci_config_ref_uri` claim). `floor attest identity` reads only that claim, because the token also has claims about the person who started the pipeline. The job never prints the token.
+  - `floor attest predicate` gives cosign the predicate and its type; cosign wraps them in its own Statement on the digest. After the signature, `cosign verify-attestation` checks the exact identity and the issuer (`$CI_SERVER_URL`), and `floor attest check` compares the verified predicate with the manifest. The job keeps the verify command in `out/attest/verify.txt`.
+  - cosign v2.6.5 (the v2 line, still maintained): v2 keeps the attestation next to the image as a `.att` tag, which every registry can store. The job downloads the binary from the GitHub release and checks its SHA-256 (pinned; the asset digest and `cosign_checksums.txt` agree). The tools image does not change, so no other job pulls a larger image.
+- Not yet: attaching the attestation to the GitLab Release (T-42), and two releases with a diff (AC-F5).
+- PRD impact: none.

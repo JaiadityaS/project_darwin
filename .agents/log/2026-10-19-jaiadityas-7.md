@@ -91,3 +91,8 @@
   - `probe`: EPYC-Milan stopped at 1800 s with `-t 4` on 2 vCPUs. Fix: `-t 2` and 2400 s.
 - Verified: 212 passed, 11 skipped (new tests `test_chroot_jobs_mount_proc`, `test_probe_ci_job`).
 - Open: the gate of the next fix MR (on the fixed CI); T-05 needs "Pipelines must succeed" (a user decision).
+
+## T-34: the attestation (D-023)
+- Done: `floor attest` (`attest.py`: predicate, identity, check) and the `attest` job of `.gitlab-ci.yml` (after a passed judge; keyless with the GitLab ID token; cosign v2.6.5 with a pinned SHA-256). Test `test_attest.py`.
+- Verified: 217 passed, 11 skipped. `test_gateway.py::test_limits` failed once with a Windows socket abort and then passed 3 times; it is not related.
+- Open: the first run on GitLab needs a passed judge (the next fix MR).
