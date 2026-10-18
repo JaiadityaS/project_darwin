@@ -1,0 +1,95 @@
+{
+  "tool": "floor 0.1.0",
+  "measured_at": "2026-10-18T20:16:57+00:00",
+  "wall_s": 242.958,
+  "cpu_s": 387.778,
+  "vcpus": 2,
+  "vcpu_s": 485.915,
+  "memory_gb_s": 96.609,
+  "memory_peak_gb": 0.888,
+  "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+  "scope": "cgroup",
+  "jobs": {
+    "judge": {
+      "measured_at": "2026-10-18T20:20:10+00:00",
+      "wall_s": 0.835,
+      "cpu_s": 1.057,
+      "vcpu_s": 1.669,
+      "memory_gb_s": 0.032,
+      "memory_peak_gb": 0.041,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313185"
+    },
+    "memory": {
+      "measured_at": "2026-10-18T20:17:16+00:00",
+      "wall_s": 147.349,
+      "cpu_s": 273.189,
+      "vcpu_s": 294.698,
+      "memory_gb_s": 87.509,
+      "memory_peak_gb": 0.888,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313183"
+    },
+    "offline": {
+      "measured_at": "2026-10-18T20:16:59+00:00",
+      "wall_s": 17.016,
+      "cpu_s": 22.049,
+      "vcpu_s": 34.032,
+      "memory_gb_s": 2.058,
+      "memory_peak_gb": 0.285,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313184"
+    },
+    "probe-epyc-milan": {
+      "measured_at": "2026-10-18T20:16:59+00:00",
+      "wall_s": 15.724,
+      "cpu_s": 18.179,
+      "vcpu_s": 31.449,
+      "memory_gb_s": 1.458,
+      "memory_peak_gb": 0.159,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313182"
+    },
+    "probe-nehalem": {
+      "measured_at": "2026-10-18T20:16:58+00:00",
+      "wall_s": 15.16,
+      "cpu_s": 17.826,
+      "vcpu_s": 30.32,
+      "memory_gb_s": 1.305,
+      "memory_peak_gb": 0.125,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313180"
+    },
+    "probe-qemu64": {
+      "measured_at": "2026-10-18T20:16:58+00:00",
+      "wall_s": 12.874,
+      "cpu_s": 15.466,
+      "vcpu_s": 25.748,
+      "memory_gb_s": 1.163,
+      "memory_peak_gb": 0.125,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313179"
+    },
+    "probe-sandybridge": {
+      "measured_at": "2026-10-18T20:17:05+00:00",
+      "wall_s": 16.155,
+      "cpu_s": 18.686,
+      "vcpu_s": 32.309,
+      "memory_gb_s": 1.474,
+      "memory_peak_gb": 0.149,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313181"
+    },
+    "scan": {
+      "measured_at": "2026-10-18T20:16:57+00:00",
+      "wall_s": 17.845,
+      "cpu_s": 21.326,
+      "vcpu_s": 35.69,
+      "memory_gb_s": 1.61,
+      "memory_peak_gb": 0.133,
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17268313178"
+    }
+  },
+  "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960804030"
+}

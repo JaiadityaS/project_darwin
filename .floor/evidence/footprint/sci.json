@@ -2,9 +2,10 @@
   "tool": "floor 0.1.0",
   "method": "GSF Impact Framework (@grnsft/if@1.1.1, if-run) with Cloud Carbon Footprint coefficients",
   "sci_gco2e_per_audio_minute": 0.0019596936511420246,
-  "sci_gco2e_per_release_check": null,
+  "sci_gco2e_per_release_check": 0.36160130564626297,
   "regions": {
-    "audio-minutes": "northamerica-northeast1"
+    "audio-minutes": "northamerica-northeast1",
+    "release-checks": "us-east1"
   },
   "rows": [
     {
@@ -76,6 +77,20 @@
       "carbon_gco2e": 0.028667818193241712,
       "functional_units": 2.1833,
       "sci_gco2e": 0.013130498874750016
+    },
+    {
+      "manifest": "floor-sci-release-check",
+      "child": "release-check",
+      "unit": "release-checks",
+      "headline": true,
+      "region": "us-east1",
+      "grid_gco2e_per_kwh": 579.44,
+      "energy_kwh": 0.0005551562189791853,
+      "operational_gco2e": 0.32167971952529917,
+      "embodied_gco2e": 0.039921586120963796,
+      "carbon_gco2e": 0.36160130564626297,
+      "functional_units": 1.0,
+      "sci_gco2e": 0.36160130564626297
     }
   ]
 }

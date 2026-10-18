@@ -13,4 +13,12 @@
   - The GitHub runs are in the private dev repo, so a judge cannot open them. The evidence files have the run IDs.
 - Gotchas:
   - On Windows, a clone of the GitLab project needs `core.longpaths=true` (an Android example path is too long).
+
+
+## After the human sync (GitLab `main` `64329927`, pipeline 2960804030)
+- Verified on GitLab (public API and job logs, no token): see STATE.md "Facts learned". The judge failed as planned. The `notice-draft` job printed the expected "no draft" line. The manifest has the AC-F7 and AC-F8 fields. The README is the front page.
+- Done (T-54, R2): `out/judge/meter.json` of the pipeline is now `.floor/evidence/release/meter.json`. `floor footprint write` made `.floor/impact/sci-release-check.yml`. if-run (`npx -p @grnsft/if@1.1.1`, Node 22.17) on both manifests, then `floor footprint check --out .floor/evidence/footprint/sci.json`: "6 result(s): every output matches the formulas". `floor footprint stale`: up to date. SCI per release check: 0.36 g CO2e (us-east1). The README footprint paragraph has it.
+- Verified: 193 passed, 11 skipped. `floor page` shows the release-check row.
+- Open: `floor manifest --footprint` in the judge job (the manifest footprint fields are still null).
+- Gotcha: the GitLab job logs are public at `<project>/-/jobs/<id>/raw`, and the artifacts at `/api/v4/projects/87296266/jobs/<id>/artifacts`.
 - Branch: main

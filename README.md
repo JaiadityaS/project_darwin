@@ -55,7 +55,7 @@ The difference between all-variants and the folk fix (0.4%) is smaller than the 
 
 **The other floors.** The smallest cgroup memory limit that transcribes: tiny 512 MB, base 512 MB, small 768 MB (peak RSS 177, 284 and 750 MB on GitLab). Offline: 0 network attempts in a new network namespace under strace. The download is 81.9 MB (the tiny.en model, `whisper-cli` and its libraries).
 
-**Footprint.** SCI (ISO/IEC 21031, Green Software Foundation Impact Framework 1.1.1): 0.00196 g CO2e per audio-minute for the all-variants build in Google Cloud northamerica-northeast1. Embodied carbon is 84.6% of it. The same work in us-central1 gives 0.0131 g, 6.7 times more. ΔM, the embodied carbon of the devices that a floor raise could force people to replace, is a separate scenario with a range. It is never added into SCI.
+**Footprint.** SCI (ISO/IEC 21031, Green Software Foundation Impact Framework 1.1.1): 0.00196 g CO2e per audio-minute for the all-variants build in Google Cloud northamerica-northeast1. Embodied carbon is 84.6% of it. The same work in us-central1 gives 0.0131 g, 6.7 times more. One release check of Rieux itself (the scan, the 4 QEMU probes, the memory, offline and judge jobs of GitLab pipeline 2960804030) gives 0.36 g CO2e on the GitLab runners in us-east1: 486 vCPU-seconds, metered in the cgroup of each job. This is a lower bound, because the build and the unit tests are not in it. ΔM, the embodied carbon of the devices that a floor raise could force people to replace, is a separate scenario with a range. It is never added into SCI.
 
 ## What Rieux adds
 

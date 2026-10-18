@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-19 · @JaiadityaS · session 7
+Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 
 ## Where we are
 
@@ -29,10 +29,11 @@ Last update: 2026-10-19 · @JaiadityaS · session 7
 
 ## Next agent: start here
 
-1. AC-F7 and AC-F8 are written and tested locally (dev, not on GitLab yet; see `.agents/log/2026-10-17-jaiadityas-5.md`): the memory floor lists the peak RSS and the download size per model; connectivity lists `download_mb` and `download_bytes` (each file); each floor links its own job (`floor manifest --floor-evidence`). A peak-RSS rise over 10% is a Judge note (report only). Next: a human syncs to GitLab. Then read `out/judge/floor-manifest.json` of the judge job: the job link per floor, `peak_rss_mb` and `download_mb` per model, and `download_bytes`. In the same pipeline, check the new `notice-draft` job (T-43, D-016): the judge fails on `main` (cpu raised), so the job runs, and it must print "no draft: the canned inclusive config is not on this branch yet …". If GitLab does not make the pipeline, read the error about `notice-draft` (`when: on_failure` with `needs`, or `expose_as`).
-2. Then T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes.
-3. T-54, R2 (DECISIONS D-015): each GitLab job of the `.tools` template meters its own container (cgroup v2), and the judge job joins the meters into `out/judge/meter.json`. After the next human sync, check the `floor meter stop` line of each job, then commit `out/judge/meter.json` of a `main` pipeline as `.floor/evidence/release/meter.json`. Then make the SCI files again and commit them together: `floor footprint write`, if-run on each manifest (Node 22), `floor footprint check --out .floor/evidence/footprint/sci.json`. The commands are in `.floor/evidence/README.md`. `ci.yml` runs if-run and compares the result with `sci.json`. R1 is done: the energy evidence (T-55) and its SCI files are committed, and the Rieux page shows them (T-60).
-4. T-90 README: the draft is done (D-017, session 7). At the next human sync, `README.md` becomes the GitLab front page and whisper.cpp's README moves to `README.whisper.cpp.md`. Check on GitLab that the README shows, that its links work, and that `README.whisper.cpp.md` shows its images. Update the stage table (status column) when a stage starts to run.
+1. Done on GitLab (pipeline 2960804030, GitLab `main` `64329927` = dev `a26571f`): AC-F7 and AC-F8 fields, the `notice-draft` job, the R2 meter and the README front page. See "Facts learned". Nothing in item 1 is open now.
+2. T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes. First the T-41 CI job: run `floor fallback` on an agent branch and run the gate again.
+3. T-54: R2 is done (`.floor/evidence/release/meter.json`, `sci-release-check.yml`, `sci.json`). Open: `floor manifest --footprint` in the judge job, so the manifest has the SCI values (now null).
+4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
+5. T-52 (upload page) needs no GitLab.
 
 ## Needs a human (agents cannot do these)
 
@@ -57,6 +58,12 @@ Last update: 2026-10-19 · @JaiadityaS · session 7
   - So the same recipe gives v3 on the GitHub runner (G-1) and v4 on the GitLab runner: the build machine sets the floor.
   - Image `main@sha256:7e756879…` (full digest in the judge job's `floor-manifest.json`), base `ubuntu:22.04@sha256:0a988793…`.
 
+- **Pipeline 2960804030 (GitLab `main` `64329927`, the sync of dev `a26571f`, 2026-10-18).** It failed as planned at the judge (cpu raised to x86-64-v4; memory and connectivity held). Build 208 s, memory 190 s.
+  - The manifest has a job link per floor, `peak_rss_mb` (tiny 177, base 284, small 751), `download_mb` per model (tiny 81.9, base 152.1, small 491.8) and `download_bytes` per file (AC-F7, AC-F8 on GitLab).
+  - `notice-draft` ran after the failed judge and printed "no draft: the canned inclusive config is not on this branch yet (…7 Dockerfiles, .floor/overrides/main.flags)". It passed. GitLab warns "out/notice/: no matching files" for the artifact, and that is correct when there is no draft.
+  - R2 meter: 8 jobs (scan, 4 probes, memory, offline, judge), 243 s wall, 388 CPU s, 486 vCPU-s, 96.6 GB-s, peak 0.89 GB, all on an Intel Xeon Platinum 8581C. SCI per release check: 0.36 g CO2e in us-east1 (0.32 operational, 0.04 embodied). A lower bound (D-015).
+  - The README shows as the project front page, and `README.whisper.cpp.md` is there (D-017).
+  - `floor paths --actor auto` prints nothing on a push pipeline. It runs on the first MR pipeline.
 - **Step 2 pipeline (2958309699, GitLab `main` `84388f56`).** It failed as planned in 405 s (cpu raised). Judge: memory held, connectivity held, policy met for both. `floor memory --cgroup` and chroot work on the runner.
   - memory (181 s): smallest passing limit tiny 512 MB (peak RSS 177), base 512 (284), small 768 (750). The GitHub run gave 179, 290 and 758.
   - offline (43 s): 0 network attempts, offline proven, download 81.9 MB (the tiny.en model, whisper-cli and the `.so` files in `/app/build/bin`).
