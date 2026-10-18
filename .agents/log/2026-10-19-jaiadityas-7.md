@@ -1,0 +1,16 @@
+# 2026-10-19 @JaiadityaS session 7
+- Tasks: T-90 (doing).
+- Done:
+  - `README.md`: the Rieux README (PRD §16.2). The problem (#3510, #3814, the cause in the build), what we measured (H-1, the folk fix under QEMU, the cost of inclusion, the other floors, SCI), the claims N1–N4 with prior art and "what we do not claim", the loop, the DevSecOps stage table with a status column, how to run, the layout and the sources. Each number comes from STATE.md "Facts learned" or a file in `.floor/evidence/`.
+  - D-017: `README.md` is a product file (`scripts/assemble-gitlab.sh`). The first sync after this moves whisper.cpp's README to `README.whisper.cpp.md` (one `git mv`, same folder).
+- Verified:
+  - A dry run of `assemble-gitlab.sh` in a scratch copy (a clone of this repo and a bare copy of `work/gitlab` as the remote): the sync commit has `README.md` (Rieux) and `README.whisper.cpp.md` (whisper.cpp). A second run gives the same result. Nothing was pushed.
+  - `python -m floor probe -h` and `python -m floor image -h` match the README commands. The image tags use the full 40-character hash.
+  - `python -m pytest .floor/tests -q -p no:cacheprovider`: 193 passed, 11 skipped. `bash scripts/guard.sh tree`: no problems.
+- Open:
+  - The README is not on GitLab yet. It goes with the next human sync.
+  - Git shows the move as a new file plus a changed `README.md`, not as a rename, because the new README is all new text.
+  - The GitHub runs are in the private dev repo, so a judge cannot open them. The evidence files have the run IDs.
+- Gotchas:
+  - On Windows, a clone of the GitLab project needs `core.longpaths=true` (an Android example path is too long).
+- Branch: main

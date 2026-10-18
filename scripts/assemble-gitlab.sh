@@ -23,8 +23,8 @@ case "${1:-}" in
   *) echo "usage: bash scripts/assemble-gitlab.sh [--push]" >&2; exit 2 ;;
 esac
 
-# Product paths (D-002). Everything else in this repo is dev-only.
-PRODUCT=(.floor .gitlab .gitlab-ci.yml deploy infra)
+# Product paths (D-002, D-017). Everything else in this repo is dev-only.
+PRODUCT=(.floor .gitlab .gitlab-ci.yml deploy infra README.md)
 # Paths that the repair agent may change on GitLab (.floor/floor/paths.py AGENT_ALLOWED).
 # A sync adds new files there, but never overwrites or deletes the agent's files.
 AGENT_OWNED=(.floor/overrides deploy)
@@ -87,6 +87,11 @@ Upstream history is kept. Every later commit is Floor work."
 fi
 
 # 3. Overlay the product files from HEAD (committed content only, no local files).
+# The Rieux README is the front page (T-90, D-017). whisper.cpp's README moves once, to the same folder,
+# so its relative links still work.
+if [ ! -e "$WORK/README.whisper.cpp.md" ] && [ -e "$WORK/README.md" ]; then
+  G mv README.md README.whisper.cpp.md
+fi
 keep="$(mktemp -d)"
 trap 'rm -rf "$keep"' EXIT
 for p in "${AGENT_OWNED[@]}"; do

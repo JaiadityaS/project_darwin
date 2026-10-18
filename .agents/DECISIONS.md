@@ -135,3 +135,10 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - The loop stops for three reasons. The judge failed the pipeline. The fallback has nothing left to apply. Automation cannot fire a trigger, so no new agent attempt starts (§9.1). The next step is human: a code owner opens the notice MR, or closes the agent MR.
 - `floor fallback` now reads each RUN instruction as shell words. The old line regex crashed on the quoted CMAKE_ARGS of upstream's main-cuda and main-rocm Dockerfiles ("No closing quotation"). It also put CMAKE_ARGS into the dnf package list of main-rocm (the `make` package). Now only a `make` command changes, and quotes, escapes and line continuations stay.
 - PRD impact: F4.5 (the script writes the draft, and a code owner opens the notice MR). F6.1 does not change.
+
+## D-017 (2026-10-19) The Rieux README is the front page of the GitLab project
+- `README.md` of this repo is now a product file (`PRODUCT` in `scripts/assemble-gitlab.sh`). It is the README of the GitLab project, so the judges see Rieux first.
+- The first sync after this change moves whisper.cpp's `README.md` to `README.whisper.cpp.md` (`git mv`, one time). It stays in the top folder, so its relative links still work. The Rieux README links to it in its first section. This is the one change to an upstream file after the import. D-012 allowed it ("it can move the upstream README").
+- whisper.cpp's `LICENSE` stays. The Rieux README states that both parts are MIT.
+- The README is the same file in this repo and on GitLab. Its links point only to files that are on GitLab (product files and whisper.cpp files). The dev-only files (`docs/PRD.md`, `.github/workflows/`) are not linked. The GitHub run IDs stay in the evidence files.
+- The stage table has a status column with a date. Update it before submission (T-90 stays open until then).
