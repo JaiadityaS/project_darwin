@@ -178,3 +178,15 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Decision: every flow definition is a file in `.floor/flows/`, code-owned (CODEOWNERS and `paths.CODE_OWNED`), with a test. The catalog copy must equal the file. The repair agent cannot change a flow.
 - Not tested yet: a human tag push (T-42). It is also an action by a person, so it should start the flow in the same way.
 - PRD impact: none to the design. §9.1 wording only (see above).
+
+## D-021 (2026-10-19) T-40: the floor-repair flow; two PRD steps are agent steps
+- PRD §9 table: "Exit unless the Judge said raised (deterministic) → diagnose and propose (agent) → open the fix MR (deterministic)".
+- Fact: a `DeterministicStepComponent` runs one tool with inputs taken whole from the flow state. It cannot take one field out of `context:goal` (the pipeline event is one JSON value), and a router matches exact string values only. So no deterministic step can read "the judge build failed" from the event, and none can build the commit and the MR with values from the event.
+- Decision (`.floor/flows/floor-repair.yml`, code-owned, tested in `test_flows.py`):
+  1. `gate`: an agent with no tools. It answers "raised" only when the event says that the pipeline and its `judge` build failed and the ref is not a `floor-fix/` branch. The router starts `repair` only on the exact string "raised"; any other answer ends the flow. A wrong answer costs one run, and it cannot weaken the gate.
+  2. `repair`: an agent with five tools (`get_logs_from_job`, `get_repository_file`, `create_branch`, `create_commit`, `create_merge_request`). It stops unless the judge log says "Pareto: raised". It copies the patch of the `fallback` job (D-018) from the job log and applies it to the files at the pipeline commit. On an MR pipeline it commits to the MR source branch (F4.3, "the same branch"). Else it commits to `floor-fix/<pipeline>` and opens an MR into the ref (into the default branch for a tag).
+- The `fallback` job now prints the patch in its log between `--- BEGIN fallback.patch ---` and `--- END fallback.patch ---`, because the flow tools read job logs and not artifacts.
+- Why this still meets F5.1: the judge script sets every floor. The agent applies a patch that a script wrote. The MR pipeline runs the whole gate again, and `floor paths` refuses any path outside the allowlist for the service account (D-014). If the agent changes a line wrongly, the gate (or the reviewer) sees it in the MR.
+- The order "the agent's fix, then the fallback" (D-018) becomes one step for now: the flow's fix is the canned config. A free-form agent fix is cut, because the canned config is the fix that G-1 proved.
+- Auto-merge (F4.4) is T-05. The flow does not set it yet.
+- PRD impact: §9 table (the exit step and the MR step are agent steps with fixed rules); F4.2 (the agent proposes the canned config only).

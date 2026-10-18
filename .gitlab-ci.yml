@@ -374,6 +374,10 @@ fallback:
       if [ ! -s out/judge/judge.json ]; then echo "no fallback: the judge wrote no result"; exit 0; fi
       pip install -q -e ./.floor
       floor fallback --judge out/judge/judge.json --patch out/fallback/fallback.patch
+      # The floor-repair flow reads job logs, not artifacts (T-40), so the log carries the patch too.
+      if [ -s out/fallback/fallback.patch ]; then
+        echo "--- BEGIN fallback.patch ---"; cat out/fallback/fallback.patch; echo "--- END fallback.patch ---"
+      fi
   artifacts:
     expose_as: Canned config patch
     paths: [out/fallback/]
