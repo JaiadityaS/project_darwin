@@ -191,17 +191,19 @@ service:
         sleep 2
       done
       if [ "$ok" != 1 ]; then docker logs rieux-service 2>&1 | tail -n 40; exit 1; fi
-      wget -q -O out/service/transcribe.json --header "Content-Type: audio/wav" \
-        --post-file samples/jfk.wav http://docker:8080/transcribe
+      # curl, not BusyBox wget: its post-file option sets Content-Length with strlen(), so it cuts binary
+      # data at the first zero byte (pipeline 2960896128 got 400 for jfk.wav).
+      apk add --no-cache curl > /dev/null
+      code=$(curl -sS -o out/service/transcribe.json -w '%{http_code}' -H "Content-Type: audio/wav" \
+        --data-binary @samples/jfk.wav http://docker:8080/transcribe)
       cat out/service/transcribe.json; echo
+      [ "$code" = 200 ] || { echo "HTTP $code"; docker logs rieux-service 2>&1 | tail -n 40; exit 1; }
       grep -qi "$EXPECT" out/service/transcribe.json || { echo "the text does not match: $EXPECT"; exit 1; }
       # A body that is not 16 kHz mono WAV never reaches whisper-server (the unit tests check 413 and 429).
       head -c 500000 /dev/zero > /tmp/not-wav.bin
-      if wget -q -O /dev/null --post-file /tmp/not-wav.bin http://docker:8080/transcribe 2> /tmp/bad.err; then
-        echo "a body that is not WAV was accepted"; exit 1
-      fi
-      grep -q "400" /tmp/bad.err || { cat /tmp/bad.err; exit 1; }
-      echo "not WAV: 400"
+      code=$(curl -sS -o /tmp/bad.json -w '%{http_code}' --data-binary @/tmp/not-wav.bin http://docker:8080/transcribe)
+      [ "$code" = 400 ] || { echo "a body that is not WAV got HTTP $code"; cat /tmp/bad.json; exit 1; }
+      echo "not WAV: 400 $(cat /tmp/bad.json)"
       docker logs rieux-service > out/service/service.log 2>&1
       docker rm -f rieux-service > /dev/null
   artifacts:

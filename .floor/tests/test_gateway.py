@@ -174,5 +174,6 @@ def test_service_ci_job():
     assert job["needs"] == ["build"] and job["artifacts"]["paths"] == ["out/service/"]
     script = job["script"][0]
     assert '-f deploy/service.Dockerfile --build-arg IMAGE="$IMAGE_REF"' in script
-    assert "--post-file samples/jfk.wav http://docker:8080/transcribe" in script and 'grep -qi "$EXPECT"' in script
+    assert "--data-binary @samples/jfk.wav http://docker:8080/transcribe" in script and 'grep -qi "$EXPECT"' in script
+    assert "--post-file" not in script  # BusyBox wget cuts binary bodies at the first zero byte
     assert "docker push" not in script

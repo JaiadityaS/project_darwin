@@ -61,3 +61,12 @@
 
 ## T-90: the stage table
 - The Create row has the `fallback` and `notice-draft` jobs. The Configure row has the service image and the `service` job. Both say "new" until a GitLab pipeline runs them.
+
+## GitLab pipeline 2960896128 (GitLab `main` `04bddeb5` = dev `43b907a`)
+- judge: failed as planned (Pareto raised, decision fail: the upstream image floor is v4).
+- fallback (T-41): passed. It wrote `out/fallback/fallback.patch` (canned config `-DGGML_NATIVE=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DBUILD_SHARED_LIBS=ON`). AC for the patch artifact is met.
+- notice-draft: passed with no draft (the canned config is not on the branch yet), as planned.
+- service (T-52): the image built and `/healthz` passed, but the jfk.wav POST got HTTP 400.
+  - Cause: BusyBox wget sets Content-Length with strlen() for its post-file option, so it cut the WAV at the first zero byte. Locally `wav_seconds(jfk.wav)` = 11.0.
+  - Fix: the job installs curl and posts with `--data-binary`; it checks the HTTP code (200, then 400 for a non-WAV body) and prints the service log on a failure. Test: `test_service_ci_job` refuses the post-file option.
+- Open: the next GitLab run of `service`.
