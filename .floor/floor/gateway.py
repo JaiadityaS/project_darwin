@@ -36,6 +36,7 @@ MAX_SECONDS = 30
 RATE = 16000
 # 16-bit mono PCM at 16 kHz, plus room for the header and a few extra chunks.
 MAX_BYTES = MAX_SECONDS * RATE * 2 + 4096
+DRAIN_BYTES = 2 * 1024 * 1024  # a refused body up to this size is read and dropped (see do_POST)
 PER_CLIENT = (6, 60.0)     # requests per seconds, for one client address
 PER_INSTANCE = (30, 60.0)  # requests per seconds, for all clients of one instance
 UPSTREAM = os.environ.get("WHISPER_URL", "http://127.0.0.1:8081/inference")
@@ -187,6 +188,15 @@ class Handler(BaseHTTPRequestHandler):
             self._json(411, {"error": "send the WAV file with a Content-Length"})
             return
         if int(length) > MAX_BYTES:
+            # Read and drop a body of moderate size, so the client gets the 413 and not a reset connection.
+            # A larger body is not read: the connection closes.
+            if int(length) <= DRAIN_BYTES:
+                left = int(length)
+                while left > 0:
+                    chunk = self.rfile.read(min(left, 65536))
+                    if not chunk:
+                        break
+                    left -= len(chunk)
             self.close_connection = True
             self._json(413, {"error": f"the limit is {MAX_SECONDS} s of 16 kHz mono WAV ({MAX_BYTES} bytes)"})
             return

@@ -54,3 +54,7 @@
 - Tests: `test_gateway.py` (WAV checks, the rate limiter, the client address, a fake whisper-server: fixed form fields, the limits, a 502, the image recipe, standard library only).
 - Verified: 206 passed, 11 skipped. The guard passed. In the browser pane with a fake whisper-server: a 2 s 44.1 kHz stereo WAV became 16 kHz mono and got the text; a 35 s file was refused in the page; a non-WAV body got 400. Phone width (375 px) is good.
 - Open: Docker is not installed on this PC, so the service image is not built yet. T-51 builds it from the held image and runs the smoke test. Max instances go in `infra/` (T-50).
+- Then: the `service` job in `.gitlab-ci.yml` (stage `floors`, `needs: [build]`, Docker-in-Docker like the build job). It builds `deploy/service.Dockerfile` with `IMAGE=$IMAGE_REF`, runs it, waits for `/healthz`, posts `samples/jfk.wav` (16 kHz mono, 11 s) and greps `$EXPECT`, then posts 500,000 zero bytes and expects 400. It pushes nothing. Test: `test_service_ci_job`.
+- Fix: a 413 with an unread body made the client see a reset connection (WinError 10053, a flaky test). Now the gateway reads and drops a refused body up to 2 MB (`DRAIN_BYTES`), then sends the 413. A larger body is not read.
+- Verified: 207 passed, 11 skipped; `test_gateway.py` 5 runs in a row passed.
+- Open: the first GitLab run of the `service` job (after the next human sync).

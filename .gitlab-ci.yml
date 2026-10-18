@@ -9,6 +9,7 @@
 #   probe   whisper-cli from the pushed image under QEMU, one job per CPU model, with controls
 #   memory  whisper-cli from the pushed image under cgroup memory limits, no swap, per model size
 #   offline whisper-cli from the pushed image with no network, under strace
+#   service the service image (pushed image + gateway) with the real whisper-server: a smoke test (F13.3)
 #   judge   floor judge and floor manifest; fails the pipeline when a floor rises
 #   fallback      only after a failed judge: the canned inclusive config as a patch for the branch (F4.3)
 #   notice-draft  only after a failed judge: drafts the Leave-Behind Notice for a code owner (F4.5)
@@ -154,6 +155,57 @@ build:
     paths: [out/build/]
     reports:
       dotenv: out/build/image.env
+
+# F13.3 (T-52, D-019): the service image is the pushed image plus the gateway. The job runs it with
+# the real whisper-server and checks the upload path: samples/jfk.wav gives the reference text, and
+# a body that is not WAV gets 400. It pushes nothing; the deploy jobs (T-51) build it again.
+service:
+  stage: floors
+  extends: .evidence
+  image: docker:27.5.1
+  services:
+    - name: docker:27.5.1-dind
+      alias: docker
+      command: ["--registry-mirror", "https://mirror.gcr.io"]
+  needs: [build]
+  timeout: 30m
+  variables:
+    GIT_DEPTH: "1"
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: /certs
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: /certs/client
+  script:
+    - |
+      for i in $(seq 1 30); do docker info > /dev/null 2>&1 && break; sleep 2; done
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+      mkdir -p out/service
+      echo "$CI_JOB_URL" > out/service/job-url.txt
+      docker build --progress=plain -f deploy/service.Dockerfile --build-arg IMAGE="$IMAGE_REF" -t rieux-service . \
+        > /tmp/service-build.log 2>&1 || { tail -n 40 /tmp/service-build.log; exit 1; }
+      cp /tmp/service-build.log out/service/build.log
+      docker run -d --name rieux-service -p 8080:8080 rieux-service
+      ok=0
+      for i in $(seq 1 90); do
+        if wget -q -O /dev/null http://docker:8080/healthz 2>/dev/null; then ok=1; break; fi
+        sleep 2
+      done
+      if [ "$ok" != 1 ]; then docker logs rieux-service 2>&1 | tail -n 40; exit 1; fi
+      wget -q -O out/service/transcribe.json --header "Content-Type: audio/wav" \
+        --post-file samples/jfk.wav http://docker:8080/transcribe
+      cat out/service/transcribe.json; echo
+      grep -qi "$EXPECT" out/service/transcribe.json || { echo "the text does not match: $EXPECT"; exit 1; }
+      # A body that is not 16 kHz mono WAV never reaches whisper-server (the unit tests check 413 and 429).
+      head -c 500000 /dev/zero > /tmp/not-wav.bin
+      if wget -q -O /dev/null --post-file /tmp/not-wav.bin http://docker:8080/transcribe 2> /tmp/bad.err; then
+        echo "a body that is not WAV was accepted"; exit 1
+      fi
+      grep -q "400" /tmp/bad.err || { cat /tmp/bad.err; exit 1; }
+      echo "not WAV: 400"
+      docker logs rieux-service > out/service/service.log 2>&1
+      docker rm -f rieux-service > /dev/null
+  artifacts:
+    paths: [out/service/]
 
 scan:
   stage: floors

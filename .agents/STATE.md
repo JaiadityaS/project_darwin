@@ -33,7 +33,7 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 2. T-41: the `fallback` job is done (D-018: CI cannot push, so the job keeps `out/fallback/fallback.patch`, and the flow or a human commits it). After the next human sync, the main pipeline fails at the judge, so check that the job writes the patch. Then T-05 (auto-merge test, D-010): an MR that commits the patch.
 3. T-54: R2 is done (`.floor/evidence/release/meter.json`, `sci-release-check.yml`, `sci.json`). The judge job now passes `--footprint` (on GitHub main; not on GitLab yet). Open: after the next human sync, check that the GitLab manifest footprint fields are not null.
 4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
-5. T-52: the gateway and the upload page are done (D-019). Open: a run with the real whisper-server in the service image (needs a held image: T-51), and max instances in `infra/` (T-50, needs T-06).
+5. T-52: the gateway and the upload page are done (D-019). The `service` job (GitLab CI) runs the service image with the real whisper-server. Open: its first GitLab run after the next human sync (check `out/service/transcribe.json`), and max instances in `infra/` (T-50, needs T-06).
 
 ## Needs a human (agents cannot do these)
 

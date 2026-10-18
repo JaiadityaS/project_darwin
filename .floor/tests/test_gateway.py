@@ -114,7 +114,7 @@ def test_limits(service):
     # The size cap comes first, before the body is read, and it does not count as a request.
     assert call(service + "/transcribe", make_wav(31))[0] == 413
     req = urllib.request.Request(service + "/transcribe", data=b"x", method="POST",
-                                 headers={"Content-Length": str(gateway.MAX_BYTES + 1)})
+                                 headers={"Content-Length": str(gateway.DRAIN_BYTES + 1)})  # not read
     with pytest.raises(urllib.error.HTTPError) as too_big:
         urllib.request.urlopen(req, timeout=10)
     assert too_big.value.code == 413
@@ -161,3 +161,18 @@ def test_service_image_recipe():
     assert "COPY .floor/floor/gateway.py .floor/floor/gateway.html /srv/rieux/" in recipe
     assert 'ENTRYPOINT ["python3", "/srv/rieux/gateway.py", "--serve"]' in recipe
     assert "FROM ${IMAGE}" in recipe and (root / ".floor/floor/gateway.html").exists()
+
+
+def test_service_ci_job():
+    """T-52: GitLab CI runs the service image with the real whisper-server (a smoke test)."""
+    from pathlib import Path
+
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    ci = yaml.safe_load((root / ".gitlab-ci.yml").read_text(encoding="utf-8"))
+    job = ci["service"]
+    assert job["needs"] == ["build"] and job["artifacts"]["paths"] == ["out/service/"]
+    script = job["script"][0]
+    assert '-f deploy/service.Dockerfile --build-arg IMAGE="$IMAGE_REF"' in script
+    assert "--post-file samples/jfk.wav http://docker:8080/transcribe" in script and 'grep -qi "$EXPECT"' in script
+    assert "docker push" not in script
