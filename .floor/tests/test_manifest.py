@@ -111,3 +111,23 @@ def test_cli_manifest_and_diff(tmp_path, capsys):
     capsys.readouterr()
     assert main(["diff", str(first), str(second)]) == 0
     assert "No floor moved." in capsys.readouterr().out
+
+
+def test_judge_job_reads_the_committed_footprint(tmp_path):
+    """T-54: the judge job passes the committed SCI summary, so the manifest's footprint fields are not null."""
+    from pathlib import Path
+
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    sci = root / ".floor/evidence/footprint/sci.json"
+    script = "\n".join(yaml.safe_load((root / ".gitlab-ci.yml").read_text(encoding="utf-8"))["judge"]["script"])
+    assert "sci=.floor/evidence/footprint/sci.json" in script and '--footprint "$sci"' in script
+    scan_file = tmp_path / "scan.json"
+    scan_file.write_text(json.dumps({"summary": scan("x86-64-v1")}), encoding="utf-8")
+    verdict, out = tmp_path / "judge.json", tmp_path / "m.json"
+    assert main(["judge", "--scan", str(scan_file), "--out", str(verdict)]) == 0
+    assert main(["manifest", "--judge", str(verdict), "--subject", "img", "--digest", "sha256:" + "b" * 64,
+                 "--commit", "abc", "--release", "r1", "--footprint", str(sci), "--out", str(out)]) == 0
+    footprint = json.loads(out.read_text(encoding="utf-8"))["predicate"]["footprint"]
+    assert footprint["sci_gco2e_per_audio_minute"] > 0 and footprint["sci_gco2e_per_release_check"] > 0
+    assert footprint["method"].startswith("GSF Impact Framework")

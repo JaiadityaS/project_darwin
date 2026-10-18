@@ -31,7 +31,7 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 
 1. Done on GitLab (pipeline 2960804030, GitLab `main` `64329927` = dev `a26571f`): AC-F7 and AC-F8 fields, the `notice-draft` job, the R2 meter and the README front page. See "Facts learned". Nothing in item 1 is open now.
 2. T-05 (auto-merge test, D-010) with a fix MR that `floor fallback` (T-41) makes. First the T-41 CI job: run `floor fallback` on an agent branch and run the gate again.
-3. T-54: R2 is done (`.floor/evidence/release/meter.json`, `sci-release-check.yml`, `sci.json`). Open: `floor manifest --footprint` in the judge job, so the manifest has the SCI values (now null).
+3. T-54: R2 is done (`.floor/evidence/release/meter.json`, `sci-release-check.yml`, `sci.json`). The judge job now passes `--footprint` (on GitHub main; not on GitLab yet). Open: after the next human sync, check that the GitLab manifest footprint fields are not null.
 4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
 5. T-52 (upload page) needs no GitLab.
 

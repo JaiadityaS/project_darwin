@@ -22,3 +22,9 @@
 - Open: `floor manifest --footprint` in the judge job (the manifest footprint fields are still null).
 - Gotcha: the GitLab job logs are public at `<project>/-/jobs/<id>/raw`, and the artifacts at `/api/v4/projects/87296266/jobs/<id>/artifacts`.
 - Branch: main
+
+## T-54: the SCI values in the judge's manifest
+- Done: the judge job in `.gitlab-ci.yml` adds `--footprint .floor/evidence/footprint/sci.json` when the file exists. The file is committed, so GitLab has it.
+- Test: `test_judge_job_reads_the_committed_footprint` (the CI script has the flag; a manifest made with the committed file has both SCI values above 0).
+- Verified: 194 passed, 11 skipped. The guard passed.
+- Open: `.gitlab-ci.yml` goes to GitLab only with a human sync. Then check the manifest footprint fields in the judge job's artifacts.
