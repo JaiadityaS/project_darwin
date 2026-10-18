@@ -43,3 +43,14 @@
   - The user's home folder is a git repo. In a temp folder below it, `git apply` skips the paths outside the folder and still exits 0. The test runs `git init` first.
   - Git on this PC has `core.autocrlf=true`, so `git apply` writes CRLF. The test uses `-c core.autocrlf=false`.
   - Heredocs in this shell halve backslashes, also in quoted heredocs. Write code with backslashes through the Write or Edit tool.
+
+## T-52: the upload page (D-019)
+- Fact: whisper-server takes `duration` and other parameters from the request form and has no rate limit, so it cannot be the public port.
+- Done:
+  - `.floor/floor/gateway.py`: GET `/` (the page), POST `/transcribe` (a WAV body), GET `/healthz`. `python3 gateway.py --serve` starts whisper-server on 127.0.0.1:8081 (`-d 30000`), then the gateway on `$PORT`. It exits when whisper-server exits.
+  - `.floor/floor/gateway.html`: record (stops at 30 s) or choose a file; the browser makes 16 kHz mono WAV with `OfflineAudioContext`.
+  - `deploy/service.Dockerfile`: `ARG IMAGE` (the held image digest), python3, the two gateway files.
+  - `.floor/pyproject.toml`: `gateway.html` is package data.
+- Tests: `test_gateway.py` (WAV checks, the rate limiter, the client address, a fake whisper-server: fixed form fields, the limits, a 502, the image recipe, standard library only).
+- Verified: 206 passed, 11 skipped. The guard passed. In the browser pane with a fake whisper-server: a 2 s 44.1 kHz stereo WAV became 16 kHz mono and got the text; a 35 s file was refused in the page; a non-WAV body got 400. Phone width (375 px) is good.
+- Open: Docker is not installed on this PC, so the service image is not built yet. T-51 builds it from the held image and runs the smoke test. Max instances go in `infra/` (T-50).

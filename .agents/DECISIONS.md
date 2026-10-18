@@ -153,3 +153,14 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - The order stays: the agent's fix, then the fallback, then the draft notice. When the branch already has the canned config, `floor fallback --patch` writes no patch, and `floor notice-draft` writes the draft (D-016).
 - Gap: one more push is needed (by the flow or a human). The Hands-off claim holds only when the flow does it (T-40). If the flow cannot, a human commits the patch, and the demo says so.
 - PRD impact: F4.3 ("applies … to the same branch" now means "makes the patch for the same branch").
+
+## D-019 (2026-10-19) F13.3: a code-owned gateway in front of whisper-server
+- Fact: whisper-server reads its parameters from the request form (for example `duration`, `beam_size`), and it has no rate limit (`examples/server/server.cpp`, `get_req_parameters`). With `--convert`, it writes each upload to a temp file. So whisper-server cannot be the public port.
+- Decision: `.floor/floor/gateway.py` (standard library only) is the public port. whisper-server listens on 127.0.0.1:8081, with `-d 30000` and no `--convert`, so it decodes the audio in memory.
+  - The browser makes 16 kHz mono 16-bit WAV (`gateway.html`), so the gateway can check the length from the WAV header and the data size, with no decoder.
+  - Limits: at most 30 s; a body cap of 964,096 bytes (checked before the body is read); 6 requests a minute per client; 30 a minute per instance; one transcription at a time per instance.
+  - The client address is the last `X-Forwarded-For` entry (Cloud Run adds it; the client can set the entries before it). The per-instance limit holds even if this address is wrong.
+  - The gateway sends only fixed parameters (`response_format=json`, `temperature=0.0`) and the audio.
+  - Privacy (NFR-7): no file, and the log has the method, the path and the status only.
+- The gateway is code-owned (`.floor/`), so the repair agent cannot weaken the limits. `deploy/service.Dockerfile` (agent allowlist) builds FROM the held image and only adds python3 and the gateway files.
+- Max instances: a Cloud Run setting in `infra/` (T-50).
