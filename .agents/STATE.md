@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
+Last update: 2026-10-19 · @JaiadityaS · session 7 (T-40 flow run, D-022)
 
 ## Where we are
 
@@ -25,12 +25,12 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 | G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
 | G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014), and the first pipeline ran (2958271425). Open: the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
-| G-4 Release loop | Oct 22 | started: `floor fallback` (T-41) and `floor notice-draft` with its CI job (T-43, D-016), both tested locally. T-41 CI job done (D-018; not on GitLab yet). Open: the flow (T-40), auto-merge (T-05), the release job (T-42) |
+| G-4 Release loop | Oct 22 | started: `floor fallback` (T-41) and `floor notice-draft` with its CI job (T-43, D-016), both tested locally. T-41 CI job done (D-018). The flow (T-40, D-021) opened its first fix MR (!1). Open: a fix MR that passes the gate (harness fixed, D-022), auto-merge (T-05), the release job (T-42) |
 
 ## Next agent: start here
 
 1. Done on GitLab (pipeline 2960804030, GitLab `main` `64329927` = dev `a26571f`): AC-F7 and AC-F8 fields, the `notice-draft` job, the R2 meter and the README front page. See "Facts learned". Nothing in item 1 is open now.
-2. T-41 is done on GitLab: pipeline 2960896128 failed at the judge as planned, and the `fallback` job wrote `out/fallback/fallback.patch`. T-03 is done (D-020): the "Pipeline events: Failed" trigger starts a flow. Next: T-40 (the floor-repair flow, in `.floor/flows/`), then T-05 (its MR commits the patch, with auto-merge).
+2. T-41 is done on GitLab: pipeline 2960896128 failed at the judge as planned, and the `fallback` job wrote `out/fallback/fallback.patch`. T-03 is done (D-020): the "Pipeline events: Failed" trigger starts a flow. T-40 works (D-021): a failed judge starts the flow, and the flow opens a fix MR with the fallback patch. The first fix MR (!1) failed its gate because of the harness (D-022). Next: check the gate of the next fix MR (on the fixed CI), then T-05 (auto-merge; needs "Pipelines must succeed", see "Needs a human").
 3. T-54 is done: the GitLab judge manifest (pipeline 2960896128) has both SCI fields.
 4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
 5. T-52: the `service` job passed on GitLab (pipeline 2960909623): jfk.wav gave the reference text in 3.31 s; a non-WAV body got 400. Gotcha: BusyBox wget cuts a binary POST body at the first zero byte, so the job uses curl. Open: max instances in `infra/` (T-50, needs T-06; the user parked GCP on 2026-10-19).
@@ -40,10 +40,14 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (after the GitLab sync)
 - [ ] T-01: access is confirmed (D-010). Still open: the Duo credit pool.
 - [ ] Sync to GitLab after each finished step. In PowerShell, from `project_darwin`: `& "C:\Program Files\Git\bin\bash.exe" scripts/assemble-gitlab.sh --push` (plain `bash` there is WSL). The push is in your name. The Showcase project is public, so a push is publishing. On 2026-10-19 the user gave a standing yes for the sync script only, after a dry run and a residue check (author and committer are the user; no trailer; no tool or vendor names in the diff or the paths). Never push this repo itself to GitLab.
 - [ ] Add the GitLab usernames of teammates to `FLOOR_HUMANS` in `.gitlab-ci.yml`. Every other pipeline user counts as an agent (D-014).
+- [ ] T-05: decide whether to turn on "Pipelines must succeed" (Settings → Merge requests). Now it is off, so an auto-merge set before the MR pipeline exists can merge at once (D-010).
 - [ ] T-06: Google Cloud project with billing and a budget alert, for Cloud Run and WIF.
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
 ## Facts learned (measured)
+
+- **T-40 first run (pipeline 2960990129, session 9657869, MR !1, 2026-10-19).** The flow went from the failed pipeline to the fix MR in about 2 min. The 8 files equal `floor fallback` byte for byte. The MR author shows as the person; the commit author and the MR pipeline user are the service account. Only an action by a person fires a trigger, so the MR pipeline cannot start the flow again (D-021).
+- **Harness fault (MR pipeline 2961002610).** With the canned config (`GGML_BACKEND_DL=ON`), ggml finds its CPU backends through `/proc/self/exe`. A plain `chroot` has no `/proc`, so `memory` and `offline` loaded 0 backends and crashed (exit -11). Under QEMU on the 2-vCPU runner, EPYC-Milan with `-t 4` took more than 1800 s; qemu64 took 297 s, Nehalem 181 s, SandyBridge 568 s (D-022).
 
 - **T-03 trigger chain (pipeline 2960962126, session 9657595, 2026-10-19).** The project trigger "Pipeline events: Failed" started the flow about 30 s after the pipeline failed. "Triggered by" is the person who started the pipeline. The flow runs as its service account. `context:goal` is the pipeline webhook payload (object_attributes, user, builds). The catalog refuses `max_cycles`, and the create form can keep its example YAML below yours: read the stored definition back after each save (D-020).
 

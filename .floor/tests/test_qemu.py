@@ -75,3 +75,15 @@ def test_controls_under_qemu(tmp_path, cpu):
     assert found["positive"]["result"] == "pass"
     assert found["negative"]["result"] == "fail"
     assert found["negative"]["signal"] == "SIGILL"
+
+
+def test_probe_ci_job():
+    """MR pipeline 2961002610: one thread per runner vCPU, and the run limit fits in the job limit."""
+    from pathlib import Path
+
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    job = yaml.safe_load((root / ".gitlab-ci.yml").read_text(encoding="utf-8"))["probe"]
+    script = job["script"][-1]
+    assert "-t 2 -nt" in script and "--timeout 2400" in script
+    assert int(job["timeout"].rstrip("m")) * 60 > 2400 + 300  # room for the model, the export and the controls

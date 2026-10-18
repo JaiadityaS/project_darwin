@@ -36,7 +36,7 @@ def test_floor_repair_flow():
                                       "routes": {"raised": "repair", "default_route": "end"}}
     assert after_repair == {"from": "repair", "to": "end"}
     # No tool that runs commands, merges, approves or changes settings.
-    assert repair["toolset"] == ["get_logs_from_job", "get_repository_file", "create_branch", "create_commit",
+    assert repair["toolset"] == ["get_job_logs", "get_repository_file", "create_branch", "create_commit",
                                  "create_merge_request"]
     prompts = {p["prompt_id"]: p for p in flow["prompts"]}
     assert set(prompts) == {gate["prompt_id"], repair["prompt_id"]}
@@ -48,6 +48,7 @@ def test_floor_repair_flow():
     user = prompts["floor_repair"]["prompt_template"]["user"]
     assert '"--- BEGIN fallback.patch ---"' in user and '"--- END fallback.patch ---"' in user  # see the fallback job
     assert '"Pareto: raised"' in user and '"floor-fix/<pipeline id>"' in user
+    assert 'the action "create" for a new file' in user  # session 9657869: "update" on a new file failed once
 
 
 def test_flow_definitions_are_code_owned():

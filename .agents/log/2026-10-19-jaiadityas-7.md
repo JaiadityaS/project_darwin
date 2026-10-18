@@ -81,3 +81,13 @@
 - Verified: 209 passed, 11 skipped.
 - Open: T-40 (the floor-repair flow), then T-05. A tag push is not tested yet (T-42).
 - Gotchas: read the stored definition back with GraphQL after every save. The editor indents typed YAML again. The default conditions of the "Enable flow" dialog (Mention, Assign, Assign reviewer) must be removed.
+
+## T-40: the floor-repair flow (D-021, D-022)
+- Done: `.floor/flows/floor-repair.yml` (a `gate` agent with no tools, then a `repair` agent with five tools), code-owned, test `test_flows.py`. AI Catalog item 1018643 (private), trigger "Pipeline events: Failed". The trigger of the probe flow (1018639) is off now.
+- Catalog v2: the job log tool is `get_job_logs` (the first save had a wrong name; the catalog does not check tool names).
+- Run: the sync push pipeline 2960990129 failed at the judge. Session 9657869 ran `gate`, then `repair`, and opened MR !1 (`floor-fix/2960990129`, commit `a8aca4ca`) in about 2 min. The first commit call sent "update" for a new file and failed; the second sent "create". Catalog v3: the prompt now names the action.
+- MR pipeline 2961002610 failed its gate, because of the harness:
+  - `memory` and `offline`: exit -11 after `GGML_ASSERT(device)`. The canned config loads the CPU backends through `/proc/self/exe`, and `chroot` gives no `/proc`. Fix: both jobs mount `/proc` in the image.
+  - `probe`: EPYC-Milan stopped at 1800 s with `-t 4` on 2 vCPUs. Fix: `-t 2` and 2400 s.
+- Verified: 212 passed, 11 skipped (new tests `test_chroot_jobs_mount_proc`, `test_probe_ci_job`).
+- Open: the gate of the next fix MR (on the fixed CI); T-05 needs "Pipelines must succeed" (a user decision).

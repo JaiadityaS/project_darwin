@@ -24,7 +24,7 @@ components:
       - from: "context:goal"
         as: "event"
     toolset:
-      - "get_logs_from_job"
+      - "get_job_logs"
       - "get_repository_file"
       - "create_branch"
       - "create_commit"
@@ -78,7 +78,8 @@ prompts:
            - If merge_request is not null, commit to merge_request.source_branch. Open no new merge request.
            - Else create the branch "floor-fix/<pipeline id>" from object_attributes.sha, commit to it, and open a
              merge request into object_attributes.ref (into project.default_branch if object_attributes.tag is true).
-           Make one commit with all the files. The commit message is
+           Make one commit with all the files. Use the action "create" for a new file and "update" for a changed file.
+           The commit message is
            "fix(floor): canned inclusive config (pipeline <pipeline id>)".
         6. The merge request title is "Floor fix: hold the CPU floor (pipeline <pipeline id>)". Remove the source
            branch on merge. The description has these parts:

@@ -136,3 +136,17 @@ def test_offline_catches_a_connect():
     assert result["network_attempts"] >= 1 and not result["offline"]
     clean = offline.check([sys.executable, "-c", "print('done')"], expect="done")
     assert clean["offline"] and clean["network_attempts"] == 0
+
+
+def test_chroot_jobs_mount_proc():
+    """MR pipeline 2961002610: with GGML_BACKEND_DL=ON, ggml finds its backends through /proc/self/exe."""
+    from pathlib import Path
+
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    ci = yaml.safe_load((root / ".gitlab-ci.yml").read_text(encoding="utf-8"))
+    for name in ("memory", "offline"):
+        script = ci[name]["script"]
+        mount = script.index("mkdir -p rootfs/proc && mount -t proc proc rootfs/proc")
+        run = next(i for i, step in enumerate(script) if 'chroot "$PWD/rootfs"' in step)
+        assert script.index('crane export "$IMAGE_REF" - | tar -x -C rootfs') < mount < run

@@ -51,6 +51,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - No personal access token in CI. A personal token acts as the human code owner, so CI could then approve and merge Leave-Behind Notices (breaks F6.1), and every merge would look human-made (breaks the Hands-off claim).
 - Code-owner approval on `main` needs a Maintainer. Instead, `floor paths` fails the MR pipeline when an agent account changes a code-owned path. With "pipelines must succeed", that blocks the merge.
 - Open (T-05): can the flow set auto-merge on its own MR? If not, record it and choose a fallback before G-4.
+- Fact (2026-10-19, project API): "Pipelines must succeed" is off (`only_allow_merge_if_pipeline_succeeds: false`). Without it, auto-merge set before the MR pipeline exists can merge at once. Turning it on is a project setting, so the user decides (T-05). The flow tools have no merge tool. The note tool (`create_merge_request_note`) posts the body as it is, so a `/merge` quick action is the candidate path.
 - PRD impact: F4.4, §10.1, NFR-6. Glossary "Merge-bot" now means this auto-merge path.
 
 ## D-011 (2026-10-16) Special prize: Environmental
@@ -184,9 +185,26 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Fact: a `DeterministicStepComponent` runs one tool with inputs taken whole from the flow state. It cannot take one field out of `context:goal` (the pipeline event is one JSON value), and a router matches exact string values only. So no deterministic step can read "the judge build failed" from the event, and none can build the commit and the MR with values from the event.
 - Decision (`.floor/flows/floor-repair.yml`, code-owned, tested in `test_flows.py`):
   1. `gate`: an agent with no tools. It answers "raised" only when the event says that the pipeline and its `judge` build failed and the ref is not a `floor-fix/` branch. The router starts `repair` only on the exact string "raised"; any other answer ends the flow. A wrong answer costs one run, and it cannot weaken the gate.
-  2. `repair`: an agent with five tools (`get_logs_from_job`, `get_repository_file`, `create_branch`, `create_commit`, `create_merge_request`). It stops unless the judge log says "Pareto: raised". It copies the patch of the `fallback` job (D-018) from the job log and applies it to the files at the pipeline commit. On an MR pipeline it commits to the MR source branch (F4.3, "the same branch"). Else it commits to `floor-fix/<pipeline>` and opens an MR into the ref (into the default branch for a tag).
+  2. `repair`: an agent with five tools (`get_job_logs`, `get_repository_file`, `create_branch`, `create_commit`, `create_merge_request`). It stops unless the judge log says "Pareto: raised". It copies the patch of the `fallback` job (D-018) from the job log and applies it to the files at the pipeline commit. On an MR pipeline it commits to the MR source branch (F4.3, "the same branch"). Else it commits to `floor-fix/<pipeline>` and opens an MR into the ref (into the default branch for a tag).
 - The `fallback` job now prints the patch in its log between `--- BEGIN fallback.patch ---` and `--- END fallback.patch ---`, because the flow tools read job logs and not artifacts.
 - Why this still meets F5.1: the judge script sets every floor. The agent applies a patch that a script wrote. The MR pipeline runs the whole gate again, and `floor paths` refuses any path outside the allowlist for the service account (D-014). If the agent changes a line wrongly, the gate (or the reviewer) sees it in the MR.
 - The order "the agent's fix, then the fallback" (D-018) becomes one step for now: the flow's fix is the canned config. A free-form agent fix is cut, because the canned config is the fix that G-1 proved.
 - Auto-merge (F4.4) is T-05. The flow does not set it yet.
 - PRD impact: §9 table (the exit step and the MR step are agent steps with fixed rules); F4.2 (the agent proposes the canned config only).
+- First run (2026-10-19): the sync push pipeline 2960990129 failed at the judge, and session 9657869 ran `gate`, then `repair`. It read the judge and fallback logs and the 8 files, created `floor-fix/2960990129`, made commit `a8aca4ca` and opened MR !1 in about 2 minutes. The 8 files equal the output of `floor fallback` byte for byte.
+  - Identity: the MR author shows as the person (composite identity). The commit author and the MR pipeline user are the service account. The `check` job counted that user as an agent and allowed the 8 paths (D-014).
+  - Tool names come from the tool source, and the catalog does not check them: the job log tool is `get_job_logs`. The first save had a wrong name, and it was fixed before the run.
+  - The first commit call sent "update" for the new file `.floor/overrides/main.flags` and failed. The agent then sent "create" and the commit worked. The prompt now names the action for a new file.
+
+## D-022 (2026-10-19) The gate harness: /proc in the chroot jobs, and 2 threads under QEMU
+- Evidence: MR !1 (made by the flow, D-021) ran MR pipeline 2961002610 on the image with the canned config.
+  - `memory` and `offline`: each run ended with exit -11 after `GGML_ASSERT(device)`. ggml loaded 0 backends.
+  - `probe`: qemu64 (297 s), Nehalem (181 s) and SandyBridge (568 s) passed. EPYC-Milan stopped at the 1800 s run limit (1816 s).
+  - The judge said: CPU inconclusive, memory inconclusive, connectivity raised. So the gate failed, but the cause is the harness, not the image.
+- Cause 1: the canned config sets `GGML_BACKEND_DL=ON`, so ggml loads its CPU backends from the folder of the program, which it finds through `/proc/self/exe`. A container runtime gives the image a `/proc`; `chroot` does not. The upstream image has a static CPU backend, so the main pipelines did not see this. QEMU user mode emulates `/proc/self/exe`, so `probe` was not hit.
+- Cause 2: the runner has 2 vCPUs. With `-t 4`, the ggml threads spin at each barrier and use emulated CPU time for no work.
+- Decision (`.gitlab-ci.yml`, tested in `test_floors_linux.py` and `test_qemu.py`):
+  - `memory` and `offline` mount `/proc` in the exported image (`mount -t proc proc rootfs/proc`) after the export and before the first run.
+  - `probe` runs with `-t 2` and a run limit of 2400 s. The job limit stays 50 min.
+  - `memory` and `offline` keep `-t 4`; they run natively.
+- No PRD impact: the measures and the floors do not change. The next MR pipeline (from the flow, on the fixed CI) is the check.
