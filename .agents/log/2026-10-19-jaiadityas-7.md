@@ -58,3 +58,6 @@
 - Fix: a 413 with an unread body made the client see a reset connection (WinError 10053, a flaky test). Now the gateway reads and drops a refused body up to 2 MB (`DRAIN_BYTES`), then sends the 413. A larger body is not read.
 - Verified: 207 passed, 11 skipped; `test_gateway.py` 5 runs in a row passed.
 - Open: the first GitLab run of the `service` job (after the next human sync).
+
+## T-90: the stage table
+- The Create row has the `fallback` and `notice-draft` jobs. The Configure row has the service image and the `service` job. Both say "new" until a GitLab pipeline runs them.

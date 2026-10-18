@@ -111,12 +111,12 @@ Status on 2026-10-19. "Runs" means that it runs in this project's GitLab pipelin
 | Stage | What Rieux does | GitLab feature | Status |
 |---|---|---|---|
 | Plan | Leave-Behind Notices are planned, reviewed decisions | MR templates, labels | Runs (`floor notice` in the check job) |
-| Create | The repair step writes a build-config fix (`floor fallback`); the notice draft (`floor notice-draft`) | Merge requests, flows | Local |
+| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the flow or a code owner commits them | Merge requests, MR widget artifacts, flows | The notice-draft job runs (pipeline 2960804030); the fallback job is new |
 | Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs (pipelines 2958271425, 2958309699) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; signed attestations | Container registry, keyless signing | Partly runs; signing is planned |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
 | Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Planned |
-| Configure | Cloud Run in a low-carbon region | OpenTofu state, environments | Planned |
+| Configure | The service image (the checked image plus an upload gateway: 30 s cap, rate limits, no storage) with a smoke test; Cloud Run in a low-carbon region | Container registry, OpenTofu state, environments | The `service` job is new; Cloud Run is planned |
 | Monitor | The Rieux page with the backtest, the floors and SCI | Pages | Runs |
 | Govern | The ratchet, code owners, the agent path allowlist, the human-only notice | CODEOWNERS, approval rules | Runs (`floor ratchet`, `floor paths`) |
 
