@@ -15,7 +15,7 @@ import requests
 
 from . import __version__
 from . import (attest, backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice,
-               herald, offline, page, paths, policy, qemu, ratchet, release, spotcheck)
+               herald, language, offline, page, paths, policy, qemu, ratchet, release, spotcheck)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -121,6 +121,47 @@ def _cmd_backtest_footprint(args: argparse.Namespace) -> int:
         _write_json(Path(args.out), {"tool": f"floor {__version__}", "repo": args.repo, **result})
     print(f"Images: {result['images']}  downloaded: {result['download_mb']} MB  "
           f"runner time: {result['runner_minutes']} min in {len(result['runs'])} run(s)")
+    return 0
+
+
+def _cmd_language(args: argparse.Namespace) -> int:
+    if args.action == "choose":
+        clips = language.choose(language.read_tsv(args.tsv), int(args.clips or 50), args.seed)
+        _write_json(Path(args.out), {"fleurs": args.fleurs, "lang": language.FLEURS[args.fleurs], "seed": args.seed,
+                                     "clips": clips})
+        print("\n".join(clip["file"] for clip in clips))
+        return 0
+    if args.action == "score":
+        doc = _read_json(args.clips)
+        models = [model for size in args.sizes for model in (size, f"{size}-{args.quant}")]
+        scores = language.score(doc["clips"], args.hyp_root, models)
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", "fleurs": doc["fleurs"], "lang": doc["lang"],
+                                     "seed": doc["seed"], "sizes": args.sizes, "quant": args.quant,
+                                     "decoding": args.decoding, "commit": args.commit, "evidence": args.evidence,
+                                     "models": scores})
+        _print_rows([("MODEL", "WER", "CER", "MISSING", "SECONDS")] + [
+            (m, f"{r['wer']:.1%}", f"{r['cer']:.1%}", str(r["missing"]), str(r["seconds"] or "-"))
+            for m, r in scores.items()])
+        failed = [m for m, r in scores.items() if r["missing"] == len(doc["clips"])]
+        if failed:
+            print(f"floor: no transcript at all from {', '.join(failed)}", file=sys.stderr)
+        return 1 if failed else 0
+    if not args.files or not args.whisper:
+        print("floor: give the score files and --whisper src/whisper.cpp", file=sys.stderr)
+        return 2
+    usable = policy.load(args.policy)["language"]["usable_wer"]
+    doc = language.table([_read_json(path) for path in args.files], usable,
+                         language.whisper_languages(Path(args.whisper).read_text(encoding="utf-8")))
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **doc})
+    _print_rows([("LANGUAGE", "SIZE", "CLIPS", "WER_F16", f"WER_{(doc['quant'] or '').upper()}", "DRIFT_95CI", "SERVED")] + [
+        (r["name"], r["size"], str(r["clips"]), f"{r['wer_f16']:.1%}", f"{r['wer_quant']:.1%}",
+         f"{r['drift'] * 100:+.1f} [{r['drift_ci'][0] * 100:+.1f}, {r['drift_ci'][1] * 100:+.1f}]",
+         ("yes" if r["served_f16"] else "no") + ("" if r["served_f16"] == r["served_quant"] else
+                                                  f" ({'yes' if r['served_quant'] else 'no'} at {doc['quant']})"))
+        for r in doc["rows"]])
+    print(f"Served (f16 WER at most {usable:.0%}): {', '.join(doc['served']) or 'none'}. "
+          f"Not served: {', '.join(doc['not_served']) or 'none'}. Not measured: {len(doc['not_measured'])} languages")
     return 0
 
 
@@ -817,6 +858,26 @@ def main(argv: list[str] | None = None) -> int:
     bf.add_argument("--repo", default=DEFAULT_REPO, help="image repository")
     bf.add_argument("--out", metavar="FILE", help="write the result as JSON")
     bf.set_defaults(func=_cmd_backtest_footprint)
+
+    lg = sub.add_parser("language", help="served / not-served table on FLEURS, f16 and one quantization (PRD F9.1)")
+    lg.add_argument("action", choices=["choose", "score", "table"],
+                    help="choose: a seeded sample of clips; score: WER and CER of the whisper-cli -otxt output; "
+                         "table: the served / not-served table from the score files")
+    lg.add_argument("files", nargs="*", help="floor language score --out files (table)")
+    lg.add_argument("--fleurs", choices=sorted(language.FLEURS), help="FLEURS configuration (choose)")
+    lg.add_argument("--tsv", help="the FLEURS test.tsv (choose)")
+    lg.add_argument("--clips", help="clip count (choose) or the choose --out file (score)")
+    lg.add_argument("--seed", type=int, default=62, help="sample seed (choose)")
+    lg.add_argument("--hyp-root", metavar="DIR", help="<DIR>/<model>/<clip>.wav.txt and <DIR>/<model>/seconds (score)")
+    lg.add_argument("--sizes", nargs="+", default=["tiny", "base", "small"], help="model sizes (score)")
+    lg.add_argument("--quant", default="q5_1", help="the quantization level (score)")
+    lg.add_argument("--decoding", default="", help="the pinned whisper-cli flags, for the record (score)")
+    lg.add_argument("--commit", default="", help="whisper.cpp commit (score)")
+    lg.add_argument("--evidence", default="", help="CI run URL (score)")
+    lg.add_argument("--whisper", metavar="FILE", help="whisper.cpp src/whisper.cpp, for the language list (table)")
+    lg.add_argument("--policy", default=str(policy.DEFAULT_POLICY), help="policy file with language.usable_wer (table)")
+    lg.add_argument("--out", metavar="FILE", help="write the result as JSON")
+    lg.set_defaults(func=_cmd_language)
 
     sc = sub.add_parser("spotcheck", help="true-positive rate of the keyword counts from a labelled sample (PRD §3.2)")
     sc.add_argument("labels", help="the spot-check file: the search hits, the seed and one label per sampled hit")

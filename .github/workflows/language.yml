@@ -1,0 +1,177 @@
+name: language
+
+# Language table (PRD F9.1, F9.2; task T-62). For each FLEURS language, one job builds whisper-cli, takes a
+# seeded sample of test clips (`floor language choose`) and transcribes them with each model size at f16 and
+# at one quantization level, with pinned decoding. `floor language score` gives the WER and the CER of each
+# model; the last job makes the served / not-served table (`floor language table`).
+#   gh workflow run language.yml
+#   gh workflow run language.yml -f languages="sw_ke" -f clips=10
+# Results: the run summary and the artifact "language-<run_id>". A human commits out/language.json as
+# .floor/evidence/language/language.json (CI has no token that can push, D-010).
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "whisper.cpp commit to build"
+        default: "0c7be696371069e0baa2515ed7aa08d5a5473aa6"
+      languages:
+        description: "FLEURS configurations"
+        default: "en_us es_419 hi_in bn_in ta_in sw_ke ha_ng yo_ng"
+      sizes:
+        description: "model sizes (multilingual)"
+        default: "tiny base small"
+      quant:
+        description: "quantization level"
+        default: "q5_1"
+      clips:
+        description: "sentences per language"
+        default: "50"
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      languages: ${{ steps.plan.outputs.languages }}
+    steps:
+      - id: plan
+        env:
+          LANGUAGES: ${{ inputs.languages }}
+        run: echo "languages=$(python3 -c 'import json, os; print(json.dumps(os.environ["LANGUAGES"].split()))')" >> "$GITHUB_OUTPUT"
+
+  run:
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        fleurs: ${{ fromJson(needs.plan.outputs.languages) }}
+    env:
+      COMMIT: ${{ inputs.commit }}
+      FLEURS: ${{ matrix.fleurs }}
+      SIZES: ${{ inputs.sizes }}
+      QUANT: ${{ inputs.quant }}
+      CLIPS: ${{ inputs.clips }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/whisper.cpp
+          ref: ${{ inputs.commit }}
+          path: w
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - name: Build whisper-cli
+        shell: bash
+        run: |
+          mkdir -p out
+          lscpu > out/runner.txt
+          cmake -S w -B w/build -DCMAKE_BUILD_TYPE=Release > out/cmake.txt 2>&1
+          cmake --build w/build -j "$(nproc)" --config Release --target whisper-cli 2>&1 | tail -n 3
+      - name: Models
+        shell: bash
+        run: |
+          for size in $SIZES; do
+            bash w/models/download-ggml-model.sh "$size" > /dev/null
+            bash w/models/download-ggml-model.sh "$size-$QUANT" > /dev/null
+          done
+          ls -l w/models/*.bin
+      - name: FLEURS clips
+        shell: bash
+        run: |
+          base="https://huggingface.co/datasets/google/fleurs/resolve/main/data/$FLEURS"
+          mkdir -p fleurs/audio
+          curl -sSfL --retry 3 -o fleurs/test.tsv "$base/test.tsv"
+          curl -sSfL --retry 3 -o fleurs/test.tar.gz "$base/audio/test.tar.gz"
+          python -m floor language choose --fleurs "$FLEURS" --tsv fleurs/test.tsv --clips "$CLIPS" \
+            --out "out/clips-$FLEURS.json" > fleurs/files.txt
+          tar -xzf fleurs/test.tar.gz -C fleurs/audio
+          mkdir clips
+          while read -r name; do
+            found=$(find fleurs/audio -name "$name" -print -quit)
+            test -n "$found" || { echo "missing in the archive: $name"; exit 1; }
+            cp "$found" clips/
+          done < fleurs/files.txt
+          ls clips | wc -l
+      - name: Transcribe (F9.2 pinned decoding)
+        shell: bash
+        run: |
+          lang=$(python -c "from floor.language import FLEURS; print(FLEURS['$FLEURS'])")
+          threads=$(nproc)
+          echo "DECODING=-l $lang -nf -bs 5 -bo 5 -t $threads -nt" >> "$GITHUB_ENV"
+          for size in $SIZES; do
+            for model in "$size" "$size-$QUANT"; do
+              dir="out/hyp/$model"
+              mkdir -p "$dir"
+              for wav in clips/*.wav; do ln -s "$PWD/$wav" "$dir/"; done
+              start=$(date +%s)
+              # -otxt writes <clip>.wav.txt next to each input. A clip that fails has no file; score counts it.
+              w/build/bin/whisper-cli -m "w/models/ggml-$model.bin" -l "$lang" -nf -bs 5 -bo 5 -t "$threads" \
+                -nt -np -otxt "$dir"/*.wav > /dev/null 2> "$dir/log.txt" || echo "whisper-cli exit $? for $model"
+              echo $(( $(date +%s) - start )) > "$dir/seconds"
+              find "$dir" -name '*.wav' -type l -delete
+              echo "$model: $(cat "$dir/seconds") s"
+            done
+          done
+      - name: Score
+        shell: bash
+        run: |
+          python -m floor language score --clips "out/clips-$FLEURS.json" --hyp-root out/hyp --sizes $SIZES \
+            --quant "$QUANT" --decoding "$DECODING" --commit "$COMMIT" \
+            --evidence "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --out "out/language-$FLEURS.json" | tee "out/score-$FLEURS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: language-${{ matrix.fleurs }}
+          path: out
+
+  table:
+    needs: run
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/whisper.cpp
+          ref: ${{ inputs.commit }}
+          path: w
+          sparse-checkout: src/whisper.cpp
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e "./.floor[dev]"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: language-*
+          path: out
+          merge-multiple: true
+      - name: Table
+        shell: bash
+        run: |
+          python -m floor language table out/language-*.json --whisper w/src/whisper.cpp \
+            --out out/language.json | tee out/table.txt
+      - name: Run summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Language table (whisper.cpp ${{ inputs.commit }}, FLEURS test, ${{ inputs.clips }} sentences per language)"
+            echo
+            echo '```'
+            cat out/table.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: language-${{ github.run_id }}
+          path: |
+            out/language.json
+            out/table.txt
+            out/language-*.json
+            out/score-*.txt

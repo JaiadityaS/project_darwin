@@ -18,6 +18,7 @@ connectivity:
 language:
   gate: false                        # report-only table (F9.1); a gate is a COULD (F9.3)
   metric: drift_vs_f16
+  usable_wer: 0.30                   # served: the f16 WER on the FLEURS sample is at most this (F9.1, D-031)
 
 footprint:
   report_only: true

@@ -291,3 +291,16 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Result: 13 floor, 1 likely, 4 unknown, 2 not-floor. The true-positive rate is 65% (70% with the likely one; at most 90%). The 2 false positives are an Ascend NPU device error and a thread that names the words only in passing.
 - Deviation: the labels are a reading of text, not a script result; the file says so. Only the "illegal instruction" count of whisper.cpp is checked. The other keyword counts of §3.2 (old CPU, Raspberry Pi, OOM, quantization) and the 88 llama.cpp hits are not checked, so the README and the Devpost text do not use them.
 - PRD impact: §3.2 (the spot check covers one keyword).
+
+## D-031 (2026-10-19) T-62: the language table is one GitHub Actions run per whisper.cpp commit, not a release check
+- PRD F9.1: a served / not-served table of languages and model sizes with a usable f16 error rate on FLEURS, their drift at one quantization level, and the unmeasured languages. F9.2: pinned decoding. AC-F9: on the Floor page, with sample sizes and limits.
+- Decision (`language.py`, `floor language choose|score|table`, `.github/workflows/language.yml`, tested in `test_language.py` and `test_page.py`):
+  - Languages: English (the control), Spanish, Hindi, Bengali, Tamil, Swahili, Hausa and Yoruba (`language.FLEURS`). Sizes: tiny, base and small (multilingual). Quantization: q5_1.
+  - Clips: the FLEURS test split, one recording per sentence (the first by file name), a seeded sample (`random.Random(62)`) of 50 sentences per language.
+  - Decoding (F9.2): `-l <lang> -nf -bs 5 -bo 5 -t <nproc> -nt`, recorded in the result.
+  - Score: corpus WER (all word edits / all reference words) and CER, after one normalizer: NFKC, lower case, no bracketed text, punctuation and symbols to spaces. Combining marks stay, because Indic vowel signs are marks (Whisper's basic normalizer removes them). A clip without a transcript counts as all words wrong.
+  - Drift: q5_1 WER minus f16 WER, with a paired-bootstrap 95% interval (2000 rounds, clips resampled).
+  - Served: the f16 WER is at most `language.usable_wer` in the policy, 0.30: above that, about one word in three is wrong, and a reader cannot rely on the text. The table also shows when q5_1 crosses the line.
+  - Not measured: every other language of whisper.cpp's `g_lang` table (`src/whisper.cpp`).
+- Deviation: the table is not made per release. One run takes about 25 runner-minutes per language, so the gate does not run it. The manifest still lists `language` as not measured, because the release check did not measure it. The page names the commit of the run. No gate uses the table (F9.3 is a COULD).
+- PRD impact: F9.1 (the table is per whisper.cpp commit, not per release).

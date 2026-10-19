@@ -47,7 +47,8 @@
       "additionalProperties": false,
       "properties": {
         "gate": { "type": "boolean" },
-        "metric": { "enum": ["drift_vs_f16"] }
+        "metric": { "enum": ["drift_vs_f16"] },
+        "usable_wer": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
       }
     },
     "footprint": {

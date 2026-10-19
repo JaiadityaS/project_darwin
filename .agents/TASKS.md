@@ -81,7 +81,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 |---|---|---|---|---|---|
 | T-60 | Floor page (title: Rieux, D-013): backtest timeline, side-by-side runs, SCI, notices | F12.2 | done | @JaiadityaS | `floor page --out site` (`page.py`): one static HTML file from `.floor/evidence/`. It has all the F12.2 sections: H-1, backtest, CPU proof, release, languages, energy per audio-minute (with the spread of the runs), SCI and notices. The language table says "not measured yet" until T-62. The `pages` job publishes it from `main`: https://showcase-9a1941.gitlab.io/ (first deploy: pipeline 2958271425). Checked live on 2026-10-19: the title is Rieux and every F12.2 section is there. The language table waits for T-62 |
 | T-61 | Pinned issue summary | F12.3 | later | - | |
-| T-62 | Language served / not-served table | F9 | later | - | |
+| T-62 | Language served / not-served table | F9 | doing | @JaiadityaS | Code done (D-031): `floor language choose|score|table`, `language.yml`, the page section, `language.usable_wer` 0.30 in the policy. Open: a pilot run (sw_ke, 10 clips), then the full run and `.floor/evidence/language/language.json` |
 | T-63 | Field triage flow | F11 | later | - | |
 | T-64 | 20-issue spot check of the keyword counts | §3.2 | done | @JaiadityaS | Done (D-030): `floor spotcheck .floor/evidence/spotcheck/illegal-instruction-2026-10-19.json`. 20 of the 39 "illegal instruction" hits: 13 floor (65%), 1 likely, 4 unknown, 2 not-floor. Only this keyword is checked; the README uses only this count |
 

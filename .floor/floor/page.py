@@ -199,10 +199,37 @@ def _section_manifest(diff: str | None) -> str:
     return f'<div class="card"><table>{table}</table><p>{"<br>".join(rest)}</p></div>'
 
 
-def _section_languages() -> str:
-    return ('<div class="card">Language table: not measured yet. The gate checks English only: the JFK sample must give '
-            'the expected words. A served / not-served table needs FLEURS runs at f16 and at one quantization level. '
-            'Until then, Rieux makes no claim for any other language.</div>')
+def _section_languages(doc: dict | None) -> str:
+    if not doc or not doc.get("rows"):
+        return ('<div class="card">Language table: not measured yet. The gate checks English only: the JFK sample must '
+                'give the expected words. A served / not-served table needs FLEURS runs at f16 and at one quantization '
+                'level. Until then, Rieux makes no claim for any other language.</div>')
+    usable, quant = doc["usable_wer"], escape(doc.get("quant") or "?")
+    rows = []
+    for r in doc["rows"]:
+        served = '<span class="pass">yes</span>' if r["served_f16"] else '<span class="fail">no</span>'
+        if r["served_f16"] != r["served_quant"]:
+            served += f' <span class="inc">({"yes" if r["served_quant"] else "no"} at {quant})</span>'
+        lo, hi = r["drift_ci"]
+        rows.append(f'<tr><td><b>{escape(r["name"])}</b></td><td>{escape(r["size"])}</td><td>{r["clips"]}</td>'
+                    f'<td>{r["wer_f16"]:.1%}</td><td>{r["cer_f16"]:.1%}</td><td>{r["wer_quant"]:.1%}</td>'
+                    f'<td>{r["drift"] * 100:+.1f} <span class="mute">[{lo * 100:+.1f}, {hi * 100:+.1f}]</span></td>'
+                    f'<td>{served}</td></tr>')
+    missing = sum(r.get("missing", 0) for r in doc["rows"])
+    clips = sorted({r["clips"] for r in doc["rows"]})
+    return (f'<div class="card"><p><b>Served</b> (f16 WER at most {usable:.0%}): '
+            f'{escape(", ".join(doc["served"]) or "none")}. <b>Not served:</b> {escape(", ".join(doc["not_served"]) or "none")}.</p>'
+            f'<table><tr><th>Language</th><th>Model</th><th>Clips</th><th>WER f16</th><th>CER f16</th>'
+            f'<th>WER {quant}</th><th>Drift, points (95% CI)</th><th>Served</th></tr>{"".join(rows)}</table>'
+            f'<p class="mute">FLEURS test split, {"/".join(map(str, clips))} sentences per language (one recording each, '
+            f'seeded sample), read speech. WER and CER after one simple normalizer (lower case, no punctuation). '
+            f'Pinned decoding: <code>{escape(doc.get("decoding") or "?")}</code>, whisper.cpp '
+            f'<code>{escape((doc.get("commit") or "?")[:8])}</code>. The drift is the {quant} WER minus the f16 WER, '
+            f'with a paired-bootstrap interval. Real speech is noisier than read speech, so real error rates are higher. '
+            f'Report only: no gate uses this table (F9.3).'
+            + (f' {missing} clip(s) gave no transcript and count as all words wrong.' if missing else "")
+            + f'</p><p class="mute">Not measured: {len(doc["not_measured"])} other whisper languages, so Rieux makes no '
+            f'claim for them.</p></div>')
 
 
 def _section_energy(energy: dict | None, sci: dict | None) -> str:
@@ -313,6 +340,7 @@ def collect(evidence: Path, notices_dir: Path | None = None) -> dict:
     costs = sorted((evidence / "backtest").glob("footprint-*.json")) if (evidence / "backtest").is_dir() else []
     return {"timelines": timelines, "h1": h1, "h1_cuda": h1_cuda, "proofs": proofs, "diff": diff, "notices": notices,
             "backtest_cost": _load(costs[-1]) if costs else None,
+            "language": _load(evidence / "language" / "language.json"),
             "energy": _load(evidence / "energy" / "energy.json"), "sci": _load(evidence / "footprint" / "sci.json")}
 
 
@@ -328,7 +356,7 @@ people behind, the gate stops it, an agent repairs it, and only a human can acce
 <h2>Backtest: published images over time</h2>{_section_timeline(data["timelines"], data.get("backtest_cost"))}
 <h2>CPU proof: three builds, four old CPUs</h2>{_section_cpu(data["proofs"])}
 <h2>Latest release</h2>{_section_manifest(data["diff"])}
-<h2>Languages</h2>{_section_languages()}
+<h2>Languages</h2>{_section_languages(data.get("language"))}
 <h2>Energy per audio-minute: the cost of inclusion</h2>{_section_energy(data["energy"], data["sci"])}
 <h2>Footprint (SCI)</h2>{_section_sci(data["sci"])}
 <h2>Leave-Behind Notices</h2>{_section_notices(data["notices"])}
