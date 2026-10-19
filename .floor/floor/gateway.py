@@ -5,7 +5,9 @@ no rate limit. So whisper-server listens only on 127.0.0.1, and this gateway is 
 - GET /          the upload page (the browser makes 16 kHz mono WAV from a file or the microphone);
 - POST /transcribe  a WAV body of at most 30 seconds; the gateway checks the length from the header and
                  the data size, then sends fixed parameters to whisper-server;
-- GET /healthz   "ok" while whisper-server runs.
+- GET /healthz   "ok" while whisper-server runs;
+- GET /floor     the x86-64 level of the host CPU and the ggml CPU variant that whisper-server loaded,
+                 from its log (PRD F13.4).
 Limits: a request rate per client and per instance, one transcription at a time per instance, and a
 body size cap. Cloud Run caps the instances (infra/, T-50). Audio stays in memory: no file, no log
 line, no copy after the answer. The log has the method, the path and the status only.
@@ -20,6 +22,7 @@ import argparse
 import io
 import json
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -42,6 +45,14 @@ PER_CLIENT = (6, 60.0)     # requests per seconds, for one client address
 PER_INSTANCE = (30, 60.0)  # requests per seconds, for all clients of one instance
 UPSTREAM = os.environ.get("WHISPER_URL", "http://127.0.0.1:8081/inference")
 PAGE = Path(__file__).with_name("gateway.html")
+# The /proc/cpuinfo flag names of the x86-64 psABI levels (pni is SSE3, abm is LZCNT), as in .gitlab/ci/facts.sh.
+LEVEL_FLAGS = (
+    ("x86-64-v2", {"cx16", "lahf_lm", "popcnt", "pni", "sse4_1", "sse4_2", "ssse3"}),
+    ("x86-64-v3", {"avx", "avx2", "bmi1", "bmi2", "f16c", "fma", "abm", "movbe", "xsave"}),
+    ("x86-64-v4", {"avx512f", "avx512bw", "avx512cd", "avx512dq", "avx512vl"}),
+)
+# The ggml backend loader names the file that it loaded: "load_backend: loaded CPU backend from .../libggml-cpu-haswell.so".
+VARIANT_RE = re.compile(r"libggml-cpu-([A-Za-z0-9_]+)\.so")
 
 
 class AudioError(ValueError):
@@ -126,13 +137,69 @@ def transcribe(audio: bytes, url: str = UPSTREAM, timeout: float = 120.0) -> str
     return str(answer.get("text", "")).strip()
 
 
+def host_cpu(cpuinfo: str) -> dict:
+    """The model and the x86-64 level of the first CPU in the text of /proc/cpuinfo. No flags: no level."""
+    model, flags = None, None
+    for line in cpuinfo.splitlines():
+        key, _, value = line.partition(":")
+        if key.strip() == "model name" and model is None:
+            model = value.strip()
+        elif key.strip() == "flags" and flags is None:
+            flags = set(value.split())
+    level = None
+    if flags is not None:
+        level = "x86-64-v1"
+        for name, needed in LEVEL_FLAGS:
+            if not needed <= flags:
+                break
+            level = name
+    return {"model": model, "level": level}
+
+
+def loaded_variant(line: str) -> str | None:
+    """The ggml CPU variant in a backend-loader line of the whisper-server log, else None."""
+    if "load" in line.lower() and "cpu" in line.lower():
+        match = VARIANT_RE.search(line)
+        if match:
+            return match.group(1)
+    return None
+
+
+def relay(stream, out, found: dict) -> None:
+    """Copies the whisper-server log to `out` unchanged, and keeps the first ggml CPU variant that it names."""
+    for raw in iter(stream.readline, b""):
+        out.write(raw)
+        out.flush()
+        if found.get("variant") is None:
+            found["variant"] = loaded_variant(raw.decode("utf-8", "replace"))
+
+
+def floor_doc(host: dict, variant: str | None, ready: bool) -> dict:
+    """The answer of GET /floor (PRD F13.4). It reports only what the host and the log show."""
+    doc = {"host_cpu": host.get("model"), "host_level": host.get("level"), "ggml_cpu_variant": variant,
+           "source": "the flags of /proc/cpuinfo; the ggml backend-loader line of the whisper-server log"}
+    if variant is None:
+        doc["note"] = ("whisper-server is not ready yet" if not ready else
+                       "the whisper-server log has no backend-loader line (a build without GGML_BACKEND_DL has none)")
+    return doc
+
+
+def read_cpuinfo(path: str = "/proc/cpuinfo") -> str:
+    try:
+        return Path(path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
 class Gateway(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, address, upstream: str = UPSTREAM, per_client=PER_CLIENT, per_instance=PER_INSTANCE,
-                 clock=time.monotonic, healthy=lambda: True):
+                 clock=time.monotonic, healthy=lambda: True, host: dict | None = None, found: dict | None = None):
         super().__init__(address, Handler)
         self.upstream, self.healthy = upstream, healthy
+        self.host = host if host is not None else host_cpu(read_cpuinfo())
+        self.found = found if found is not None else {}
         self.per_client = RateLimiter(*per_client, clock=clock)
         self.per_instance = RateLimiter(*per_instance, clock=clock)
         self.busy = threading.BoundedSemaphore(1)
@@ -175,6 +242,8 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/healthz":
             ok = self.server.healthy()
             self._send(200 if ok else 503, b"ok\n" if ok else b"starting\n", "text/plain")
+        elif path == "/floor":
+            self._json(200, floor_doc(self.server.host, self.server.found.get("variant"), self.server.healthy()))
         else:
             self._json(404, {"error": "not found"})
 
@@ -246,7 +315,10 @@ def serve(port: int, model: str, server_bin: str, threads: int) -> int:
     """Starts whisper-server on 127.0.0.1:8081 with a 30 s cap, then the gateway. Exits when whisper-server exits."""
     cmd = [server_bin, "-m", model, "--host", "127.0.0.1", "--port", "8081", "-t", str(threads),
            "-d", str(MAX_SECONDS * 1000), "--inference-path", "/inference"]
-    child = subprocess.Popen(cmd)
+    child = subprocess.Popen(cmd, stderr=subprocess.PIPE)
+    found: dict = {}
+    log = threading.Thread(target=relay, args=(child.stderr, sys.stderr.buffer, found), daemon=True)
+    log.start()
 
     def healthy() -> bool:
         if child.poll() is not None:
@@ -257,11 +329,12 @@ def serve(port: int, model: str, server_bin: str, threads: int) -> int:
         except (OSError, urllib.error.URLError):
             return False
 
-    gateway = Gateway(("0.0.0.0", port), healthy=healthy)
+    gateway = Gateway(("0.0.0.0", port), healthy=healthy, found=found)
     thread = threading.Thread(target=gateway.serve_forever, daemon=True)
     thread.start()
-    print(f"rieux gateway on :{port}, whisper-server pid {child.pid}", file=sys.stderr)
+    print(f"rieux gateway on :{port}, whisper-server pid {child.pid}", file=sys.stderr, flush=True)
     code = child.wait()
+    log.join(timeout=5)  # the last lines of the log come before the exit line
     print(exit_text(code), file=sys.stderr)
     gateway.shutdown()
     return code or 1

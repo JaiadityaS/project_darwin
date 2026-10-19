@@ -212,6 +212,10 @@ service:
       cat out/service/transcribe.json; echo
       [ "$code" = 200 ] || { echo "HTTP $code"; docker logs rieux-service 2>&1 | tail -n 40; exit 1; }
       grep -qi "$EXPECT" out/service/transcribe.json || { echo "the text does not match: $EXPECT"; exit 1; }
+      # F13.4 (D-028): the host level and the ggml CPU variant that whisper-server loaded, from its log.
+      curl -sS -o out/service/floor.json http://docker:8080/floor
+      cat out/service/floor.json; echo
+      grep -q '"host_level": "x86-64-v' out/service/floor.json || { echo "GET /floor has no host level"; exit 1; }
       # A body that is not 16 kHz mono WAV never reaches whisper-server (the unit tests check 413 and 429).
       head -c 500000 /dev/zero > /tmp/not-wav.bin
       code=$(curl -sS -o /tmp/bad.json -w '%{http_code}' --data-binary @/tmp/not-wav.bin http://docker:8080/transcribe)

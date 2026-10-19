@@ -136,3 +136,10 @@
 - Done (D-027): the probe uses `-ac 768`, a 2700 s run limit and a 55 min job limit; a timed-out run keeps its output and time (`qemu.run`, `seconds`).
 - Verified: 233 passed, 11 skipped.
 - README: the Verify and Secure rows now cite pipeline 2961110649.
+
+## T-53: GET /floor (D-028)
+- Done: `gateway.py` relays the whisper-server log unchanged and keeps the ggml CPU variant of the backend-loader line; `host_cpu()` reads the level from `/proc/cpuinfo` (the rule of `facts.sh`); `GET /floor` reports both; the upload page shows them; the `service` job keeps `out/service/floor.json` and fails without a host level.
+- Tests: `test_host_cpu`, `test_relay_keeps_the_log_and_the_variant`, `test_floor_endpoint`, `test_page_shows_the_server_cpu`, and `test_service_ci_job`.
+- Verified: 237 passed, 11 skipped.
+- Open: the first GitLab run. Main has the upstream image (static backend), so its `floor.json` should have no variant and the note. The next fix MR has the canned image (`GGML_BACKEND_DL=ON`), so its `floor.json` should name a variant. Check both; do not assume.
+- Also checked: the live Rieux page (https://showcase-9a1941.gitlab.io/) has the title Rieux and all the F12.2 sections, so the open item of T-60 is done.

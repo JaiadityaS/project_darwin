@@ -50,6 +50,7 @@ footer{margin-top:40px;font-size:.85rem;color:var(--mute)}a{color:var(--a)}
 <footer>
   <p>The browser makes 16 kHz mono WAV. The server checks the length again, and it limits the requests.
     <a href="https://showcase-9a1941.gitlab.io/">The Rieux page</a> shows the CPU floor of each release.</p>
+  <p id="host"></p>
 </footer>
 </main>
 <script>
@@ -131,6 +132,12 @@ $("rec").addEventListener("click", async () => {
     if (s >= LIMIT - 0.5 && recorder && recorder.state === "recording") recorder.stop();
   }, 250);
 });
+// F13.4: the CPU of this server and the ggml CPU variant that whisper-server loaded.
+fetch("/floor").then((r) => r.json()).then((f) => {
+  if (!f.host_level) return;
+  const variant = f.ggml_cpu_variant ? `, and whisper.cpp loaded its ${f.ggml_cpu_variant} CPU code` : "";
+  $("host").textContent = `This server has a ${f.host_level} CPU${variant}.`;
+}).catch(() => {});
 </script>
 </body>
 </html>

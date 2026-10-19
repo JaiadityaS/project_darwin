@@ -262,3 +262,13 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Check: the next fix MR pipeline must show the four probes pass with the reference text, and their times.
 - Evidence (2026-10-19): MR !5 (pipeline 2961210282, fix of 2961183840) passed the check. Each probe got the reference text, loaded the expected variant, and had correct controls. Run times (job times): qemu64 136 s (179 s), Nehalem 108 s (155 s), SandyBridge 303 s (439 s), EPYC-Milan 1413 s (1457 s). EPYC-Milan used 52% of the 2700 s limit; before it used 2175 s of 2400 s or timed out.
 - PRD impact: F3 (the probe command). The measure (the right text on each CPU model) does not change.
+
+## D-028 (2026-10-19) T-53: the service job records GET /floor until the service is deployed
+- PRD F13.4: a `/floor` endpoint reports the x86-64 level of the host CPU and the ggml CPU variant that production loaded, from ggml's load log. The nightly job records it.
+- Decision (`gateway.py`, tested in `test_gateway.py`):
+  - The gateway reads the stderr of whisper-server, copies each line to its own stderr unchanged, and keeps the first variant that a backend-loader line names (`libggml-cpu-<variant>.so`).
+  - The host level comes from the flags of `/proc/cpuinfo`, with the rule of `.gitlab/ci/facts.sh`.
+  - `GET /floor` gives `host_cpu`, `host_level`, `ggml_cpu_variant` and the source. With no variant, a note says why: whisper-server is not ready, or its log has no backend-loader line (a build without `GGML_BACKEND_DL` has none).
+  - The upload page shows the two values in one line.
+- Deviation: there is no deployed service yet (T-06 is parked), so no nightly job. The `service` job of each pipeline asks `GET /floor` after the transcription and keeps `out/service/floor.json`. The job fails if the answer has no host level. The nightly job comes with the deploy (T-51).
+- PRD impact: F13.4 ("the nightly job records it" becomes "the service job of each pipeline records it" until T-51).

@@ -181,9 +181,69 @@ def test_service_ci_job():
     # CPU and the exit state, so the cause is evidence and not a guess.
     assert "sh .gitlab/ci/facts.sh --cpu | tee out/service/cpu.txt" in script
     assert "{{.State.ExitCode}}" in script and "> out/service/service.log" in script
+    # F13.4 (D-028): the job keeps what GET /floor reports, after the backend has loaded.
+    assert script.index("curl -sS -o out/service/floor.json http://docker:8080/floor") > script.index("/transcribe)")
+    assert '"host_level": "x86-64-v' in script
 
 
 def test_exit_text():
     assert gateway.exit_text(0) == "whisper-server exited with code 0"
     assert gateway.exit_text(-4) == "whisper-server stopped by SIGILL: this CPU lacks an instruction that the build uses"
     assert gateway.exit_text(-200) == "whisper-server stopped by signal 200"
+
+
+V1 = "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 syscall nx lm"
+V2 = V1 + " pni ssse3 cx16 sse4_1 sse4_2 popcnt lahf_lm"
+V3 = V2 + " avx avx2 bmi1 bmi2 f16c fma abm movbe xsave"
+V4 = V3 + " avx512f avx512bw avx512cd avx512dq avx512vl avx512_fp16"
+
+
+def test_host_cpu():
+    """F13.4: the same flag rule as .gitlab/ci/facts.sh; the first CPU counts."""
+    def info(flags, model="Intel(R) Xeon(R) Platinum 8581C CPU @ 2.10GHz"):
+        cpu = f"processor\t: 0\nmodel name\t: {model}\nflags\t\t: {flags}\n\n"
+        return cpu + cpu.replace("processor\t: 0", "processor\t: 1")
+    assert gateway.host_cpu(info(V4)) == {"model": "Intel(R) Xeon(R) Platinum 8581C CPU @ 2.10GHz", "level": "x86-64-v4"}
+    assert gateway.host_cpu(info(V3))["level"] == "x86-64-v3"
+    assert gateway.host_cpu(info(V2))["level"] == "x86-64-v2"
+    assert gateway.host_cpu(info(V1))["level"] == "x86-64-v1"
+    assert gateway.host_cpu(info(V3.replace(" abm", "")))["level"] == "x86-64-v2"  # no LZCNT: not v3
+    assert gateway.host_cpu(info(V4.replace(" avx512vl", "")))["level"] == "x86-64-v3"
+    assert gateway.host_cpu("") == {"model": None, "level": None}
+
+
+def test_relay_keeps_the_log_and_the_variant():
+    log = (b"whisper_init_from_file_with_params_no_state: loading model\n"
+           b"load_backend: loaded CPU backend from /app/build/bin/libggml-cpu-haswell.so\n"
+           b"load_backend: loaded CPU backend from /app/build/bin/libggml-cpu-x64.so\n"
+           b"\xff not UTF-8\n")
+    out, found = io.BytesIO(), {}
+    gateway.relay(io.BytesIO(log), out, found)
+    assert out.getvalue() == log and found == {"variant": "haswell"}
+    assert gateway.loaded_variant("whisper_model_load: n_mels = 80") is None
+
+
+def test_floor_endpoint():
+    host = {"model": "Intel(R) Xeon(R) Platinum 8581C CPU @ 2.10GHz", "level": "x86-64-v4"}
+    found, ready = {}, [False]
+    gw = gateway.Gateway(("127.0.0.1", 0), healthy=lambda: ready[0], host=host, found=found)
+    threading.Thread(target=gw.serve_forever, daemon=True).start()
+    url = f"http://127.0.0.1:{gw.server_port}/floor"
+    try:
+        doc = json.loads(call(url)[2])
+        assert doc["host_level"] == "x86-64-v4" and doc["ggml_cpu_variant"] is None
+        assert doc["note"] == "whisper-server is not ready yet"
+        ready[0] = True
+        assert "no backend-loader line" in json.loads(call(url)[2])["note"]
+        found["variant"] = "haswell"
+        status, headers, body = call(url)
+        doc = json.loads(body)
+        assert status == 200 and headers["Cache-Control"] == "no-store"
+        assert doc["ggml_cpu_variant"] == "haswell" and "note" not in doc and doc["host_cpu"] == host["model"]
+    finally:
+        gw.shutdown()
+
+
+def test_page_shows_the_server_cpu():
+    page = gateway.PAGE.read_text(encoding="utf-8")
+    assert 'fetch("/floor")' in page and 'id="host"' in page
