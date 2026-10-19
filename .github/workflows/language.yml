@@ -6,7 +6,7 @@ name: language
 # model; the last job makes the served / not-served table (`floor language table`).
 #   gh workflow run language.yml
 #   gh workflow run language.yml -f languages="sw_ke" -f clips=10
-# Results: the run summary and the artifact "language-<run_id>". A human commits out/language.json as
+# Results: the run summary, the log of the Table step and the artifact "language-<run_id>". A human commits out/language.json as
 # .floor/evidence/language/language.json (CI has no token that can push, D-010).
 on:
   workflow_dispatch:
@@ -155,6 +155,10 @@ jobs:
         run: |
           python -m floor language table out/language-*.json --whisper w/src/whisper.cpp \
             --out out/language.json | tee out/table.txt
+          # The log carries the result too, so a person can read it without the artifact download.
+          echo "--- BEGIN language.json ---"
+          cat out/language.json
+          echo "--- END language.json ---"
       - name: Run summary
         if: always()
         shell: bash
