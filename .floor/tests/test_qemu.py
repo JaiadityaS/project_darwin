@@ -85,5 +85,22 @@ def test_probe_ci_job():
     root = Path(__file__).resolve().parents[2]
     job = yaml.safe_load((root / ".gitlab-ci.yml").read_text(encoding="utf-8"))["probe"]
     script = job["script"][-1]
-    assert "-t 2 -nt" in script and "--timeout 2400" in script
-    assert int(job["timeout"].rstrip("m")) * 60 > 2400 + 300  # room for the model, the export and the controls
+    # D-027: a smaller audio context that still holds the 11 s sample (1500 frames = 30 s).
+    assert "-f /app/samples/jfk.wav -ac 768 -t 2 -nt" in script and "--timeout 2700" in script
+    assert 768 * 30 / 1500 > 11.0
+    assert int(job["timeout"].rstrip("m")) * 60 > 2700 + 300  # room for the model, the export and the controls
+
+
+def test_timeout_keeps_partial_output(monkeypatch):
+    """MR pipeline 2961093570: a timed-out run had no output; now it keeps what the run printed."""
+    import subprocess
+
+    from floor import qemu
+
+    def fake_run(*a, **k):
+        raise subprocess.TimeoutExpired(a[0], 1, output=b"partial out", stderr=b"load_backend: loaded CPU backend")
+    monkeypatch.setattr(qemu.subprocess, "run", fake_run)
+    result = qemu.run(["whisper-cli"], "EPYC-Milan", qemu="/usr/bin/qemu-x86_64", timeout=1)
+    assert result["timeout"] and result["stdout"] == "partial out"
+    assert result["stderr"] == "load_backend: loaded CPU backend" and isinstance(result["seconds"], float)
+    assert qemu._text(None) == "" and qemu._text("x") == "x"

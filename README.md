@@ -112,8 +112,8 @@ Status on 2026-10-19. "Runs" means that it runs in this project's GitLab pipelin
 |---|---|---|---|
 | Plan | Leave-Behind Notices are planned, reviewed decisions | MR templates, labels | Runs (`floor notice` in the check job) |
 | Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: the flow opened fix MRs !2 and !3 about 1.5 min after the failed pipelines 2961083963 and 2961094614 |
-| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs (pipelines 2958271425, 2958309699) |
-| Secure | Offline tripwire, pinned model hash, the image by digest; signed attestations | Container registry, keyless signing | Partly runs; signing is planned |
+| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gate of fix MR !3 held every floor (pipeline 2961110649) |
+| Secure | Offline tripwire, pinned model hash, the image by digest; the Floor Manifest signed as an attestation | Container registry, keyless signing (GitLab ID token, Sigstore) | Runs: the attest job signed and verified the manifest (pipeline 2961110649, job 17270217868) |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
 | Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Planned |
 | Configure | The service image (the checked image plus an upload gateway: 30 s cap, rate limits, no storage) with a smoke test; Cloud Run in a low-carbon region | Container registry, OpenTofu state, environments | The `service` job transcribes `samples/jfk.wav` in 3.3 s (pipeline 2960909623); Cloud Run is planned |

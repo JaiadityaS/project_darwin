@@ -208,6 +208,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - `probe` runs with `-t 2` and a run limit of 2400 s. The job limit stays 50 min.
   - `memory` and `offline` keep `-t 4`; they run natively.
 - No PRD impact: the measures and the floors do not change. The next MR pipeline (from the flow, on the fixed CI) is the check.
+- Evidence (2026-10-19): MR !2 (pipeline 2961093570, fix of 2961083963): memory, offline, service and three probes passed; EPYC-Milan timed out at 2400 s, so the judge said cpu inconclusive and failed (D-027). MR !3 (pipeline 2961110649, fix of 2961094614): every floor held, Pareto held, gate pass. Probe job times: qemu64 259 s, Nehalem 220 s, SandyBridge 541 s, EPYC-Milan 2175 s.
 
 ## D-023 (2026-10-19) T-34: the `attest` job signs the manifest after a passed judge
 - PRD F5.4: sign the manifest as an in-toto attestation (`cosign attest`, keyless with GitLab OIDC) on the image digest. AC-F5: `cosign verify-attestation` passes.
@@ -216,6 +217,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - Keyless: the job asks GitLab for an ID token with the audience `sigstore`. cosign trades it for a short-lived Sigstore certificate, and the public Rekor log records the signature. The certificate identity is the pipeline definition at the ref (`https://` and the `ci_config_ref_uri` claim). `floor attest identity` reads only that claim, because the token also has claims about the person who started the pipeline. The job never prints the token.
   - `floor attest predicate` gives cosign the predicate and its type; cosign wraps them in its own Statement on the digest. After the signature, `cosign verify-attestation` checks the exact identity and the issuer (`$CI_SERVER_URL`), and `floor attest check` compares the verified predicate with the manifest. The job keeps the verify command in `out/attest/verify.txt`.
   - cosign v2.6.5 (the v2 line, still maintained): v2 keeps the attestation next to the image as a `.att` tag, which every registry can store. The job downloads the binary from the GitHub release and checks its SHA-256 (pinned; the asset digest and `cosign_checksums.txt` agree). The tools image does not change, so no other job pulls a larger image.
+- Evidence (2026-10-19): MR pipeline 2961110649, attest job 17270217868 (30 s). `cosign attest` signed with the GitLab ID token, `cosign verify-attestation` passed with identity `https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase//.gitlab-ci.yml@refs/heads/floor-fix/2961094614` (the double slash is in the GitLab claim) and issuer `https://gitlab.com`, and `floor attest check` matched the signed predicate to the manifest. `out/attest/verify.txt` has the command.
 - Not yet: attaching the attestation to the GitLab Release (T-42), and two releases with a diff (AC-F5).
 - PRD impact: none.
 
@@ -250,3 +252,10 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - A notice that fails covers nothing, and the job log says why. A stricter policy needs no notice, as before.
 - Not checked on GitLab yet: no notice MR exists. The first test needs a human approval of a real notice MR (a code owner acts; the agent does not).
 - PRD impact: none; this makes F6.1 true in CI and not only in the text.
+
+## D-027 (2026-10-19) The probe uses an audio context of 768 frames
+- Fact: on the GitLab runners (Intel Xeon Platinum 8581C, 2 vCPUs), the AVX variants of ggml run slowly under QEMU 8.2. Probe job times: SandyBridge 541 to 634 s and EPYC-Milan 2175 s (MR pipeline 2961110649) or more than 2400 s (MR pipeline 2961093570, a timeout). On the 2-CPU AMD EPYC 7763 machine of `.floor/evidence/cpu-proof/all-variants` (same QEMU), EPYC-Milan took 562 s and SandyBridge 275 s, with the encoder at about 80% of the time.
+- Decision: the probe runs `whisper-cli ... -ac 768`. 768 frames are 15.36 s of audio, and the sample is 11 s, so all the audio is in the context. The encoder then does about half the matrix work and about a quarter of the attention work. The binary and the kernels do not change. The run limit is 2700 s and the job limit 55 min.
+- The probe now keeps the partial output and the time of a run that times out (`seconds`, `stderr_tail`), so a timeout shows how far the run got.
+- Check: the next fix MR pipeline must show the four probes pass with the reference text, and their times.
+- PRD impact: F3 (the probe command). The measure (the right text on each CPU model) does not change.

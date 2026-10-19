@@ -245,7 +245,7 @@ probe:
   stage: floors
   extends: [.tools, .evidence]
   needs: [build]
-  timeout: 50m
+  timeout: 55m
   parallel:
     matrix:
       - CPU_MODEL: [qemu64, Nehalem, SandyBridge, EPYC-Milan]
@@ -261,10 +261,13 @@ probe:
       # The image is the sysroot (qemu -L). Paths that exist in it, such as /app/samples, come from it.
       # -t 2: the runner has 2 vCPUs. ggml threads spin at each barrier, so more threads than vCPUs
       # waste emulated CPU time (MR pipeline 2961002610: EPYC-Milan timed out at 1800 s with -t 4).
-      floor probe --cpu "$CPU_MODEL" --sysroot "$PWD/rootfs" --expect "$EXPECT" --timeout 2400 \
+      # -ac 768: an audio context of 15.36 s, which holds the 11 s sample. The encoder (about 80% of
+      # the emulated time) then does about half the work. On the GitLab runners the AVX variants run
+      # slowly under QEMU (MR pipeline 2961093570: EPYC-Milan timed out at 2400 s; D-027).
+      floor probe --cpu "$CPU_MODEL" --sysroot "$PWD/rootfs" --expect "$EXPECT" --timeout 2700 \
         --label "$CI_COMMIT_SHORT_SHA" --out "out/probe/$CPU_MODEL.json" -- \
         "$PWD/rootfs/app/build/bin/whisper-cli" -m "$PWD/.cache/models/ggml-tiny.en.bin" \
-        -f /app/samples/jfk.wav -t 2 -nt | tee "out/probe/$CPU_MODEL.txt"
+        -f /app/samples/jfk.wav -ac 768 -t 2 -nt | tee "out/probe/$CPU_MODEL.txt"
   artifacts:
     paths: [out/probe/, out/meter/]
 

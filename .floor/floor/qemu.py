@@ -13,6 +13,7 @@ import shutil
 import signal
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 from .controls import control_elf
@@ -84,18 +85,30 @@ def run(cmd: list[str], cpu: str, *, sysroot: str | None = None, timeout: float 
     if qemu is None:
         raise FileNotFoundError("qemu-x86_64 is not installed")
     full = [qemu, "-cpu", cpu] + (["-L", sysroot] if sysroot else []) + cmd
+    started = time.monotonic()
     try:
         proc = subprocess.run(full, capture_output=True, text=True, errors="replace", timeout=timeout,
                               env={**os.environ, **(env or {})})
-    except subprocess.TimeoutExpired:
-        return {"cpu": cpu, "exit": None, "signal": None, "timeout": True, "stdout": "", "stderr": ""}
+    except subprocess.TimeoutExpired as exc:
+        # Keep the output so far: it shows how far the run got (the loaded variant, the model load).
+        return {"cpu": cpu, "exit": None, "signal": None, "timeout": True,
+                "seconds": round(time.monotonic() - started, 1),
+                "stdout": _text(exc.stdout), "stderr": _text(exc.stderr)}
+    seconds = round(time.monotonic() - started, 1)
     sig = None
     if proc.returncode < 0:
         sig = _signal_name(-proc.returncode)
     elif proc.returncode in (128 + 4, 128 + 6, 128 + 11):  # a shell reports SIGILL, SIGABRT, SIGSEGV this way
         sig = _signal_name(proc.returncode - 128)
-    return {"cpu": cpu, "exit": proc.returncode, "signal": sig, "timeout": False,
+    return {"cpu": cpu, "exit": proc.returncode, "signal": sig, "timeout": False, "seconds": seconds,
             "stdout": proc.stdout, "stderr": proc.stderr}
+
+
+def _text(data: bytes | str | None) -> str:
+    """The partial output of a timed-out run: TimeoutExpired gives bytes, also in text mode."""
+    if isinstance(data, bytes):
+        return data.decode("utf-8", errors="replace")
+    return data or ""
 
 
 def judge(result: dict, expect: str | None = None) -> str:
@@ -152,6 +165,7 @@ def probe(cmd: list[str], models: tuple[str, ...] = DEFAULT_MODELS, *, expect: s
                 "exit": result["exit"],
                 "signal": result["signal"],
                 "timeout": result["timeout"],
+                "seconds": result.get("seconds"),
                 "loaded_variant": loaded_variant(result["stderr"] + "\n" + result["stdout"]),
                 "controls": ctl,
                 "stdout_tail": _tail(result["stdout"]),
