@@ -228,3 +228,12 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - Workflow rule: no pipeline for a `-floor.N` tag. The default-branch pipeline of the same commit already proved and signed it, and a second run would only use runner time.
 - Facts still to check on the first run: whether the job token of that pipeline may create the tag (protected tags are a Maintainer setting, D-010), and who the pipeline user is after an auto-merge (T-05).
 - PRD impact: F4.4 (the default-branch pipeline makes the release; no merge-bot token, D-010).
+
+## D-025 (2026-10-19) T-46: Herald starts as a template; the agent part waits for T-04
+- PRD F12.1: release notes get a "Who this release serves" section from the manifest, by the Herald CI job, for every release. PRD §9.2 allows a deterministic template when the Duo CLI is not available.
+- Decision (`floor herald`, `herald.py`, the `herald` job, tested in `test_herald.py`):
+  - The `herald` job runs after `judge` and `attest`, so only for a signed manifest. It writes `out/herald/who.md`.
+  - The text comes only from the manifest: the CPU level in plain words, the emulated CPU models that ran (with the ggml variant) or did not run, the smallest memory limit per model, the offline download and network attempts, notices, what is not measured, and SCI. If a floor rose, it says that the gate blocks the build; it never says "nobody" then.
+  - The `release` job puts the section first in the release description.
+- Not yet: the agent summary (Duo CLI, T-04) and the pinned issue (F12.3). If T-04 fails, the submission says that Herald is a template.
+- PRD impact: F12.1 runs as a template for now (§9.2 fallback).

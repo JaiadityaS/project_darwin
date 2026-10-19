@@ -14,13 +14,14 @@
 #   fallback      only after a failed judge: the canned inclusive config as a patch for the branch (F4.3)
 #   notice-draft  only after a failed judge: drafts the Leave-Behind Notice for a code owner (F4.5)
 #   attest  only after a passed judge: signs the manifest on the image digest, keyless (F5.4)
+#   herald  after attest: "Who this release serves" from the manifest, a template (F12.1)
 #   release default branch, after attest: cuts <tag>-floor.N when the commit merged a fix of a tag (F4.4)
 #   pages   the Rieux page from the committed evidence (default branch only)
 #
 # Evidence: the artifacts below out/ (the judge job keeps all of them).
 # SCI per release check (R2): each job that uses the tools image meters its own container, and
 # the judge job adds the meters into out/judge/meter.json (DECISIONS D-015).
-# Not here yet: herald, deploy.
+# Not here yet: the agent part of herald (T-04), deploy.
 
 workflow:
   rules:
@@ -467,6 +468,21 @@ attest:
   artifacts:
     paths: [out/attest/]
 
+# F12.1 (T-46, D-025): "Who this release serves" from the signed manifest. A template, so every value in it
+# comes from the manifest. The agent summary (Duo CLI, T-04) is not here yet.
+herald:
+  stage: publish
+  extends: .evidence
+  image: python:3.12-slim
+  needs: [judge, attest]
+  variables:
+    GIT_DEPTH: "1"
+  script:
+    - pip install -q -e ./.floor
+    - floor herald --manifest out/judge/floor-manifest.json --out out/herald/who.md
+  artifacts:
+    paths: [out/herald/]
+
 # F4.4 (T-42, D-024): a fix MR merged and the gate held again, so cut <tag>-floor.N from the merged commit.
 # floor release finds the fix MR of this commit and the tag pipeline that the fix repaired. Any other
 # commit gets no release. The Releases API makes the tag from ref, with CI_JOB_TOKEN (D-010).
@@ -474,7 +490,7 @@ release:
   stage: publish
   extends: .evidence
   image: python:3.12-slim
-  needs: [judge, attest]
+  needs: [judge, attest, herald]
   interruptible: false
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -485,7 +501,7 @@ release:
     - |
       floor release --sha "$CI_COMMIT_SHA" --default-branch "$CI_DEFAULT_BRANCH" \
         --api "$CI_API_V4_URL" --project "$CI_PROJECT_ID" \
-        --diff out/judge/diff.md --verify out/attest/verify.txt \
+        --diff out/judge/diff.md --verify out/attest/verify.txt --herald out/herald/who.md \
         --link "Floor Manifest=$(cat out/judge/job-url.txt)/artifacts/file/out/judge/floor-manifest.json" \
         --link "Signature check=$(cat out/attest/job-url.txt)/artifacts/file/out/attest/verify.txt" \
         --out out/release/release.json

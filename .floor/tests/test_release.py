@@ -54,6 +54,8 @@ def test_notes():
     assert "pipeline 111" in text and MR["web_url"] in text and "| cpu |" in text
     assert "```\ncosign verify-attestation x\n```" in text
     assert "cosign" not in release.notes(plan, "diff", None)
+    with_herald = release.notes(plan, "diff", None, "## Who this release serves\n\n- **CPU:** any\n")
+    assert with_herald.index("## Who this release serves") < with_herald.index("pipeline 111")
 
 
 def test_cli_dry_run(tmp_path, monkeypatch, capsys):
@@ -98,7 +100,7 @@ def test_release_ci_job():
     import yaml
     ci = yaml.safe_load((ROOT / ".gitlab-ci.yml").read_text(encoding="utf-8"))
     job = ci["release"]
-    assert job["needs"] == ["judge", "attest"] and job["rules"] == [{"if": "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"}]
+    assert job["needs"] == ["judge", "attest", "herald"] and job["rules"] == [{"if": "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"}]
     script = "\n".join(job["script"])
     assert 'floor release --sha "$CI_COMMIT_SHA"' in script and "--dry-run" not in script
     assert "TOKEN" not in script  # floor release reads CI_JOB_TOKEN itself; no other token

@@ -53,12 +53,14 @@ def plan(sha: str, default_branch: str, get: Callable[[str], object]) -> dict:
     return {"tag": next_tag(base, tags), "base": base, "pipeline": pipeline_id, "mr": mr["web_url"]}
 
 
-def notes(release: dict, diff: str, verify: str | None) -> str:
-    """The release description: the floor diff, the fix, and the command that checks the signature."""
-    lines = [f"Rieux release of `{release['base']}` with every floor held.", "",
-             f"- The gate failed on `{release['base']}` (pipeline {release['pipeline']}).",
-             f"- The fix: {release['mr']}. The pipeline of the merged commit proved the floors again.", "",
-             diff.strip(), ""]
+def notes(release: dict, diff: str, verify: str | None, herald: str | None = None) -> str:
+    """The release description: Herald's section, the fix, the floor diff and the command that checks the signature."""
+    lines = [f"Rieux release of `{release['base']}` with every floor held.", ""]
+    if herald:
+        lines += [herald.strip(), ""]
+    lines += [f"- The gate failed on `{release['base']}` (pipeline {release['pipeline']}).",
+              f"- The fix: {release['mr']}. The pipeline of the merged commit proved the floors again.", "",
+              diff.strip(), ""]
     if verify:
         lines += ["Check the signed Floor Manifest (keyless, Sigstore):", "", "```", verify.strip(), "```", ""]
     return "\n".join(lines)

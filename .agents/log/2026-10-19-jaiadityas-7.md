@@ -101,3 +101,9 @@
 - Done: `floor release` (`release.py`) and the `release` job of `.gitlab-ci.yml`. The workflow skips `-floor.N` tag pipelines. The judge and attest jobs write `job-url.txt` for the release links.
 - Verified: 223 passed, 11 skipped.
 - Open: the first real run (a human tag push, then a merged fix MR); check the tag permission of the job token then.
+
+## T-46: Herald, the template (D-025)
+- Done: `floor herald` (`herald.py`) and the `herald` job; `floor release --herald` puts the section first in the notes. Test `test_herald.py`.
+- Checked on the real manifest of pipeline 2961083963 (judge job 17270054359): the text matches the values.
+- Verified: 227 passed, 11 skipped.
+- Gotcha: the Bash heredoc turns `\n` into a newline, even with a quoted delimiter. Use the Edit tool for text with backslashes.

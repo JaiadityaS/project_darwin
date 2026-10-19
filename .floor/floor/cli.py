@@ -15,7 +15,7 @@ import requests
 
 from . import __version__
 from . import (attest, backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice,
-               offline, page, paths, policy, qemu, ratchet, release)
+               herald, offline, page, paths, policy, qemu, ratchet, release)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -484,11 +484,12 @@ def _cmd_release(args: argparse.Namespace) -> int:
             return 0
         diff = Path(args.diff).read_text(encoding="utf-8") if args.diff else ""
         verify = Path(args.verify).read_text(encoding="utf-8") if args.verify and Path(args.verify).exists() else None
+        who = Path(args.herald).read_text(encoding="utf-8") if args.herald and Path(args.herald).exists() else None
     except (requests.RequestException, OSError, ValueError, KeyError) as exc:
         print(f"floor: {exc}", file=sys.stderr)
         return 2
     body = {"tag_name": plan["tag"], "ref": args.sha, "name": plan["tag"],
-            "description": release.notes(plan, diff, verify), "assets": {"links": links}}
+            "description": release.notes(plan, diff, verify, who), "assets": {"links": links}}
     if args.out:
         _write_json(Path(args.out), body)
     print(f"release {plan['tag']} from {args.sha[:8]}: the fix {plan['mr']} of pipeline {plan['pipeline']}")
@@ -507,6 +508,19 @@ def _cmd_release(args: argparse.Namespace) -> int:
         print(f"floor: the Releases API answered {resp.status_code}: {resp.text[:500]}", file=sys.stderr)
         return 1
     print(f"released: {resp.json().get('_links', {}).get('self', plan['tag'])}")
+    return 0
+
+
+def _cmd_herald(args: argparse.Namespace) -> int:
+    try:
+        text = herald.who(_read_json(args.manifest))
+    except (OSError, ValueError) as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.out).write_text(text, encoding="utf-8", newline="\n")
+    print(text, end="")
     return 0
 
 
@@ -973,10 +987,16 @@ def main(argv: list[str] | None = None) -> int:
     rl.add_argument("--project", required=True, help="project id ($CI_PROJECT_ID)")
     rl.add_argument("--diff", metavar="FILE", help="the floor diff of the manifest (floor manifest --diff)")
     rl.add_argument("--verify", metavar="FILE", help="the verify command of the attest job")
+    rl.add_argument("--herald", metavar="FILE", help="the \"Who this release serves\" section (floor herald --out)")
     rl.add_argument("--link", action="append", metavar="NAME=URL", help="a release asset link (repeat)")
     rl.add_argument("--out", metavar="FILE", help="also write the release request as JSON")
     rl.add_argument("--dry-run", action="store_true", help="decide and print, but create no release")
     rl.set_defaults(func=_cmd_release)
+
+    hd = sub.add_parser("herald", help="\"Who this release serves\" from the floor manifest (PRD F12.1, template)")
+    hd.add_argument("--manifest", required=True, metavar="FILE", help="floor-manifest.json")
+    hd.add_argument("--out", metavar="FILE", help="also write the section to this Markdown file")
+    hd.set_defaults(func=_cmd_herald)
 
     args = parser.parse_args(argv)
     return args.func(args)
