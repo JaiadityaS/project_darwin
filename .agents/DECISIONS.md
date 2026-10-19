@@ -208,7 +208,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - `probe` runs with `-t 2` and a run limit of 2400 s. The job limit stays 50 min.
   - `memory` and `offline` keep `-t 4`; they run natively.
 - No PRD impact: the measures and the floors do not change. The next MR pipeline (from the flow, on the fixed CI) is the check.
-- Evidence (2026-10-19): MR !2 (pipeline 2961093570, fix of 2961083963): memory, offline, service and three probes passed; EPYC-Milan timed out at 2400 s, so the judge said cpu inconclusive and failed (D-027). MR !3 (pipeline 2961110649, fix of 2961094614): every floor held, Pareto held, gate pass. Probe job times: qemu64 259 s, Nehalem 220 s, SandyBridge 541 s, EPYC-Milan 2175 s.
+- Evidence (2026-10-19): MR !2 (pipeline 2961093570, fix of 2961083963): memory, offline, service and three probes passed; EPYC-Milan timed out at 2400 s, so the judge said cpu inconclusive and failed (D-027). MR !3 (pipeline 2961110649, fix of 2961094614): every floor held, Pareto held, gate pass. Probe job times: qemu64 259 s, Nehalem 220 s, SandyBridge 541 s, EPYC-Milan 2175 s. MR !5 (pipeline 2961210282, fix of 2961183840, with D-027): gate pass again.
 
 ## D-023 (2026-10-19) T-34: the `attest` job signs the manifest after a passed judge
 - PRD F5.4: sign the manifest as an in-toto attestation (`cosign attest`, keyless with GitLab OIDC) on the image digest. AC-F5: `cosign verify-attestation` passes.
@@ -218,6 +218,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - `floor attest predicate` gives cosign the predicate and its type; cosign wraps them in its own Statement on the digest. After the signature, `cosign verify-attestation` checks the exact identity and the issuer (`$CI_SERVER_URL`), and `floor attest check` compares the verified predicate with the manifest. The job keeps the verify command in `out/attest/verify.txt`.
   - cosign v2.6.5 (the v2 line, still maintained): v2 keeps the attestation next to the image as a `.att` tag, which every registry can store. The job downloads the binary from the GitHub release and checks its SHA-256 (pinned; the asset digest and `cosign_checksums.txt` agree). The tools image does not change, so no other job pulls a larger image.
 - Evidence (2026-10-19): MR pipeline 2961110649, attest job 17270217868 (30 s). `cosign attest` signed with the GitLab ID token, `cosign verify-attestation` passed with identity `https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase//.gitlab-ci.yml@refs/heads/floor-fix/2961094614` (the double slash is in the GitLab claim) and issuer `https://gitlab.com`, and `floor attest check` matched the signed predicate to the manifest. `out/attest/verify.txt` has the command.
+- Evidence 2: MR pipeline 2961210282, attest job 17270780570 (30 s): signed and verified again.
 - Not yet: attaching the attestation to the GitLab Release (T-42), and two releases with a diff (AC-F5).
 - PRD impact: none.
 
@@ -240,6 +241,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - The `release` job puts the section first in the release description.
 - Not yet: the agent summary (Duo CLI, T-04) and the pinned issue (F12.3). If T-04 fails, the submission says that Herald is a template.
 - Fact (2026-10-19, GitLab docs "Set up the GitLab Duo CLI" and the glab authentication page): headless `duo run` reads an access token from `GITLAB_TOKEN` or `GITLAB_OAUTH_TOKEN`. glab sends that value as `PRIVATE-TOKEN`, which refuses a CI job token. The documented CI pattern uses a service account's personal access token (scopes `api`, `ai_features`). D-010 forbids a personal token of a person in CI, and only a group owner can make a service account. So T-04 is blocked unless the user gives such a token; until then Herald is the template.
+- Evidence (2026-10-19): the first run on GitLab, MR pipeline 2961210282, herald job 17270780571 (25 s). `out/herald/who.md` agrees with the signed manifest: `x86-64-v1` held (static), the four emulated CPU models with their variants (x64, sse42, sandybridge, haswell), memory tiny 512, base 512, small 768 MB, a download of 98.4 MB, 0 network attempts, no notice, SCI 0.00196 g CO2e per audio-minute.
 - PRD impact: F12.1 runs as a template for now (§9.2 fallback).
 
 ## D-026 (2026-10-19) T-35: a notice counts only with a human code-owner approval in GitLab
@@ -258,4 +260,5 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Decision: the probe runs `whisper-cli ... -ac 768`. 768 frames are 15.36 s of audio, and the sample is 11 s, so all the audio is in the context. The encoder then does about half the matrix work and about a quarter of the attention work. The binary and the kernels do not change. The run limit is 2700 s and the job limit 55 min.
 - The probe now keeps the partial output and the time of a run that times out (`seconds`, `stderr_tail`), so a timeout shows how far the run got.
 - Check: the next fix MR pipeline must show the four probes pass with the reference text, and their times.
+- Evidence (2026-10-19): MR !5 (pipeline 2961210282, fix of 2961183840) passed the check. Each probe got the reference text, loaded the expected variant, and had correct controls. Run times (job times): qemu64 136 s (179 s), Nehalem 108 s (155 s), SandyBridge 303 s (439 s), EPYC-Milan 1413 s (1457 s). EPYC-Milan used 52% of the 2700 s limit; before it used 2175 s of 2400 s or timed out.
 - PRD impact: F3 (the probe command). The measure (the right text on each CPU model) does not change.

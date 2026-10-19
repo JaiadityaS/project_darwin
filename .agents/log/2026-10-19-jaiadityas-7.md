@@ -130,7 +130,9 @@
 ## Gate results of the fix MRs (D-022, D-023, D-027)
 - MR !2 (pipeline 2961093570): memory, offline, service, qemu64, Nehalem, SandyBridge passed. EPYC-Milan timed out at 2400 s, so the judge said cpu inconclusive and failed. The probe had dropped the output of the timed-out run.
 - MR !3 (pipeline 2961110649): gate pass, every floor held. Attest job 17270217868 signed and verified. Probe job times 259, 220, 541 and 2175 s. T-34 and T-40 done.
+- Checked: a merged fix MR stays after the next sync. `assemble-gitlab.sh` starts from GitLab main and overlays only the product paths; `.devops/` is upstream content, and `.floor/overrides` and `deploy` are agent paths that a sync keeps.
 - MR !4 (pipeline 2961134355, still the old probe): EPYC-Milan timed out at 2400 s (job 2449 s); SandyBridge 632 s, Nehalem 246 s, qemu64 294 s. The judge failed as cpu inconclusive, so attest and herald were skipped.
+- MR !5 (pipeline 2961210282, fix of main 2961183840, the first gate with D-027): gate pass. Probe runs (job times): qemu64 136 s (179), Nehalem 108 s (155), SandyBridge 303 s (439), EPYC-Milan 1413 s (1457); each run had the reference text, the expected variant and correct controls. Attest job 17270780570 passed. Herald job 17270780571 passed (the first run); `who.md` agrees with the signed manifest (98.4 MB, 0 attempts, SCI 0.00196). Gotcha: many anonymous API reads in a short time gave "Rate limit exceeded"; a 10 min pause fixed it.
 - Done (D-027): the probe uses `-ac 768`, a 2700 s run limit and a 55 min job limit; a timed-out run keeps its output and time (`qemu.run`, `seconds`).
 - Verified: 233 passed, 11 skipped.
 - README: the Verify and Secure rows now cite pipeline 2961110649.
