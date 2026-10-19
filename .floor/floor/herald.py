@@ -90,3 +90,63 @@ def who(statement: dict) -> str:
     if isinstance(sci, (int, float)):
         lines.append(f"- **Footprint:** {sci:.3g} g CO2e per audio-minute (SCI).")
     return "\n".join(lines) + "\n"
+
+
+# F12.3 (T-61, D-032): the flow adds one line (the release tag), so the summary has at most 7.
+SUMMARY_MAX_LINES = 7
+
+
+def _bullet(who_md: str, label: str) -> str | None:
+    """The bullet of `who_md` (the output of `who`) that starts with **<label>:**, as it is."""
+    for line in who_md.splitlines():
+        if line.startswith(f"- **{label}:**"):
+            return line
+    return None
+
+
+def summary(statement: dict, who_md: str) -> str:
+    """The pinned-issue summary of one release (PRD F12.3): at most SUMMARY_MAX_LINES lines.
+
+    The floors come from the signed manifest, in short form. The language, "Left behind" and "Not measured"
+    lines are copied from `who_md`, so the summary and the release notes say the same thing.
+    """
+    pred = statement.get("predicate") or {}
+    floors = pred.get("floors") or {}
+    digest = ((statement.get("subject") or [{}])[0].get("digest") or {}).get("sha256") or "?"
+    head = (f"**Rieux gate {pred.get('decision', '?')}** for commit `{(pred.get('commit') or '?')[:8]}` "
+            f"(image `sha256:{digest[:12]}`), Pareto {pred.get('pareto', '?')}.")
+    sci = (pred.get("footprint") or {}).get("sci_gco2e_per_audio_minute")
+    if isinstance(sci, (int, float)):
+        head += f" SCI {sci:.3g} g CO2e per audio-minute."
+    lines = [head]
+    cpu = floors.get("cpu")
+    if cpu:
+        dispatch = cpu.get("dispatch") or {}
+        ran = sum(1 for m in MODELS if dispatch.get(m))
+        text = f"- CPU: floor `{cpu.get('x86_64') or '?'}`, {cpu.get('status', '?')}"
+        text += " (static proof)" if cpu.get("proof") == "static" else ""
+        if dispatch:
+            text += f"; ran on {ran} of {len(MODELS)} emulated CPU models"
+        lines.append(text + ".")
+    memory = floors.get("memory")
+    if memory:
+        passing = memory.get("smallest_passing_mb") or {}
+        sizes = sorted(passing, key=lambda s: SIZES.index(s) if s in SIZES else len(SIZES))
+        lines.append(f"- Memory: {memory.get('status', '?')}"
+                     + ("; " + ", ".join(f"{s} {passing[s]} MB" for s in sizes) if sizes else "") + ".")
+    conn = floors.get("connectivity")
+    if conn:
+        text = f"- Connectivity: {conn.get('status', '?')}"
+        if conn.get("offline") == "proven":
+            text += "; offline proven"
+            if conn.get("download_mb") is not None:
+                text += f", {conn['download_mb']} MB download"
+            text += f", {conn.get('network_attempts', '?')} network attempts"
+        lines.append(text + ".")
+    for label in ("Language", "Left behind", "Not measured"):
+        line = _bullet(who_md, label)
+        if line:
+            lines.append(line)
+    if len(lines) > SUMMARY_MAX_LINES:
+        raise ValueError(f"the summary has {len(lines)} lines, more than {SUMMARY_MAX_LINES}")
+    return "\n".join(lines) + "\n"

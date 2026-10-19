@@ -599,6 +599,19 @@ def _cmd_herald(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_summary(args: argparse.Namespace) -> int:
+    try:
+        text = herald.summary(_read_json(args.manifest), Path(args.who).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.out).write_text(text, encoding="utf-8", newline="\n")
+    print(text, end="")
+    return 0
+
+
 def _memory_inputs(paths: list[str] | None) -> tuple[dict | None, dict | None, dict | None]:
     """Joins `floor memory --out` files (one per model) or plain {"model": MB} files. Gives the smallest
     passing limit, the peak RSS and the download size per model (a plain file has only the limit)."""
@@ -1108,6 +1121,12 @@ def main(argv: list[str] | None = None) -> int:
     hd.add_argument("--manifest", required=True, metavar="FILE", help="floor-manifest.json")
     hd.add_argument("--out", metavar="FILE", help="also write the section to this Markdown file")
     hd.set_defaults(func=_cmd_herald)
+
+    sm = sub.add_parser("summary", help="the pinned-issue summary of a release, at most 7 lines (PRD F12.3)")
+    sm.add_argument("--manifest", required=True, metavar="FILE", help="floor-manifest.json")
+    sm.add_argument("--who", required=True, metavar="FILE", help="the \"Who this release serves\" file (floor herald --out)")
+    sm.add_argument("--out", metavar="FILE", help="also write the summary to this Markdown file")
+    sm.set_defaults(func=_cmd_summary)
 
     args = parser.parse_args(argv)
     return args.func(args)

@@ -14,7 +14,7 @@
 #   fallback      only after a failed judge: the canned inclusive config as a patch for the branch (F4.3)
 #   notice-draft  only after a failed judge: drafts the Leave-Behind Notice for a code owner (F4.5)
 #   attest  only after a passed judge: signs the manifest on the image digest, keyless (F5.4)
-#   herald  after attest: "Who this release serves" from the manifest, a template (F12.1)
+#   herald  after attest: "Who this release serves" and the pinned-issue summary, from the manifest (F12.1, F12.3)
 #   release default branch, after attest: cuts <tag>-floor.N when the commit merged a fix of a tag (F4.4)
 #   pages   the Rieux page from the committed evidence (default branch only)
 #
@@ -43,6 +43,8 @@ variables:
   TOOLS_TAG: "348395c3ee88"
   # GitLab usernames of the humans, space-separated. Every other pipeline user counts as an agent.
   FLOOR_HUMANS: "jaiadityasinghr"
+  # The IID of the pinned issue that gets the release summary (F12.3, D-032). Empty: the flow posts nothing.
+  FLOOR_SUMMARY_ISSUE: ""
   # Reference transcript of samples/jfk.wav.
   EXPECT: "ask not what your country can do for you"
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
@@ -484,6 +486,8 @@ attest:
 
 # F12.1 (T-46, D-025): "Who this release serves" from the signed manifest. A template, so every value in it
 # comes from the manifest. The agent summary (Duo CLI, T-04) is not here yet.
+# F12.3 (T-61, D-032): the pinned-issue summary, at most 7 lines. CI has no token that can post a note, so the
+# job log carries it, and the release-summary flow copies it to the pinned issue after a release.
 herald:
   stage: publish
   extends: .evidence
@@ -494,6 +498,9 @@ herald:
   script:
     - pip install -q -e ./.floor
     - floor herald --manifest out/judge/floor-manifest.json --out out/herald/who.md
+    - floor summary --manifest out/judge/floor-manifest.json --who out/herald/who.md --out out/herald/summary.md > /dev/null
+    - 'echo "summary issue: $FLOOR_SUMMARY_ISSUE"'
+    - echo "--- BEGIN summary ---"; cat out/herald/summary.md; echo "--- END summary ---"
   artifacts:
     paths: [out/herald/]
 
