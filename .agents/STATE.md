@@ -29,14 +29,14 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (T-53, T-23, T-64, T-62)
 
 ## Next agent: start here
 
-1. T-62 (D-031), the language table. The pilot run 39210696789 (sw_ke, 10 clips) passed in 6 min: Swahili small f16 WER 72%, so not served. The full run 39211434118 (8 languages, 50 clips, about 25 min per job) started at 06:45 UTC on 2026-10-19. When it ends:
+1. T-62 (D-031), the language table. The pilot run 39210696789 (sw_ke, 10 clips) passed in 6 min: Swahili small f16 WER 72%, so not served. The first full run (39211434118) failed for Yoruba and Hindi: whisper-cli wrote bytes that are not UTF-8. The fix (4f0674e) counts them (`bad_utf8`). The new full run 39214706460 (8 languages, 50 clips, about 25 min per job) started at about 07:25 UTC on 2026-10-19. When it ends:
    - Read `language.json` from the log of its Table step: `gh run view <id> --log`, the lines between `--- BEGIN language.json ---` and `--- END language.json ---`. No artifact download is needed.
    - English is the control. Its small f16 WER must be low (about 10%). If it is not, look for a fault in the scoring first, and do not commit the table.
    - Commit it as `.floor/evidence/language/language.json`, add a row to `.floor/evidence/README.md`, check the page (`python -m floor page`), add the log lines, and set T-62 to done.
    - A cloud session has no `gh` login. If it cannot read the run, leave this item to a local session.
 2. T-61 (PRD F12.3, SHOULD): a summary of at most 8 lines on a pinned issue after each release. Not started. CI has no token that can post a note (D-010, D-025). Plan: `floor summary` (from the signed manifest and `who.md`) in the `herald` job, printed in its log between markers. Then a private flow, started by "Pipeline events: Passed", exits unless the pipeline made a release, and copies the summary from the job log to the pinned issue with an issue-note tool. The code and the tests can be done in the cloud. The flow, its trigger and the issue need a local session (catalog work in the browser). T-63 (F11, field triage) is also a flow: check in the trigger list if a work-item-created trigger exists.
 3. GitLab sync: the T-23, T-64 and T-62 changes (the page, the README, the evidence) are not on GitLab yet. Only a local session syncs (standing yes, after a dry run and a residue check). Sync once after item 1, because each sync starts a fix MR.
-4. MR !6 (pipeline 2961810145, the canned image): offline, memory, service and the qemu64, Nehalem and SandyBridge probes passed. EPYC-Milan, judge, attest and herald had not ended at 06:45 UTC. Record the end state in the log.
+4. MR !6 (pipeline 2961810145, the canned image) passed every job (EPYC-Milan 1449 s, attest, herald). It is in the log. The user decides whether to close or merge it.
 5. T-90 README: update the numbers before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
 
 ## Needs a human (agents cannot do these)
