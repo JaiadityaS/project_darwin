@@ -29,6 +29,13 @@ def test_edits():
     assert language.edits([], ["a"]) == 1
 
 
+def test_read_hyp_joins_a_character_split_by_a_segment_break():
+    data = " আমি ভাত".encode()
+    assert language.read_hyp(data[:2] + b"\n" + data[2:] + b"\n") == ("আমি ভাত", False)  # the break is inside আ
+    assert language.read_hyp(b" one\n two\n") == ("one two", False)
+    assert language.read_hyp(b" seven\xe1\n") == ("seven�", True)
+
+
 def test_choose_takes_one_recording_per_sentence(tmp_path):
     (tmp_path / "test.tsv").write_text(TSV, encoding="utf-8")
     rows = language.read_tsv(tmp_path / "test.tsv")
@@ -56,7 +63,7 @@ def test_score_bootstrap_and_table(tmp_path):
     assert scores["tiny-q5_1"]["wer"] == 6 / 8 and scores["tiny-q5_1"]["missing"] == 1
     lo, hi = language.bootstrap(scores["tiny"]["clips"], scores["tiny-q5_1"]["clips"], rounds=200)
     assert lo <= 5 / 8 <= hi
-    result = {"fleurs": "sw_ke", "lang": "sw", "sizes": ["tiny"], "quant": "q5_1", "decoding": "-nf",
+    result = {"fleurs": "sw_ke", "lang": "sw", "sizes": ["tiny"], "quant": "q5_1", "decoding": "-l sw -nf",
               "commit": "c", "evidence": "u", "models": scores}
     doc = language.table([result], 0.3, language.whisper_languages(SOURCE))
     row = doc["rows"][0]
@@ -64,6 +71,7 @@ def test_score_bootstrap_and_table(tmp_path):
     assert (row["wer_f16"], row["wer_quant"], row["drift"]) == (0.125, 0.75, 0.625)
     assert row["served_f16"] and not row["served_quant"] and row["missing"] == 1 and row["bad_utf8"] == 1
     assert doc["served"] == ["swahili"] and doc["not_served"] == []
+    assert doc["decoding"] == "-l <lang> -nf"  # one line for all languages
     assert doc["not_measured"] == ["english", "yoruba"]
 
 

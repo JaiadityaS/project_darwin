@@ -11,6 +11,7 @@ clips, scores the transcripts and makes the table:
 
 from __future__ import annotations
 
+import codecs
 import csv
 import random
 import re
@@ -70,25 +71,37 @@ def _rates(clips: list[dict]) -> dict:
             "cer": sum(c["char_edits"] for c in clips) / chars if chars else None}
 
 
+def _open_tail(data: bytes) -> bool:
+    """True if `data` ends inside a UTF-8 character."""
+    decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+    decoder.decode(data, final=False)
+    return bool(decoder.getstate()[0])
+
+
+def read_hyp(raw: bytes) -> tuple[str, bool]:
+    """The transcript in a whisper-cli -otxt file, and whether it had bytes that are not UTF-8.
+    The file has one segment per line. Whisper tokens are bytes, so a segment can end inside a character, and
+    the line break then splits that character: such a line joins the next one without the break. Bytes that are
+    still not UTF-8 become U+FFFD, which `normalize` makes a space, so the broken word counts as wrong."""
+    text = b""
+    for line in raw.split(b"\n"):
+        text += line if _open_tail(text) else (b" " if text else b"") + line
+    decoded = text.decode("utf-8", errors="replace")
+    return " ".join(decoded.split()), decoded != text.decode("utf-8", errors="ignore")
+
+
 def score(clips: list[dict], hyp_root: str | Path, models: list[str]) -> dict:
-    """Scores the whisper-cli -otxt output `<hyp_root>/<model>/<file>.txt` of every clip.
-    A clip without output counts as an empty transcript (every word wrong). whisper-cli can write a character
-    split across two tokens as bytes that are not UTF-8: each such byte becomes U+FFFD, which `normalize` makes
-    a space, so the broken word counts as wrong."""
+    """Scores the whisper-cli -otxt output `<hyp_root>/<model>/<file>.txt` of every clip (`read_hyp`).
+    A clip without output counts as an empty transcript (every word wrong)."""
     out = {}
     for model in models:
         base = Path(hyp_root) / model
         rows, missing, bad_utf8 = [], 0, 0
         for clip in clips:
             txt = base / f"{clip['file']}.txt"
-            text = ""
-            if not txt.exists():
-                missing += 1
-            else:
-                raw = txt.read_bytes()
-                text = raw.decode("utf-8", errors="replace")
-                bad_utf8 += text != raw.decode("utf-8", errors="ignore")
-            hyp = " ".join(text.split())
+            hyp, bad = read_hyp(txt.read_bytes()) if txt.exists() else ("", False)
+            missing += not txt.exists()
+            bad_utf8 += bad
             rows.append({"id": clip["id"], "hyp": hyp, **clip_score(clip["ref"], hyp)})
         seconds = base / "seconds"
         out[model] = {**_rates(rows), "missing": missing, "bad_utf8": bad_utf8,
@@ -132,7 +145,8 @@ def table(results: list[dict], usable_wer: float, languages: list[list[str]]) ->
                          "bad_utf8": f16.get("bad_utf8", 0) + quant.get("bad_utf8", 0)})
     measured = {row["language"] for row in rows}
     first = results[0] if results else {}
-    return {"usable_wer": usable_wer, "quant": first.get("quant"), "decoding": first.get("decoding"),
+    decoding = re.sub(r"-l \S+", "-l <lang>", first["decoding"]) if first.get("decoding") else None
+    return {"usable_wer": usable_wer, "quant": first.get("quant"), "decoding": decoding,
             "commit": first.get("commit"), "evidence": first.get("evidence"), "rows": rows,
             "served": sorted({row["name"] for row in rows if row["served_f16"]}),
             "not_served": sorted({row["name"] for row in rows} - {row["name"] for row in rows if row["served_f16"]}),
