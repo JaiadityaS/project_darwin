@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-19 · @JaiadityaS · session 7 (T-40 flow run, D-022)
+Last update: 2026-10-19 · @JaiadityaS · session 7 (T-53, T-23, T-64, T-62)
 
 ## Where we are
 
@@ -14,8 +14,8 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (T-40 flow run, D-022)
 - Done in session 4: T-56 (ΔM calculator) and the SCI part of T-54 (`floor footprint`, the Impact Framework manifests, the coefficients in `.floor/impact/footprint.yml`). See `.agents/log/2026-10-16-jaiadityas-4.md`.
 - Done in session 5: T-02 (first GitLab push: `main` is `36521198`), the name (D-013), and T-47 step 1 (`.gitlab-ci.yml`, `.gitlab/ci/`, D-014). The first GitLab pipeline (2958271425) failed as planned: the CPU floor of upstream's image is x86-64-v4. T-47 step 2 (the memory and offline jobs) ran in pipeline 2958309699 (see "Facts learned"). T-55 is done (energy run 39033747472). The R1 SCI files are committed (`.floor/impact/sci-audio-minute.yml`, `.floor/evidence/footprint/sci.json`). The Rieux page has the language, energy and SCI sections (T-60). See `.agents/log/2026-10-17-jaiadityas-5.md`.
 - Done in session 6: T-43 (D-016). `floor notice-draft` writes the draft Leave-Behind Notice when the agent's fix and the canned config did not hold a floor, and the `notice-draft` job of `.gitlab-ci.yml` keeps it as an artifact. `floor fallback` now reads RUN instructions as shell words (the old regex broke 2 of the 7 upstream Dockerfiles). D-014 gap 1 is closed: the MR author counts too (`floor paths --actor auto`). See `.agents/log/2026-10-17-jaiadityas-6.md`.
-- Done in session 7: the T-90 README draft (D-017). See `.agents/log/2026-10-19-jaiadityas-7.md`.
-- CLI: `floor scan | image | sample | timeline | h1 | probe | policy | ratchet | judge | memory | offline | audio | energy | meter | notice | notice-draft | paths | fallback | page | manifest | diff | delta-m | footprint`. Run `python -m floor <command> -h`.
+- Done in session 7: the T-90 README draft (D-017), the flow and the fix MRs (D-020 to D-027), T-53 `GET /floor` (D-028), T-23 backtest footprint (D-029), T-64 spot check (D-030) and the T-62 code (D-031). See `.agents/log/2026-10-19-jaiadityas-7.md`.
+- CLI: `floor scan | image | sample | timeline | backtest-footprint | language | spotcheck | h1 | probe | policy | judge | ratchet | notice | notice-draft | memory | offline | audio | energy | meter | paths | fallback | page | delta-m | manifest | footprint | diff | attest | release | herald`. Run `python -m floor <command> -h`.
 
 ## Gates (PRD §17.1)
 
@@ -29,11 +29,15 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (T-40 flow run, D-022)
 
 ## Next agent: start here
 
-1. Done on GitLab (pipeline 2960804030, GitLab `main` `64329927` = dev `a26571f`): AC-F7 and AC-F8 fields, the `notice-draft` job, the R2 meter and the README front page. See "Facts learned". Nothing in item 1 is open now.
-2. T-41 is done on GitLab: pipeline 2960896128 failed at the judge as planned, and the `fallback` job wrote `out/fallback/fallback.patch`. T-03 is done (D-020): the "Pipeline events: Failed" trigger starts a flow. T-40 works (D-021): a failed judge starts the flow, and the flow opens a fix MR with the fallback patch. The first fix MR (!1) failed its gate because of the harness (D-022). Next: check the gate of the next fix MR (on the fixed CI), then T-05 (auto-merge; needs "Pipelines must succeed", see "Needs a human"). The `attest` job (T-34, D-023) runs first in a pipeline with a passed judge: check its log and `out/attest/`.
-3. T-54 is done: the GitLab judge manifest (pipeline 2960896128) has both SCI fields.
-4. T-90 README: the draft is on GitLab (D-017). Update the stage table (status column) when a stage starts to run, and the numbers before submission.
-5. T-52: the `service` job passed on GitLab (pipeline 2960909623): jfk.wav gave the reference text in 3.31 s; a non-WAV body got 400. Gotcha: BusyBox wget cuts a binary POST body at the first zero byte, so the job uses curl. Open: max instances in `infra/` (T-50, needs T-06; the user parked GCP on 2026-10-19).
+1. T-62 (D-031), the language table. The pilot run 39210696789 (sw_ke, 10 clips) passed in 6 min: Swahili small f16 WER 72%, so not served. The full run 39211434118 (8 languages, 50 clips, about 25 min per job) started at 06:45 UTC on 2026-10-19. When it ends:
+   - Read `language.json` from the log of its Table step: `gh run view <id> --log`, the lines between `--- BEGIN language.json ---` and `--- END language.json ---`. No artifact download is needed.
+   - English is the control. Its small f16 WER must be low (about 10%). If it is not, look for a fault in the scoring first, and do not commit the table.
+   - Commit it as `.floor/evidence/language/language.json`, add a row to `.floor/evidence/README.md`, check the page (`python -m floor page`), add the log lines, and set T-62 to done.
+   - A cloud session has no `gh` login. If it cannot read the run, leave this item to a local session.
+2. T-61 (PRD F12.3, SHOULD): a summary of at most 8 lines on a pinned issue after each release. Not started. CI has no token that can post a note (D-010, D-025). Plan: `floor summary` (from the signed manifest and `who.md`) in the `herald` job, printed in its log between markers. Then a private flow, started by "Pipeline events: Passed", exits unless the pipeline made a release, and copies the summary from the job log to the pinned issue with an issue-note tool. The code and the tests can be done in the cloud. The flow, its trigger and the issue need a local session (catalog work in the browser). T-63 (F11, field triage) is also a flow: check in the trigger list if a work-item-created trigger exists.
+3. GitLab sync: the T-23, T-64 and T-62 changes (the page, the README, the evidence) are not on GitLab yet. Only a local session syncs (standing yes, after a dry run and a residue check). Sync once after item 1, because each sync starts a fix MR.
+4. MR !6 (pipeline 2961810145, the canned image): offline, memory, service and the qemu64, Nehalem and SandyBridge probes passed. EPYC-Milan, judge, attest and herald had not ended at 06:45 UTC. Record the end state in the log.
+5. T-90 README: update the numbers before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
 
 ## Needs a human (agents cannot do these)
 
