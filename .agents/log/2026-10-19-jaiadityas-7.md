@@ -124,11 +124,13 @@
 - Main pipeline 2961114166 (upstream image, built on a Xeon Platinum 8581C, x86-64-v4): the `service` job failed. whisper-server stopped while it loaded the model; the log has no exit code. MR pipeline 2961110649 (canned image): `service` passed.
 - Done: the job writes `out/service/cpu.txt` (`facts.sh --cpu`) and, on a failed start, the container exit state and `out/service/service.log`. The gateway logs how whisper-server ended (`gateway.exit_text`, SIGILL named).
 - Verified: 232 passed, 11 skipped.
-- Open: read `cpu.txt` and the exit state in the next main pipeline; a SIGILL on a runner older than the build runner is H-1 evidence.
+- Result: main pipeline 2961183840 (the same upstream image, `build` on an 8581C, x86-64-v4) passed `service` on an 8581C (`out/service/cpu.txt`, job 17270664524). The failure did not come again, so its cause stays not proven.
+- Open: if `service` fails again, read `cpu.txt` and the exit state; a SIGILL on a runner older than the build runner is H-1 evidence.
 
 ## Gate results of the fix MRs (D-022, D-023, D-027)
 - MR !2 (pipeline 2961093570): memory, offline, service, qemu64, Nehalem, SandyBridge passed. EPYC-Milan timed out at 2400 s, so the judge said cpu inconclusive and failed. The probe had dropped the output of the timed-out run.
 - MR !3 (pipeline 2961110649): gate pass, every floor held. Attest job 17270217868 signed and verified. Probe job times 259, 220, 541 and 2175 s. T-34 and T-40 done.
+- MR !4 (pipeline 2961134355, still the old probe): EPYC-Milan timed out at 2400 s (job 2449 s); SandyBridge 632 s, Nehalem 246 s, qemu64 294 s. The judge failed as cpu inconclusive, so attest and herald were skipped.
 - Done (D-027): the probe uses `-ac 768`, a 2700 s run limit and a 55 min job limit; a timed-out run keeps its output and time (`qemu.run`, `seconds`).
 - Verified: 233 passed, 11 skipped.
 - README: the Verify and Secure rows now cite pipeline 2961110649.

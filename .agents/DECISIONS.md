@@ -254,7 +254,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - PRD impact: none; this makes F6.1 true in CI and not only in the text.
 
 ## D-027 (2026-10-19) The probe uses an audio context of 768 frames
-- Fact: on the GitLab runners (Intel Xeon Platinum 8581C, 2 vCPUs), the AVX variants of ggml run slowly under QEMU 8.2. Probe job times: SandyBridge 541 to 634 s and EPYC-Milan 2175 s (MR pipeline 2961110649) or more than 2400 s (MR pipeline 2961093570, a timeout). On the 2-CPU AMD EPYC 7763 machine of `.floor/evidence/cpu-proof/all-variants` (same QEMU), EPYC-Milan took 562 s and SandyBridge 275 s, with the encoder at about 80% of the time.
+- Fact: on the GitLab runners (Intel Xeon Platinum 8581C, 2 vCPUs), the AVX variants of ggml run slowly under QEMU 8.2. Probe job times: SandyBridge 541 to 634 s and EPYC-Milan 2175 s (MR pipeline 2961110649) or more than 2400 s (timeouts in MR pipelines 2961093570 and 2961134355, so 2 of 3 gates failed as cpu inconclusive). On the 2-CPU AMD EPYC 7763 machine of `.floor/evidence/cpu-proof/all-variants` (same QEMU), EPYC-Milan took 562 s and SandyBridge 275 s, with the encoder at about 80% of the time.
 - Decision: the probe runs `whisper-cli ... -ac 768`. 768 frames are 15.36 s of audio, and the sample is 11 s, so all the audio is in the context. The encoder then does about half the matrix work and about a quarter of the attention work. The binary and the kernels do not change. The run limit is 2700 s and the job limit 55 min.
 - The probe now keeps the partial output and the time of a run that times out (`seconds`, `stderr_tail`), so a timeout shows how far the run got.
 - Check: the next fix MR pipeline must show the four probes pass with the reference text, and their times.
