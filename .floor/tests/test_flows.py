@@ -82,7 +82,7 @@ def test_release_summary_flow():
 
 
 def test_field_triage_flow():
-    """T-63 draft, D-033: a gate with no tools sorts the issue; the reply agent can only post one note."""
+    """T-63, D-033: a gate with no tools sorts the issue; the reply agent can only post one note."""
     flow = yaml.safe_load((FLOWS / "field-triage.yml").read_text(encoding="utf-8"))
     assert flow["version"] == "v1" and flow["environment"] == "ambient" and flow["coding_environment"] == "none"
     for key in ("name", "description", "product_group"):
