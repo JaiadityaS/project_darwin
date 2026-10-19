@@ -105,10 +105,10 @@ def test_page_energy_from_repo_evidence(tmp_path):
 def test_page_language_table(tmp_path):
     row = {"language": "sw", "name": "swahili", "fleurs": "sw_ke", "size": "small", "clips": 50, "words": 1000,
            "wer_f16": 0.28, "cer_f16": 0.09, "wer_quant": 0.312, "drift": 0.032, "drift_ci": [0.011, 0.054],
-           "served_f16": True, "served_quant": False, "missing": 1}
+           "served_f16": True, "served_quant": False, "missing": 1, "bad_utf8": 2}
     doc = {"usable_wer": 0.3, "quant": "q5_1", "decoding": "-l <lang> -nf -bs 5 -bo 5 -t 2", "commit": "0c7be696abc",
            "rows": [row, {**row, "size": "tiny", "wer_f16": 0.61, "wer_quant": 0.65, "served_f16": False,
-                          "missing": 0}],
+                          "missing": 0, "bad_utf8": 0}],
            "served": ["swahili"], "not_served": [], "not_measured": ["english", "yoruba"]}
     (tmp_path / "language").mkdir()
     (tmp_path / "language" / "language.json").write_text(json.dumps(doc))
@@ -119,6 +119,7 @@ def test_page_language_table(tmp_path):
     assert ('<td>28.0%</td><td>9.0%</td><td>31.2%</td><td>+3.2 <span class="mute">[+1.1, +5.4]</span></td>'
             '<td><span class="pass">yes</span> <span class="inc">(no at q5_1)</span></td>') in lang
     assert "50 sentences per language" in lang and "<code>0c7be696</code>" in lang
+    assert "2 transcript(s) had bytes that are not UTF-8" in lang
     assert "1 clip(s) gave no transcript" in lang and "Not measured: 2 other whisper languages" in lang
 
 

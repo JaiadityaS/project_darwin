@@ -216,6 +216,7 @@ def _section_languages(doc: dict | None) -> str:
                     f'<td>{r["drift"] * 100:+.1f} <span class="mute">[{lo * 100:+.1f}, {hi * 100:+.1f}]</span></td>'
                     f'<td>{served}</td></tr>')
     missing = sum(r.get("missing", 0) for r in doc["rows"])
+    bad = sum(r.get("bad_utf8", 0) for r in doc["rows"])
     clips = sorted({r["clips"] for r in doc["rows"]})
     return (f'<div class="card"><p><b>Served</b> (f16 WER at most {usable:.0%}): '
             f'{escape(", ".join(doc["served"]) or "none")}. <b>Not served:</b> {escape(", ".join(doc["not_served"]) or "none")}.</p>'
@@ -228,6 +229,8 @@ def _section_languages(doc: dict | None) -> str:
             f'with a paired-bootstrap interval. Real speech is noisier than read speech, so real error rates are higher. '
             f'Report only: no gate uses this table (F9.3).'
             + (f' {missing} clip(s) gave no transcript and count as all words wrong.' if missing else "")
+            + (f' {bad} transcript(s) had bytes that are not UTF-8 (a character split across tokens); '
+               f'each broken word counts as wrong.' if bad else "")
             + f'</p><p class="mute">Not measured: {len(doc["not_measured"])} other whisper languages, so Rieux makes no '
             f'claim for them.</p></div>')
 

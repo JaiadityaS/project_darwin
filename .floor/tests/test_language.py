@@ -49,8 +49,10 @@ def test_score_bootstrap_and_table(tmp_path):
         for clip, text in zip(clips, texts):
             (tmp_path / model / f"{clip['file']}.txt").write_text(f" {text}\n", encoding="utf-8")
     (tmp_path / "tiny-q5_1" / "b.wav.txt").unlink()  # no output: an empty transcript
+    (tmp_path / "tiny" / "b.wav.txt").write_bytes(b" five six seven\xe1\n")  # a byte that is not UTF-8
     scores = language.score(clips, tmp_path, ["tiny", "tiny-q5_1"])
     assert scores["tiny"]["wer"] == 1 / 8 and scores["tiny"]["seconds"] == 12 and scores["tiny"]["missing"] == 0
+    assert scores["tiny"]["bad_utf8"] == 1 and scores["tiny"]["clips"][1]["hyp"] == "five six seven�"
     assert scores["tiny-q5_1"]["wer"] == 6 / 8 and scores["tiny-q5_1"]["missing"] == 1
     lo, hi = language.bootstrap(scores["tiny"]["clips"], scores["tiny-q5_1"]["clips"], rounds=200)
     assert lo <= 5 / 8 <= hi
@@ -60,7 +62,7 @@ def test_score_bootstrap_and_table(tmp_path):
     row = doc["rows"][0]
     assert (row["name"], row["size"], row["clips"], row["words"]) == ("swahili", "tiny", 2, 8)
     assert (row["wer_f16"], row["wer_quant"], row["drift"]) == (0.125, 0.75, 0.625)
-    assert row["served_f16"] and not row["served_quant"] and row["missing"] == 1
+    assert row["served_f16"] and not row["served_quant"] and row["missing"] == 1 and row["bad_utf8"] == 1
     assert doc["served"] == ["swahili"] and doc["not_served"] == []
     assert doc["not_measured"] == ["english", "yoruba"]
 

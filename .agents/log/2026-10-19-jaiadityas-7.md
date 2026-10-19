@@ -159,3 +159,11 @@
 - Done: `spotcheck.py`, `floor spotcheck`, `.floor/evidence/spotcheck/illegal-instruction-2026-10-19.json`, a line in the README problem section.
 - Tests: `test_spotcheck.py` (4 tests). Verified: 243 passed, 11 skipped.
 - Not checked: the other keyword counts of PRD §3.2 and the llama.cpp count. Do not use them in the Devpost text (T-92).
+
+## T-53 second image and the MR !6 gate (D-028)
+- MR !6 pipeline 2961810145 (the canned image) passed every job: offline, memory, service, the four probes (EPYC-Milan 1449 s), judge, attest and herald. It is the third full gate pass with a signature.
+
+## T-62: the language table (D-031)
+- Done: `language.py`, `floor language choose|score|table`, `.github/workflows/language.yml`, the page section, `language.usable_wer` 0.30 in the policy and its schema.
+- Pilot run 39210696789 (sw_ke, 10 clips): the job took 6 min. Model times: tiny 13 s, tiny-q5_1 15 s, base 23 s, base-q5_1 27 s, small 73 s, small-q5_1 91 s. Swahili f16 WER: tiny 100.5%, base 95.7%, small 72.0%, so not served.
+- Full run 39211434118: Yoruba and Hindi failed in `score` with a UnicodeDecodeError. whisper-cli wrote bytes that are not UTF-8 (a character split across tokens). Fix: decode with replacement and count the clips (`bad_utf8`). I cancelled the run, so that one run has all 8 languages. Yoruba model times (50 clips): tiny 78 s, base 128 s, small 517 s, small-q5_1 595 s.

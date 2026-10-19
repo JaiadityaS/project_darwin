@@ -72,19 +72,26 @@ def _rates(clips: list[dict]) -> dict:
 
 def score(clips: list[dict], hyp_root: str | Path, models: list[str]) -> dict:
     """Scores the whisper-cli -otxt output `<hyp_root>/<model>/<file>.txt` of every clip.
-    A clip without output counts as an empty transcript (every word wrong)."""
+    A clip without output counts as an empty transcript (every word wrong). whisper-cli can write a character
+    split across two tokens as bytes that are not UTF-8: each such byte becomes U+FFFD, which `normalize` makes
+    a space, so the broken word counts as wrong."""
     out = {}
     for model in models:
         base = Path(hyp_root) / model
-        rows, missing = [], 0
+        rows, missing, bad_utf8 = [], 0, 0
         for clip in clips:
             txt = base / f"{clip['file']}.txt"
+            text = ""
             if not txt.exists():
                 missing += 1
-            hyp = " ".join(txt.read_text(encoding="utf-8").split()) if txt.exists() else ""
+            else:
+                raw = txt.read_bytes()
+                text = raw.decode("utf-8", errors="replace")
+                bad_utf8 += text != raw.decode("utf-8", errors="ignore")
+            hyp = " ".join(text.split())
             rows.append({"id": clip["id"], "hyp": hyp, **clip_score(clip["ref"], hyp)})
         seconds = base / "seconds"
-        out[model] = {**_rates(rows), "missing": missing,
+        out[model] = {**_rates(rows), "missing": missing, "bad_utf8": bad_utf8,
                       "seconds": int(seconds.read_text().strip()) if seconds.exists() else None, "clips": rows}
     return out
 
@@ -121,7 +128,8 @@ def table(results: list[dict], usable_wer: float, languages: list[list[str]]) ->
                          "wer_quant": round(quant["wer"], 4), "drift": round(drift, 4),
                          "drift_ci": bootstrap(f16["clips"], quant["clips"]),
                          "served_f16": f16["wer"] <= usable_wer, "served_quant": quant["wer"] <= usable_wer,
-                         "missing": f16["missing"] + quant["missing"]})
+                         "missing": f16["missing"] + quant["missing"],
+                         "bad_utf8": f16.get("bad_utf8", 0) + quant.get("bad_utf8", 0)})
     measured = {row["language"] for row in rows}
     first = results[0] if results else {}
     return {"usable_wer": usable_wer, "quant": first.get("quant"), "decoding": first.get("decoding"),
