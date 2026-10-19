@@ -305,3 +305,22 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - Not measured: every other language of whisper.cpp's `g_lang` table (`src/whisper.cpp`).
 - Deviation: the table is not made per release. One run takes about 25 runner-minutes per language, so the gate does not run it. The manifest still lists `language` as not measured, because the release check did not measure it. The page names the commit of the run. No gate uses the table (F9.3 is a COULD).
 - PRD impact: F9.1 (the table is per whisper.cpp commit, not per release).
+
+## D-032 (2026-10-19) T-61: the release summary goes from the herald job log to the pinned issue by a flow
+- PRD F12.3: a summary of at most 8 lines goes on a pinned issue after each release.
+- Fact: CI has no token that can post a note (D-010, D-025). The flow tools read job logs, not artifacts (D-021).
+- Decision (`herald.summary`, `floor summary`, the `herald` job, `.floor/flows/release-summary.yml`, tested in `test_herald.py` and `test_flows.py`):
+  1. `floor summary` makes at most 7 lines from the signed manifest and `out/herald/who.md`: a head line (decision, commit, image digest, Pareto, SCI), one short line each for CPU, memory and connectivity from the manifest, and the Language, "Left behind" and "Not measured" lines of `who.md` as they are. More than 7 lines is an error.
+  2. The `herald` job prints `summary issue: $FLOOR_SUMMARY_ISSUE` and the summary between `--- BEGIN summary ---` and `--- END summary ---`. `FLOOR_SUMMARY_ISSUE` (in `.gitlab-ci.yml`) is the IID of the pinned issue. Empty means "post nothing".
+  3. The flow: the trigger "Pipeline events: Passed" starts it. `gate` (no tools) answers "passed" only for a passed default-branch pipeline whose `release` and `herald` builds passed. `post` (tools `get_job_logs`, `create_issue_note`) stops unless the release log has a `released:` line, so a pipeline that made no release posts nothing. It copies the summary as it is and adds one line with the tag: `Release: `<tag>` (pipeline <id>).` So the note has at most 8 lines.
+- Why the tag line is the agent's: the release job, not the herald job, knows the tag, and it runs after herald. The agent copies the tag from the `release <tag> from` line. It writes no floor value (F5.1).
+- Not proven yet: the tool name `create_issue_note` (the catalog does not check tool names, D-021), and whether "Pipeline events: Passed" fires for a pipeline that an auto-merge started (only an action by a person fires a trigger, D-021). A local session checks both on the first release.
+- PRD impact: F12.3 (the note is posted by a flow, not by CI).
+
+## D-033 (2026-10-19) T-63: the field triage flow answers from the gate's proof; it runs no new reproduction
+- PRD F11.1: a flow on the work-item-created trigger classifies floor symptoms (illegal instruction, exit code 132, OOM, language accuracy). F11.2: it reproduces the problem on the matching CPU model and replies with the working artifact and proof; it asks for `ld.so --help` output when the CPU is unknown.
+- Fact: a flow has no runner and no tool that runs QEMU. The gate already runs the four probe models (qemu64, Nehalem, SandyBridge, EPYC-Milan) for every release, and the signed manifest records the ggml CPU variant that ran on each (`dispatch`).
+- Decision (draft, `.floor/flows/field-triage.yml`, tested in `test_flows.py`): `gate` (no tools) answers "cpu", "memory", "language" or "skip". `reply` (tool `create_issue_note` only) maps the reporter's CPU to a probe model by a fixed table, points to the latest `-floor` release and its "Who this release serves" part, and asks for `/lib64/ld-linux-x86-64.so.2 --help` and the CPU model when the CPU is unknown. It states no floor value.
+- Deviation: no new reproduction per issue. The proof is the probe run of the release, not a run made for the issue.
+- Not proven yet: that the trigger list has a work-item-created trigger, the shape of its event, and that a component input can take `context:gate.final_answer`. A local session checks these before it saves the flow.
+- PRD impact: F11.2 (the proof is the release's probe run).

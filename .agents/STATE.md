@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-19 · @JaiadityaS · session 7 (T-53, T-23, T-64, T-62)
+Last update: 2026-10-19 · @JaiadityaS · session 8, cloud (T-61 code, T-63 draft)
 
 ## Where we are
 
@@ -34,15 +34,22 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (T-53, T-23, T-64, T-62)
    - English is the control. Its small f16 WER must be low (about 10%). If it is not, look for a fault in the scoring first, and do not commit the table.
    - Commit it as `.floor/evidence/language/language.json`, add a row to `.floor/evidence/README.md`, check the page (`python -m floor page`), add the log lines, and set T-62 to done.
    - A cloud session has no `gh` login. If it cannot read the run, leave this item to a local session.
-2. T-61 (PRD F12.3, SHOULD): a summary of at most 8 lines on a pinned issue after each release. Not started. CI has no token that can post a note (D-010, D-025). Plan: `floor summary` (from the signed manifest and `who.md`) in the `herald` job, printed in its log between markers. Then a private flow, started by "Pipeline events: Passed", exits unless the pipeline made a release, and copies the summary from the job log to the pinned issue with an issue-note tool. The code and the tests can be done in the cloud. The flow, its trigger and the issue need a local session (catalog work in the browser). T-63 (F11, field triage) is also a flow: check in the trigger list if a work-item-created trigger exists.
-3. GitLab sync: the T-23, T-64 and T-62 changes (the page, the README, the evidence) are not on GitLab yet. Only a local session syncs (standing yes, after a dry run and a residue check). Sync once after item 1, because each sync starts a fix MR.
-4. MR !6 (pipeline 2961810145, the canned image) passed every job (EPYC-Milan 1449 s, attest, herald). It is in the log. The user decides whether to close or merge it.
-5. T-90 README: update the numbers before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
+2. T-61 (PRD F12.3, D-032): the code is done in session 8 (cloud). `floor summary` makes at most 7 lines from the signed manifest and `who.md`. The `herald` job prints `summary issue: $FLOOR_SUMMARY_ISSUE` and the summary between `--- BEGIN summary ---` and `--- END summary ---`. The flow is `.floor/flows/release-summary.yml`. A local session must:
+   - sync to GitLab (item 4), then make the issue "Rieux release summaries", pin it, and set its IID in `FLOOR_SUMMARY_ISSUE` (`.gitlab-ci.yml` variables; a commit, then a sync).
+   - check the tool name `create_issue_note` in the catalog tool list (the catalog does not check names, D-021). If the name differs, change the flow and `test_release_summary_flow`.
+   - save the flow as a private catalog flow, read the stored definition back (D-020), and add the trigger "Pipeline events: Passed".
+   - after the next release (a merged fix MR of a tag, D-024), check the note: at most 8 lines, the same text as the herald log, and the tag line. Check also that the trigger fires for a pipeline that an auto-merge started.
+3. T-63 (F11, D-033): a draft only, `.floor/flows/field-triage.yml` and its test. Not in the catalog. A local session checks in the trigger list whether a work-item-created trigger exists, and the shape of its event. If it exists: save the flow, add the trigger, and run AC-F11 (a test issue about a crash on a Sandy Bridge desktop; an answer in under 15 min). If not: write that in D-033 and set T-63 to cut.
+4. GitLab sync: the T-23, T-64, T-62, T-61 and T-63 changes (the page, the README, the evidence) are not on GitLab yet. Only a local session syncs (standing yes, after a dry run and a residue check). Sync once after item 1, because each sync starts a fix MR.
+5. MR !6 (pipeline 2961810145, the canned image) passed every job (EPYC-Milan 1449 s, attest, herald). It is in the log. The user decides whether to close or merge it.
+6. T-90 README: update the numbers before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
 
 ## Needs a human (agents cannot do these)
 
 - [ ] T-01: access is confirmed (D-010). Still open: the Duo credit pool.
 - [ ] Sync to GitLab after each finished step. In PowerShell, from `project_darwin`: `& "C:\Program Files\Git\bin\bash.exe" scripts/assemble-gitlab.sh --push` (plain `bash` there is WSL). The push is in your name. The Showcase project is public, so a push is publishing. On 2026-10-19 the user gave a standing yes for the sync script only, after a dry run and a residue check (author and committer are the user; no trailer; no tool or vendor names in the diff or the paths). Never push this repo itself to GitLab.
+- [ ] T-61: make and pin the issue "Rieux release summaries" in the Showcase project, and save the release-summary flow with the trigger "Pipeline events: Passed" (STATE item 2, D-032).
+- [ ] T-63: check in the trigger list whether a work-item-created trigger exists (STATE item 3, D-033).
 - [ ] Add the GitLab usernames of teammates to `FLOOR_HUMANS` in `.gitlab-ci.yml`. Every other pipeline user counts as an agent (D-014).
 - [ ] T-05: decide whether to turn on "Pipelines must succeed" (Settings → Merge requests). Now it is off, so an auto-merge set before the MR pipeline exists can merge at once (D-010).
 - [ ] T-04: the Duo CLI in CI needs a service-account access token (scopes `api`, `ai_features`) as a masked CI variable. A group owner makes service accounts. Without it, Herald stays a template (D-025), and the submission says so.

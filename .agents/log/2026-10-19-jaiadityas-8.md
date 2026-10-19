@@ -1,0 +1,10 @@
+# 2026-10-19 jaiadityas session 8 (cloud)
+- Tasks: T-61 (code), T-63 (draft)
+- Done:
+  - T-61 (D-032): `herald.summary` and `floor summary` (`.floor/floor/herald.py`, `.floor/floor/cli.py`): at most 7 lines from the signed manifest and `who.md`. The `herald` job in `.gitlab-ci.yml` writes `out/herald/summary.md` and prints `summary issue: $FLOOR_SUMMARY_ISSUE` and the summary between `--- BEGIN summary ---` and `--- END summary ---`. New variable `FLOOR_SUMMARY_ISSUE` (empty). The flow `.floor/flows/release-summary.yml`: a gate with no tools, then `post` with `get_job_logs` and `create_issue_note`; it stops unless the release log has `released:`, and adds one tag line, so the note has at most 8 lines.
+  - T-63 (D-033): the draft `.floor/flows/field-triage.yml`: a gate sorts the issue (cpu, memory, language, skip); `reply` (only `create_issue_note`) maps the CPU to a probe model, points to the release proof, and asks for `ld.so --help` when the CPU is unknown.
+  - Tests: `test_summary_is_short_and_copies_who`, `test_summary_never_hides_a_raise_and_keeps_the_limit`, `test_summary_cli`, `test_herald_job_prints_the_summary`, `test_release_summary_flow`, `test_field_triage_flow`.
+- Verified: `python -m pytest .floor/tests -q -p no:cacheprovider`: 262 passed, 5 skipped (this container has the Linux tools, so fewer skips than 11). `floor summary` on `.floor/evidence/release/floor-manifest.json` gives 6 lines; an older manifest without `download_mb` gives no "?".
+- Open: every catalog step (STATE items 2 and 3): the pinned issue and `FLOOR_SUMMARY_ISSUE`, the tool name `create_issue_note`, saving both flows, the triggers, the first note after a release, AC-F11. The language run 39214706460 (STATE item 1) and the GitLab sync stay with a local session.
+- Gotchas: in `.gitlab-ci.yml`, a script line `echo "summary issue: ..."` must be quoted, because `: ` makes it a YAML map. The release tag is known only in the release job (after herald), so the flow adds the tag line.
+- Branch: main
