@@ -20,6 +20,7 @@ import argparse
 import io
 import json
 import os
+import signal
 import subprocess
 import sys
 import threading
@@ -229,6 +230,18 @@ class Handler(BaseHTTPRequestHandler):
                          "processing_seconds": round(time.monotonic() - started, 2)})
 
 
+def exit_text(code: int) -> str:
+    """How whisper-server ended, for the log. SIGILL: this CPU has no instruction that the build used (H-1)."""
+    if code >= 0:
+        return f"whisper-server exited with code {code}"
+    try:
+        name = signal.Signals(-code).name
+    except ValueError:
+        name = f"signal {-code}"
+    lacks = ": this CPU lacks an instruction that the build uses" if -code == signal.SIGILL else ""
+    return f"whisper-server stopped by {name}{lacks}"
+
+
 def serve(port: int, model: str, server_bin: str, threads: int) -> int:
     """Starts whisper-server on 127.0.0.1:8081 with a 30 s cap, then the gateway. Exits when whisper-server exits."""
     cmd = [server_bin, "-m", model, "--host", "127.0.0.1", "--port", "8081", "-t", str(threads),
@@ -249,6 +262,7 @@ def serve(port: int, model: str, server_bin: str, threads: int) -> int:
     thread.start()
     print(f"rieux gateway on :{port}, whisper-server pid {child.pid}", file=sys.stderr)
     code = child.wait()
+    print(exit_text(code), file=sys.stderr)
     gateway.shutdown()
     return code or 1
 

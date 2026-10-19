@@ -119,3 +119,9 @@
 
 ## T-90: README stage table
 - Create now says "Runs": the flow opened fix MRs !2 and !3.
+
+## T-52: the service job records its CPU
+- Main pipeline 2961114166 (upstream image, built on a Xeon Platinum 8581C, x86-64-v4): the `service` job failed. whisper-server stopped while it loaded the model; the log has no exit code. MR pipeline 2961110649 (canned image): `service` passed.
+- Done: the job writes `out/service/cpu.txt` (`facts.sh --cpu`) and, on a failed start, the container exit state and `out/service/service.log`. The gateway logs how whisper-server ended (`gateway.exit_text`, SIGILL named).
+- Verified: 232 passed, 11 skipped.
+- Open: read `cpu.txt` and the exit state in the next main pipeline; a SIGILL on a runner older than the build runner is H-1 evidence.

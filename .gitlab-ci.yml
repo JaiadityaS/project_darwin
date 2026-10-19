@@ -187,6 +187,8 @@ service:
       echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
       mkdir -p out/service
       echo "$CI_JOB_URL" > out/service/job-url.txt
+      # The CPU of this job: the image may stop on a runner that is older than the build runner (H-1).
+      sh .gitlab/ci/facts.sh --cpu | tee out/service/cpu.txt
       docker build --progress=plain -f deploy/service.Dockerfile --build-arg IMAGE="$IMAGE_REF" -t rieux-service . \
         > /tmp/service-build.log 2>&1 || { tail -n 40 /tmp/service-build.log; exit 1; }
       cp /tmp/service-build.log out/service/build.log
@@ -196,7 +198,12 @@ service:
         if wget -q -O /dev/null http://docker:8080/healthz 2>/dev/null; then ok=1; break; fi
         sleep 2
       done
-      if [ "$ok" != 1 ]; then docker logs rieux-service 2>&1 | tail -n 40; exit 1; fi
+      if [ "$ok" != 1 ]; then
+        docker inspect -f 'container {{.State.Status}}, exit code {{.State.ExitCode}}' rieux-service || true
+        docker logs rieux-service > out/service/service.log 2>&1 || true
+        tail -n 40 out/service/service.log
+        exit 1
+      fi
       # curl, not BusyBox wget: its post-file option sets Content-Length with strlen(), so it cuts binary
       # data at the first zero byte (pipeline 2960896128 got 400 for jfk.wav).
       apk add --no-cache curl > /dev/null

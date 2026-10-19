@@ -177,3 +177,13 @@ def test_service_ci_job():
     assert "--data-binary @samples/jfk.wav http://docker:8080/transcribe" in script and 'grep -qi "$EXPECT"' in script
     assert "--post-file" not in script  # BusyBox wget cuts binary bodies at the first zero byte
     assert "docker push" not in script
+    # Pipeline 2961114166: the container stopped while it loaded the model. The job now records its
+    # CPU and the exit state, so the cause is evidence and not a guess.
+    assert "sh .gitlab/ci/facts.sh --cpu | tee out/service/cpu.txt" in script
+    assert "{{.State.ExitCode}}" in script and "> out/service/service.log" in script
+
+
+def test_exit_text():
+    assert gateway.exit_text(0) == "whisper-server exited with code 0"
+    assert gateway.exit_text(-4) == "whisper-server stopped by SIGILL: this CPU lacks an instruction that the build uses"
+    assert gateway.exit_text(-200) == "whisper-server stopped by signal 200"
