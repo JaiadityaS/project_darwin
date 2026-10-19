@@ -272,6 +272,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - The upload page shows the two values in one line.
 - Deviation: there is no deployed service yet (T-06 is parked), so no nightly job. The `service` job of each pipeline asks `GET /floor` after the transcription and keeps `out/service/floor.json`. The job fails if the answer has no host level. The nightly job comes with the deploy (T-51).
 - Evidence 1 (2026-10-19): main pipeline 2961779904, service job 17274060434, the upstream image: `host_level` x86-64-v4 (an 8581C, the same as `cpu.txt`), `ggml_cpu_variant` null, with the note about the backend-loader line. That is right for a static CPU backend.
+- Evidence 2 (2026-10-19): fix MR !6 pipeline 2961810145, service job 17274238498, the canned image (`GGML_BACKEND_DL=ON`): `host_level` x86-64-v4 (an 8581C), `ggml_cpu_variant` `sapphirerapids`. The loader took the best variant for the host, as expected.
 - PRD impact: F13.4 ("the nightly job records it" becomes "the service job of each pipeline records it" until T-51).
 
 ## D-029 (2026-10-19) T-23: the backtest footprint counts blob bytes and runner time

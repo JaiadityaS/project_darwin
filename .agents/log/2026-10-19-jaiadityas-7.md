@@ -142,6 +142,7 @@
 - Tests: `test_host_cpu`, `test_relay_keeps_the_log_and_the_variant`, `test_floor_endpoint`, `test_page_shows_the_server_cpu`, and `test_service_ci_job`.
 - Verified: 237 passed, 11 skipped.
 - Result 1: main pipeline 2961779904 (sync f5f6650d), service job 17274060434: `host_level` x86-64-v4 (an 8581C, the same as `cpu.txt`), `ggml_cpu_variant` null with the note. Right for the static backend of the upstream image.
+- Result 2: fix MR !6 pipeline 2961810145, service job 17274238498, the canned image (`GGML_BACKEND_DL=ON`): `host_level` x86-64-v4 (an 8581C), `ggml_cpu_variant` `sapphirerapids`. Both images give the expected answer, so T-53 is done. The nightly job waits for the deploy (T-51).
 - Open: the first GitLab run. Main has the upstream image (static backend), so its `floor.json` should have no variant and the note. The next fix MR has the canned image (`GGML_BACKEND_DL=ON`), so its `floor.json` should name a variant. Check both; do not assume.
 - Also checked: the live Rieux page (https://showcase-9a1941.gitlab.io/) has the title Rieux and all the F12.2 sections, so the open item of T-60 is done.
 - T-14: already done in fact: `judge.py` writes `dispatch` into the signed manifest (MR !5: EPYC-Milan haswell, Nehalem sse42, SandyBridge sandybridge, qemu64 x64). Marked done.
