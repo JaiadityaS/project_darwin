@@ -1,0 +1,288 @@
+{
+  "query": "repo:ggml-org/whisper.cpp \"illegal instruction\"",
+  "searched": "2026-10-19",
+  "source": "gh api -X GET search/issues -f q='repo:ggml-org/whisper.cpp \"illegal instruction\"' -f per_page=100",
+  "total_count": 39,
+  "hits": [
+    {
+      "number": 7,
+      "pull_request": false
+    },
+    {
+      "number": 12,
+      "pull_request": false
+    },
+    {
+      "number": 66,
+      "pull_request": false
+    },
+    {
+      "number": 83,
+      "pull_request": false
+    },
+    {
+      "number": 91,
+      "pull_request": false
+    },
+    {
+      "number": 199,
+      "pull_request": false
+    },
+    {
+      "number": 238,
+      "pull_request": false
+    },
+    {
+      "number": 285,
+      "pull_request": true
+    },
+    {
+      "number": 290,
+      "pull_request": false
+    },
+    {
+      "number": 358,
+      "pull_request": false
+    },
+    {
+      "number": 470,
+      "pull_request": false
+    },
+    {
+      "number": 486,
+      "pull_request": true
+    },
+    {
+      "number": 563,
+      "pull_request": true
+    },
+    {
+      "number": 597,
+      "pull_request": false
+    },
+    {
+      "number": 610,
+      "pull_request": false
+    },
+    {
+      "number": 628,
+      "pull_request": true
+    },
+    {
+      "number": 722,
+      "pull_request": false
+    },
+    {
+      "number": 789,
+      "pull_request": false
+    },
+    {
+      "number": 794,
+      "pull_request": false
+    },
+    {
+      "number": 824,
+      "pull_request": false
+    },
+    {
+      "number": 828,
+      "pull_request": false
+    },
+    {
+      "number": 967,
+      "pull_request": false
+    },
+    {
+      "number": 997,
+      "pull_request": false
+    },
+    {
+      "number": 1203,
+      "pull_request": false
+    },
+    {
+      "number": 1261,
+      "pull_request": true
+    },
+    {
+      "number": 1279,
+      "pull_request": false
+    },
+    {
+      "number": 1394,
+      "pull_request": false
+    },
+    {
+      "number": 1694,
+      "pull_request": true
+    },
+    {
+      "number": 2172,
+      "pull_request": false
+    },
+    {
+      "number": 2259,
+      "pull_request": false
+    },
+    {
+      "number": 2372,
+      "pull_request": false
+    },
+    {
+      "number": 2928,
+      "pull_request": false
+    },
+    {
+      "number": 3012,
+      "pull_request": false
+    },
+    {
+      "number": 3117,
+      "pull_request": false
+    },
+    {
+      "number": 3510,
+      "pull_request": false
+    },
+    {
+      "number": 3525,
+      "pull_request": false
+    },
+    {
+      "number": 3699,
+      "pull_request": true
+    },
+    {
+      "number": 3814,
+      "pull_request": false
+    },
+    {
+      "number": 3920,
+      "pull_request": true
+    }
+  ],
+  "n": 20,
+  "seed": 64,
+  "labels": [
+    {
+      "number": 7,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/7",
+      "label": "floor",
+      "reason": "A comment: a Raspberry Pi Zero W (ARMv6) built with -mfpu=neon-fp-armv8 crashes with \"Illegal instruction\". With -mfpu=vfp and the NEON code removed, it runs."
+    },
+    {
+      "number": 12,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/12",
+      "label": "floor",
+      "reason": "An i5-3470 (Ivy Bridge) stops at _mm256_fmadd_ps. The maintainer: x86 builds then needed FMA and F16C; remove -mavx -mavx2 -mfma -mf16c and rebuild."
+    },
+    {
+      "number": 66,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/66",
+      "label": "floor",
+      "reason": "An Apple M1 Max with an old x86 Homebrew: the Makefile added -mavx -mavx2 -mfma -mf16c (the maintainer saw this), and the x86 binary crashed with SIGILL. A native arm64 toolchain fixed it."
+    },
+    {
+      "number": 91,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/91",
+      "label": "unknown",
+      "reason": "A container on the AWS Lambda x86 Node.js image gives \"Illegal instruction\". The reporter moved to the arm64 image; the thread does not show the cause on x86."
+    },
+    {
+      "number": 238,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/238",
+      "label": "floor",
+      "reason": "A 2011 MacBook Pro (Sandy Bridge: AVX, no AVX2, no F16C). A build without -mavx works (slowly). The maintainer: this CPU is not fully supported."
+    },
+    {
+      "number": 285,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/285",
+      "label": "floor",
+      "reason": "A pull request, with a comment: a Mac Pro 6,1 (Xeon E5, no AVX2) had \"Illegal Instruction\" until the build used WHISPER_NO_AVX2."
+    },
+    {
+      "number": 563,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/563",
+      "label": "floor",
+      "reason": "A pull request: CMake support for Linux machines without AVX2, to avoid \"Illegal instruction (core dumped)\" at run time."
+    },
+    {
+      "number": 597,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/597",
+      "label": "floor",
+      "reason": "A Mac Pro 5,1 (Xeon X5675: no AVX, no F16C) built with -mf16c crashes. With the flag removed from the Makefile, \"everything worked\"."
+    },
+    {
+      "number": 610,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/610",
+      "label": "floor",
+      "reason": "An i7-2620M (Sandy Bridge: AVX, no AVX2). With the -mavx lines of the Makefile commented out, it works."
+    },
+    {
+      "number": 789,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/789",
+      "label": "likely",
+      "reason": "A Xeon E5-2697 v2: its /proc/cpuinfo in the issue has avx and f16c but no avx2 and no fma. A second reporter's crash on a 2012 Xeon went away on a 2022 CPU. Nobody confirmed a fix for the first reporter."
+    },
+    {
+      "number": 828,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/828",
+      "label": "floor",
+      "reason": "An i5-2520M (ThinkPad X220, Sandy Bridge, no F16C) stops at vcvtph2ps, an F16C instruction, in ggml_init."
+    },
+    {
+      "number": 997,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/997",
+      "label": "unknown",
+      "reason": "An Apple M1 Max build with CLBlast gives \"Illegal instruction: 4\". No comments; the cause is not shown."
+    },
+    {
+      "number": 1261,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/1261",
+      "label": "floor",
+      "reason": "A pull request: choose the x86 instruction sets at run time, so one binary runs on many machines \"without encountering illegal instruction errors\"."
+    },
+    {
+      "number": 1279,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/1279",
+      "label": "unknown",
+      "reason": "An Intel N4200 (no AVX) with an OpenVINO build crashes. A CLBlast build works on the same machine, so the thread does not show the cause."
+    },
+    {
+      "number": 1394,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/1394",
+      "label": "unknown",
+      "reason": "Mostly an OpenVINO model-load error (bad magic). One reporter shows \"illegal instruction\" in a screenshot, with no cause."
+    },
+    {
+      "number": 2372,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/2372",
+      "label": "not-floor",
+      "reason": "The \"Illegal instruction\" is an error of the Ascend NPU device (\"usually caused by unaligned UUB addresses\"), not of the host CPU."
+    },
+    {
+      "number": 2928,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/2928",
+      "label": "floor",
+      "reason": "A build on a new machine turns on AVX-512, and the binary fails on older computers \"due to illegal instructions\". The maintainers closed it as fixed."
+    },
+    {
+      "number": 3117,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/3117",
+      "label": "not-floor",
+      "reason": "A segmentation fault in Termux. The words \"illegal instruction\" only refer to an earlier, different issue."
+    },
+    {
+      "number": 3510,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/3510",
+      "label": "floor",
+      "reason": "The image main-a1867e0 exits with code 132 on a 2024 laptop chip and other CPUs; an image from two weeks before works. Rieux found x86-64-v4 code in it and reproduced the crash under QEMU (README, F10.2)."
+    },
+    {
+      "number": 3699,
+      "url": "https://github.com/ggml-org/whisper.cpp/issues/3699",
+      "label": "floor",
+      "reason": "A pull request: AVX and AVX-512 code runs although the OS does not save those registers, which gives SIGILL. It gates the dispatch on XGETBV."
+    }
+  ]
+}

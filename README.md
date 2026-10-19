@@ -17,6 +17,7 @@ The official whisper.cpp images crash with "illegal instruction" on normal compu
 
 - [#3510](https://github.com/ggml-org/whisper.cpp/issues/3510): the image `main-a1867e0` exits with code 132 at startup. Reporters had a 2024 laptop chip and a 2020 desktop chip. An image from two weeks before works. A stale bot closed the issue. There is no fix, and a user reported it again on 2026-10-03.
 - [#3814](https://github.com/ggml-org/whisper.cpp/issues/3814): `main-cuda` crashes on a 2020 desktop CPU, and the CPU image works on the same machine. A stale bot closed it too.
+- These two are not alone. A GitHub search for "illegal instruction" in whisper.cpp finds 39 issues and pull requests. We read a seeded sample of 20: 13 are crashes from instructions that the CPU could not run (65%), 4 do not show the cause, and 2 are about other things ([`spotcheck/`](.floor/evidence/spotcheck/illegal-instruction-2026-10-19.json)).
 
 The cause is in the build:
 

@@ -151,3 +151,10 @@
 - Result: 121 images, 27,470 MB (CPU images about 153 MB each, CUDA images about 302 MB each), 18.4 runner-minutes. Spot check: `main-e6234cd4` app layer 148,057,889 bytes; `main-0c7be696` 158,927,554 bytes.
 - Tests: `test_footprint_adds_the_downloaded_blobs_and_the_job_times`, `test_download_sizes_reads_the_manifest_and_the_config`, and a line in `test_page_from_repo_evidence`.
 - Verified: 239 passed, 11 skipped.
+
+## T-64: the spot check of the keyword counts (D-030)
+- The search `repo:ggml-org/whisper.cpp "illegal instruction"` gives 39 hits (31 issues, 8 pull requests). Seeded sample (`random.Random(64)`, 20): #7 #12 #66 #91 #238 #285 #563 #597 #610 #789 #828 #997 #1261 #1279 #1394 #2372 #2928 #3117 #3510 #3699.
+- I read each thread (all comments; #7 has 156) and gave one label with a reason. Result: 13 floor, 1 likely (#789), 4 unknown (#91 #997 #1279 #1394), 2 not-floor (#2372 NPU device error, #3117 words in passing). True positives 65%.
+- Done: `spotcheck.py`, `floor spotcheck`, `.floor/evidence/spotcheck/illegal-instruction-2026-10-19.json`, a line in the README problem section.
+- Tests: `test_spotcheck.py` (4 tests). Verified: 243 passed, 11 skipped.
+- Not checked: the other keyword counts of PRD §3.2 and the llama.cpp count. Do not use them in the Devpost text (T-92).

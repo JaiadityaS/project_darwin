@@ -83,7 +83,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 | T-61 | Pinned issue summary | F12.3 | later | - | |
 | T-62 | Language served / not-served table | F9 | later | - | |
 | T-63 | Field triage flow | F11 | later | - | |
-| T-64 | 20-issue spot check of the keyword counts | §3.2 | later | - | |
+| T-64 | 20-issue spot check of the keyword counts | §3.2 | done | @JaiadityaS | Done (D-030): `floor spotcheck .floor/evidence/spotcheck/illegal-instruction-2026-10-19.json`. 20 of the 39 "illegal instruction" hits: 13 floor (65%), 1 likely, 4 unknown, 2 not-floor. Only this keyword is checked; the README uses only this count |
 
 ## Submission (Oct 24–26)
 

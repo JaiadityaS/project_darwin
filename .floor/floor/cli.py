@@ -15,7 +15,7 @@ import requests
 
 from . import __version__
 from . import (attest, backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice,
-               herald, offline, page, paths, policy, qemu, ratchet, release)
+               herald, offline, page, paths, policy, qemu, ratchet, release, spotcheck)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -121,6 +121,12 @@ def _cmd_backtest_footprint(args: argparse.Namespace) -> int:
         _write_json(Path(args.out), {"tool": f"floor {__version__}", "repo": args.repo, **result})
     print(f"Images: {result['images']}  downloaded: {result['download_mb']} MB  "
           f"runner time: {result['runner_minutes']} min in {len(result['runs'])} run(s)")
+    return 0
+
+
+def _cmd_spotcheck(args: argparse.Namespace) -> int:
+    result = spotcheck.summary(_read_json(args.labels))
+    print(spotcheck.text(result))
     return 0
 
 
@@ -811,6 +817,10 @@ def main(argv: list[str] | None = None) -> int:
     bf.add_argument("--repo", default=DEFAULT_REPO, help="image repository")
     bf.add_argument("--out", metavar="FILE", help="write the result as JSON")
     bf.set_defaults(func=_cmd_backtest_footprint)
+
+    sc = sub.add_parser("spotcheck", help="true-positive rate of the keyword counts from a labelled sample (PRD §3.2)")
+    sc.add_argument("labels", help="the spot-check file: the search hits, the seed and one label per sampled hit")
+    sc.set_defaults(func=_cmd_spotcheck)
 
     hyp = sub.add_parser("h1", help="H-1 analysis: flips in a timeline vs changes in the floor paths (PRD F10.3)")
     hyp.add_argument("timeline", help="timeline JSON from floor timeline")

@@ -282,3 +282,12 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Deviation: F14.4 says CPU time. The jobs do not record CPU time, so the footprint gives runner time (job wall time), which is an upper bound per vCPU. No conversion to carbon: the footprint is bytes and minutes only.
 - Evidence (2026-10-19): `.floor/evidence/backtest/footprint-2026-10-15.json`: 121 images, 27,470 MB (main 61 images, 9,343 MB, about 153 MB each; main-cuda 60 images, 18,127 MB, about 302 MB each), 18.4 runner-minutes in sweep runs 38700707825 (9 jobs, 476 s) and 38701134589 (8 jobs, 625 s). The Rieux page shows it under the backtest.
 - PRD impact: F14.4 (runner time in place of CPU time).
+
+## D-030 (2026-10-19) T-64: the spot check covers the "illegal instruction" hits of whisper.cpp only
+- PRD §3.2: "A 20-issue spot check will report the true-positive rate before submission."
+- Decision (`floor spotcheck`, `spotcheck.py`, tested in `test_spotcheck.py`):
+  - The GitHub search `repo:ggml-org/whisper.cpp "illegal instruction"` found 39 hits on 2026-10-19 (31 issues, 8 pull requests), the same count as the PRD. The sample is 20 of them, drawn with `random.Random(64)`; the command draws it again and fails if the labels are for other issues.
+  - Each sampled hit has one label, read from its whole thread: `floor`, `likely`, `unknown` or `not-floor` (the rules are in `spotcheck.LABELS`). A pull request that fixes such crashes is `floor`. Every label has a reason and the issue link, so a person can check it.
+- Result: 13 floor, 1 likely, 4 unknown, 2 not-floor. The true-positive rate is 65% (70% with the likely one; at most 90%). The 2 false positives are an Ascend NPU device error and a thread that names the words only in passing.
+- Deviation: the labels are a reading of text, not a script result; the file says so. Only the "illegal instruction" count of whisper.cpp is checked. The other keyword counts of §3.2 (old CPU, Raspberry Pi, OOM, quantization) and the 88 llama.cpp hits are not checked, so the README and the Devpost text do not use them.
+- PRD impact: §3.2 (the spot check covers one keyword).
