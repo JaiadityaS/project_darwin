@@ -15,7 +15,7 @@ import requests
 
 from . import __version__
 from . import (attest, backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice,
-               offline, page, paths, policy, qemu, ratchet)
+               offline, page, paths, policy, qemu, ratchet, release)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -458,6 +458,55 @@ def _cmd_attest(args: argparse.Namespace) -> int:
         return 1
     print(f"attestation: verified, same predicate as the manifest on {statement['subject'][0]['name']}@sha256:"
           f"{statement['subject'][0]['digest']['sha256']}")
+    return 0
+
+
+def _cmd_release(args: argparse.Namespace) -> int:
+    session = requests.Session()
+    project = f"{args.api.rstrip('/')}/projects/{args.project}"
+
+    def get(path: str):
+        resp = session.get(project + path, timeout=30)
+        resp.raise_for_status()
+        return resp.json()
+
+    links = []
+    for item in args.link or []:
+        name, _, url = item.partition("=")
+        if not name or not url.startswith("https://"):
+            print(f"floor: --link needs NAME=https://..., not {item!r}", file=sys.stderr)
+            return 2
+        links.append({"name": name, "url": url})
+    try:
+        plan = release.plan(args.sha, args.default_branch, get)
+        if "skip" in plan:
+            print(f"no release: {plan['skip']}")
+            return 0
+        diff = Path(args.diff).read_text(encoding="utf-8") if args.diff else ""
+        verify = Path(args.verify).read_text(encoding="utf-8") if args.verify and Path(args.verify).exists() else None
+    except (requests.RequestException, OSError, ValueError, KeyError) as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    body = {"tag_name": plan["tag"], "ref": args.sha, "name": plan["tag"],
+            "description": release.notes(plan, diff, verify), "assets": {"links": links}}
+    if args.out:
+        _write_json(Path(args.out), body)
+    print(f"release {plan['tag']} from {args.sha[:8]}: the fix {plan['mr']} of pipeline {plan['pipeline']}")
+    if args.dry_run:
+        return 0
+    token = os.environ.get("CI_JOB_TOKEN")
+    if not token:
+        print("floor: no CI_JOB_TOKEN: floor release creates releases only in CI (or use --dry-run)", file=sys.stderr)
+        return 2
+    try:
+        resp = session.post(project + "/releases", json=body, headers={"JOB-TOKEN": token}, timeout=60)
+    except requests.RequestException as exc:
+        print(f"floor: {exc}", file=sys.stderr)
+        return 2
+    if resp.status_code >= 300:
+        print(f"floor: the Releases API answered {resp.status_code}: {resp.text[:500]}", file=sys.stderr)
+        return 1
+    print(f"released: {resp.json().get('_links', {}).get('self', plan['tag'])}")
     return 0
 
 
@@ -916,6 +965,18 @@ def main(argv: list[str] | None = None) -> int:
     at.add_argument("--token-env", default="SIGSTORE_ID_TOKEN", metavar="NAME",
                     help="the variable with the GitLab ID token (identity; default SIGSTORE_ID_TOKEN)")
     at.set_defaults(func=_cmd_attest)
+
+    rl = sub.add_parser("release", help="cut <tag>-floor.N after a fix MR of a tag pipeline merged (PRD F4.4)")
+    rl.add_argument("--sha", required=True, help="the commit of this default-branch pipeline")
+    rl.add_argument("--default-branch", required=True, help="the default branch, for example main")
+    rl.add_argument("--api", required=True, metavar="URL", help="GitLab API URL ($CI_API_V4_URL)")
+    rl.add_argument("--project", required=True, help="project id ($CI_PROJECT_ID)")
+    rl.add_argument("--diff", metavar="FILE", help="the floor diff of the manifest (floor manifest --diff)")
+    rl.add_argument("--verify", metavar="FILE", help="the verify command of the attest job")
+    rl.add_argument("--link", action="append", metavar="NAME=URL", help="a release asset link (repeat)")
+    rl.add_argument("--out", metavar="FILE", help="also write the release request as JSON")
+    rl.add_argument("--dry-run", action="store_true", help="decide and print, but create no release")
+    rl.set_defaults(func=_cmd_release)
 
     args = parser.parse_args(argv)
     return args.func(args)

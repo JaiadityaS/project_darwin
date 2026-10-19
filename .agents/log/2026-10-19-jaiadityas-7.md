@@ -96,3 +96,8 @@
 - Done: `floor attest` (`attest.py`: predicate, identity, check) and the `attest` job of `.gitlab-ci.yml` (after a passed judge; keyless with the GitLab ID token; cosign v2.6.5 with a pinned SHA-256). Test `test_attest.py`.
 - Verified: 217 passed, 11 skipped. `test_gateway.py::test_limits` failed once with a Windows socket abort and then passed 3 times; it is not related.
 - Open: the first run on GitLab needs a passed judge (the next fix MR).
+
+## T-42: the release job (D-024)
+- Done: `floor release` (`release.py`) and the `release` job of `.gitlab-ci.yml`. The workflow skips `-floor.N` tag pipelines. The judge and attest jobs write `job-url.txt` for the release links.
+- Verified: 223 passed, 11 skipped.
+- Open: the first real run (a human tag push, then a merged fix MR); check the tag permission of the job token then.

@@ -218,3 +218,13 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - cosign v2.6.5 (the v2 line, still maintained): v2 keeps the attestation next to the image as a `.att` tag, which every registry can store. The job downloads the binary from the GitHub release and checks its SHA-256 (pinned; the asset digest and `cosign_checksums.txt` agree). The tools image does not change, so no other job pulls a larger image.
 - Not yet: attaching the attestation to the GitLab Release (T-42), and two releases with a diff (AC-F5).
 - PRD impact: none.
+
+## D-024 (2026-10-19) T-42: the release job cuts `<tag>-floor.N` only after a merged fix of a tag
+- PRD F4.4 and AC-F4a: a tag built with upstream's default flags ends as a live `-floor.1` release, and no human acts after the tag push. D-010: the release job on `main` uses `CI_JOB_TOKEN`.
+- Decision (`.gitlab-ci.yml` job `release`, `floor release`, tested in `test_release.py`):
+  - The job runs on the default branch after `judge` and `attest`, so only when the gate held and the manifest is signed.
+  - `floor release` (a script) decides. The commit must be the merge of a `floor-fix/<pipeline id>` MR into the default branch, and that pipeline must be a tag pipeline. Then the release is `<tag>-floor.N`, where N is one more than the highest N of that tag. Any other commit (a sync push, a fix of a branch pipeline) gets no release, and the job passes.
+  - The job posts to the Releases API with `CI_JOB_TOKEN`; GitLab makes the tag from `ref` (the merged commit). The description has the floor diff, the fix MR and the cosign verify command. The links are the manifest (judge job) and the verify command (attest job).
+  - Workflow rule: no pipeline for a `-floor.N` tag. The default-branch pipeline of the same commit already proved and signed it, and a second run would only use runner time.
+- Facts still to check on the first run: whether the job token of that pipeline may create the tag (protected tags are a Maintainer setting, D-010), and who the pipeline user is after an auto-merge (T-05).
+- PRD impact: F4.4 (the default-branch pipeline makes the release; no merge-bot token, D-010).

@@ -25,7 +25,7 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (T-40 flow run, D-022)
 | G-1 CPU proof | Oct 15 | **met**: cpu-proof run 38702242235 (AC-F2, AC-F3); see "Facts learned" |
 | G-2 Backtest and H-1 | Oct 16 | client done (T-20); T-21 and T-22 done. H-1 is supported: 11 of 38 commits built as both `main` and `main-cuda` have different floors |
 | G-3 Gate integrity | Oct 18 | code ready (`floor ratchet`, `floor paths`, `floor notice`, `.gitlab/CODEOWNERS`). The check job of `.gitlab-ci.yml` runs them (D-014), and the first pipeline ran (2958271425). Open: the proof MRs (T-05). Protected settings need a Maintainer (D-010) |
-| G-4 Release loop | Oct 22 | started: `floor fallback` (T-41) and `floor notice-draft` with its CI job (T-43, D-016), both tested locally. T-41 CI job done (D-018). The flow (T-40, D-021) opened its first fix MR (!1). The `attest` job (T-34, D-023) signs the manifest after a passed judge. Open: a fix MR that passes the gate (harness fixed, D-022) and its first attestation, auto-merge (T-05), the release job (T-42) |
+| G-4 Release loop | Oct 22 | started: `floor fallback` (T-41) and `floor notice-draft` with its CI job (T-43, D-016), both tested locally. T-41 CI job done (D-018). The flow (T-40, D-021) opened its first fix MR (!1). The `attest` job (T-34, D-023) signs the manifest after a passed judge, and the `release` job (T-42, D-024) cuts `<tag>-floor.N` after a merged fix of a tag. Open: a fix MR that passes the gate (harness fixed, D-022) and its first attestation, auto-merge (T-05), the release job (T-42) |
 
 ## Next agent: start here
 

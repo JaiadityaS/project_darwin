@@ -14,17 +14,21 @@
 #   fallback      only after a failed judge: the canned inclusive config as a patch for the branch (F4.3)
 #   notice-draft  only after a failed judge: drafts the Leave-Behind Notice for a code owner (F4.5)
 #   attest  only after a passed judge: signs the manifest on the image digest, keyless (F5.4)
+#   release default branch, after attest: cuts <tag>-floor.N when the commit merged a fix of a tag (F4.4)
 #   pages   the Rieux page from the committed evidence (default branch only)
 #
 # Evidence: the artifacts below out/ (the judge job keeps all of them).
 # SCI per release check (R2): each job that uses the tools image meters its own container, and
 # the judge job adds the meters into out/judge/meter.json (DECISIONS D-015).
-# Not here yet: herald, release, deploy.
+# Not here yet: herald, deploy.
 
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "web"
+    # The release job made this tag, after the pipeline of the same commit proved and signed it (D-024).
+    - if: $CI_COMMIT_TAG =~ /-floor\.[0-9]+$/
+      when: never
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
@@ -329,6 +333,7 @@ judge:
   script:
     - |
       mkdir -p out/judge
+      echo "$CI_JOB_URL" > out/judge/job-url.txt
       set --
       for f in out/probe/*.json; do
         if [ -e "$f" ]; then set -- "$@" --probe "$f"; fi
@@ -446,6 +451,7 @@ attest:
       cosign version 2>&1 | grep -E '^GitVersion'
     - |
       mkdir -p out/attest
+      echo "$CI_JOB_URL" > out/attest/job-url.txt
       type="$(floor attest predicate --manifest out/judge/floor-manifest.json --out out/attest/predicate.json)"
       identity="$(floor attest identity)"
       echo "predicate type: $type"
@@ -460,6 +466,31 @@ attest:
         "$type" "$identity" "$CI_SERVER_URL" "$IMAGE_REF" | tee out/attest/verify.txt
   artifacts:
     paths: [out/attest/]
+
+# F4.4 (T-42, D-024): a fix MR merged and the gate held again, so cut <tag>-floor.N from the merged commit.
+# floor release finds the fix MR of this commit and the tag pipeline that the fix repaired. Any other
+# commit gets no release. The Releases API makes the tag from ref, with CI_JOB_TOKEN (D-010).
+release:
+  stage: publish
+  extends: .evidence
+  image: python:3.12-slim
+  needs: [judge, attest]
+  interruptible: false
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    GIT_DEPTH: "1"
+  script:
+    - pip install -q -e ./.floor
+    - |
+      floor release --sha "$CI_COMMIT_SHA" --default-branch "$CI_DEFAULT_BRANCH" \
+        --api "$CI_API_V4_URL" --project "$CI_PROJECT_ID" \
+        --diff out/judge/diff.md --verify out/attest/verify.txt \
+        --link "Floor Manifest=$(cat out/judge/job-url.txt)/artifacts/file/out/judge/floor-manifest.json" \
+        --link "Signature check=$(cat out/attest/job-url.txt)/artifacts/file/out/attest/verify.txt" \
+        --out out/release/release.json
+  artifacts:
+    paths: [out/release/]
 
 pages:
   stage: publish
