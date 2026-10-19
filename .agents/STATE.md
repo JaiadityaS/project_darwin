@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-19 · @JaiadityaS · session 8, cloud (T-61 code, T-63 draft)
+Last update: 2026-10-19 · @JaiadityaS · session 9 (T-62 done, T-63 trigger check)
 
 ## Where we are
 
@@ -29,11 +29,7 @@ Last update: 2026-10-19 · @JaiadityaS · session 8, cloud (T-61 code, T-63 draf
 
 ## Next agent: start here
 
-1. T-62 (D-031), the language table. The pilot run 39210696789 (sw_ke, 10 clips) passed in 6 min: Swahili small f16 WER 72%, so not served. The first full run (39211434118) failed for Yoruba and Hindi: whisper-cli wrote bytes that are not UTF-8. The fix (4f0674e) counts them (`bad_utf8`). The new full run 39214706460 (8 languages, 50 clips, about 25 min per job) started at about 07:25 UTC on 2026-10-19. When it ends:
-   - Read `language.json` from the log of its Table step: `gh run view <id> --log`, the lines between `--- BEGIN language.json ---` and `--- END language.json ---`. No artifact download is needed.
-   - English is the control. Its small f16 WER must be low (about 10%). If it is not, look for a fault in the scoring first, and do not commit the table.
-   - Commit it as `.floor/evidence/language/language.json`, add a row to `.floor/evidence/README.md`, check the page (`python -m floor page`), add the log lines, and set T-62 to done.
-   - A cloud session has no `gh` login. If it cannot read the run, leave this item to a local session.
+1. T-62 is done (D-031): run 39233922646, `.floor/evidence/language/language.json`. Served: English and Spanish. Not served: the other six languages. The page shows it after the next GitLab sync. Open, not urgent: the cause of the transcripts with bytes that are not UTF-8 (57 of 100 Bengali small, 60 of 100 Yoruba small). The segment break was not the main cause. Read some of them in the run artifacts (a download needs the owner's yes).
 2. T-61 (PRD F12.3, D-032): the code is done in session 8 (cloud). `floor summary` makes at most 7 lines from the signed manifest and `who.md`. The `herald` job prints `summary issue: $FLOOR_SUMMARY_ISSUE` and the summary between `--- BEGIN summary ---` and `--- END summary ---`. The flow is `.floor/flows/release-summary.yml`. A local session must:
    - sync to GitLab (item 4), then make the issue "Rieux release summaries", pin it, and set its IID in `FLOOR_SUMMARY_ISSUE` (`.gitlab-ci.yml` variables; a commit, then a sync).
    - check the tool name `create_issue_note` in the catalog tool list (the catalog does not check names, D-021). If the name differs, change the flow and `test_release_summary_flow`.

@@ -229,8 +229,8 @@ def _section_languages(doc: dict | None) -> str:
             f'with a paired-bootstrap interval. Real speech is noisier than read speech, so real error rates are higher. '
             f'Report only: no gate uses this table (F9.3).'
             + (f' {missing} clip(s) gave no transcript and count as all words wrong.' if missing else "")
-            + (f' {bad} transcript(s) had bytes that are not UTF-8 (a character split across tokens); '
-               f'each broken word counts as wrong.' if bad else "")
+            + (f' {bad} transcript(s) had bytes that are not UTF-8; each broken word counts as wrong.'
+               if bad else "")
             + f'</p><p class="mute">Not measured: {len(doc["not_measured"])} other whisper languages, so Rieux makes no '
             f'claim for them.</p></div>')
 
