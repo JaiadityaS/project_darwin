@@ -107,3 +107,15 @@
 - Checked on the real manifest of pipeline 2961083963 (judge job 17270054359): the text matches the values.
 - Verified: 227 passed, 11 skipped.
 - Gotcha: the Bash heredoc turns `\n` into a newline, even with a quoted delimiter. Use the Edit tool for text with backslashes.
+
+## T-04: the Duo CLI in CI (blocked)
+- Finding: headless `duo run` needs an access token in `GITLAB_TOKEN` or `GITLAB_OAUTH_TOKEN`. The job token does not work. D-010 forbids a personal token of a person, so only a service-account token fits, and a group owner makes it. Herald stays a template (D-025). Recorded in D-025 and STATE "Needs a human".
+- Fact: the merge method is `merge`, and the protected-tags API gives 403 to the Developer role (D-024).
+
+## T-35: the notice approvals (D-026)
+- Done: `floor ratchet --approvals URL --default-branch BRANCH` (`ratchet.approval`, `ratchet.approvers`, `ratchet.code_owners`); the check job passes them. The approvals API of this public project needs no token.
+- Verified: 231 passed, 11 skipped.
+- Open: a real notice MR with a human approval.
+
+## T-90: README stage table
+- Create now says "Runs": the flow opened fix MRs !2 and !3.

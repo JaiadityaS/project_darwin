@@ -202,13 +202,29 @@ def _cmd_ratchet(args: argparse.Namespace) -> int:
     except subprocess.CalledProcessError as exc:
         print(f"floor: git failed: {exc.stderr.strip()}", file=sys.stderr)
         return 2
-    result = ratchet.check(old, new, notices)
+    verify = None
+    if args.approvals:
+        if not (args.base and args.default_branch):
+            print("floor: --approvals needs --base and --default-branch", file=sys.stderr)
+            return 2
+        session = requests.Session()
+
+        def get(path: str):
+            resp = session.get(args.approvals.rstrip("/") + path, timeout=30)
+            resp.raise_for_status()
+            return resp.json()
+        humans = (args.humans if args.humans is not None else os.environ.get("FLOOR_HUMANS", "")).split()
+        verify = ratchet.approval(args.base, args.default_branch, get, humans)
+    result = ratchet.check(old, new, notices, verify)
     for row in result["changes"]:
         scope = f"{row['artifact']}: " if row["artifact"] else ""
         cover = ""
         if row["direction"] == "looser":
             cover = f" (notice: {', '.join(row['notices'])})" if row["notices"] else " NEEDS A MERGED NOTICE"
         print(f"{scope}{row['field']}: {row['from']} -> {row['to']}: {row['direction']}{cover}")
+        for name, problems in (row.get("refused") or {}).items():
+            for problem in problems:
+                print(f"  {name} does not count: {problem}")
     if not result["changes"]:
         print("policy floors did not change")
     return 0 if result["ok"] else 1
@@ -818,6 +834,10 @@ def main(argv: list[str] | None = None) -> int:
     rt.add_argument("--base", metavar="REF", help="target branch: read the old policy and the notices from git")
     rt.add_argument("--old", metavar="FILE", help="old policy file (without git)")
     rt.add_argument("--notices", default=ratchet.NOTICE_DIR, metavar="DIR", help="merged notices, with --old")
+    rt.add_argument("--approvals", metavar="URL", help="GitLab API URL of the project (.../projects/ID): a notice "
+                    "counts only when a human code owner approved its merged MR (F6.1)")
+    rt.add_argument("--default-branch", metavar="BRANCH", help="the branch that notice MRs merge into, with --approvals")
+    rt.add_argument("--humans", metavar="NAMES", help="human usernames, space-separated (default: $FLOOR_HUMANS)")
     rt.set_defaults(func=_cmd_ratchet)
 
     nt = sub.add_parser("notice", help="check that Leave-Behind Notices are complete (PRD F6, §11.2)")

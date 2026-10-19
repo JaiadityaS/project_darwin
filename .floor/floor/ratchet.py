@@ -2,6 +2,10 @@
 
 "Merged" means the notice file is already on the target branch. So the notice MR merges
 first, and the policy MR that loosens the floor follows it.
+
+The "Approved by" line is text, and an agent can write text. So in CI a notice counts only when the
+GitLab approvals of its merged MR show a code owner who is a human, and no other account (F6.1,
+`approval`).
 """
 
 from __future__ import annotations
@@ -9,10 +13,11 @@ from __future__ import annotations
 import re
 import subprocess
 from pathlib import Path
+from typing import Callable
 
 import yaml
 
-from . import policy
+from . import notice, policy
 from .isa.levels import parse_level
 
 NOTICE_DIR = ".floor/notices"
@@ -88,18 +93,83 @@ def notice_dimensions(text: str) -> set[str] | None:
     return {dimension for key, dimension in DIMENSIONS.items() if key in words or dimension in words}
 
 
-def check(old: dict, new: dict, notices: dict[str, str]) -> dict:
-    """``notices`` maps a notice file name to its text (only notices on the target branch)."""
+def check(old: dict, new: dict, notices: dict[str, str],
+          verify: Callable[[str], list[str]] | None = None) -> dict:
+    """``notices`` maps a notice file name to its text (only notices on the target branch).
+
+    ``verify`` maps a notice name to its problems (see ``approval``). A notice with a problem covers
+    nothing, and the row of a looser change lists it under "refused"."""
     covered: dict[str, list[str]] = {}
     for name, text in sorted(notices.items()):
         for dimension in notice_dimensions(text) or ():
             covered.setdefault(dimension, []).append(name)
     rows = compare(old, new)
+    found: dict[str, list[str]] = {}
     for row in rows:
         if row["direction"] == "looser":
-            row["notices"] = covered.get(row["dimension"], [])
+            names = covered.get(row["dimension"], [])
+            if verify:
+                for name in names:
+                    if name not in found:
+                        found[name] = verify(name)
+                if refused := {name: found[name] for name in names if found[name]}:
+                    row["refused"] = refused
+                names = [name for name in names if not found[name]]
+            row["notices"] = names
     blocked = [row for row in rows if row["direction"] == "looser" and not row["notices"]]
     return {"ok": not blocked, "changes": rows, "blocked": blocked}
+
+
+def approvers(sha: str, default_branch: str, get: Callable[[str], object]) -> tuple[str, list[str]]:
+    """(the merged MR into the default branch that has commit ``sha``, the usernames that approved it).
+
+    ``get`` reads one GitLab API path of the project and returns the JSON. A public project needs no
+    token for these two paths. LookupError when no such MR exists."""
+    for mr in get(f"/repository/commits/{sha}/merge_requests") or []:
+        if mr.get("state") == "merged" and mr.get("target_branch") == default_branch:
+            doc = get(f"/merge_requests/{mr['iid']}/approvals") or {}
+            return mr["web_url"], [a["user"]["username"] for a in doc.get("approved_by") or []]
+    raise LookupError(f"no merged MR into {default_branch} has commit {sha[:8]}")
+
+
+def code_owners(text: str, path: str = f"/{NOTICE_DIR}/") -> list[str]:
+    """The owners of ``path`` in a CODEOWNERS text: the last line for exactly that path wins."""
+    owners: list[str] = []
+    for line in text.splitlines():
+        words = line.split("#", 1)[0].split()
+        if words and words[0] == path:
+            owners = [w.lstrip("@") for w in words[1:]]
+    return owners
+
+
+def approval(ref: str, default_branch: str, get: Callable[[str], object], humans: list[str],
+             notice_dir: str = NOTICE_DIR, codeowners: str = ".gitlab/CODEOWNERS") -> Callable[[str], list[str]]:
+    """``verify`` for ``check``: the problems of the merged MR that added a notice on ``ref``.
+
+    Deny by default, as `floor paths` (D-014): every approver must be in ``humans`` (FLOOR_HUMANS),
+    one of them must own the notice folder in CODEOWNERS (as it is on ``ref``), and the "Approved by"
+    line must name one of them. If git or the API gives no answer, the notice does not count."""
+    owners = code_owners(_git("show", f"{ref}:{codeowners}")) if _has_tree(ref, codeowners) else []
+
+    def verify(name: str) -> list[str]:
+        path = f"{notice_dir}/{name}"
+        try:
+            sha = _git("log", "--diff-filter=A", "--format=%H", "-1", ref, "--", path).strip()
+            if not sha:
+                return [f"no commit on {ref} added {path}"]
+            mr, approved = approvers(sha, default_branch, get)
+        except subprocess.CalledProcessError as exc:
+            return [f"git failed: {exc.stderr.strip()}"]
+        except (LookupError, OSError, ValueError, KeyError, TypeError) as exc:
+            return [f"no approvals from the GitLab API ({exc})"]
+        found = notice.approval_problems(approved, owners, [a for a in approved if a not in humans])
+        line = _APPROVED_BY.search(_git("show", f"{ref}:{path}"))
+        named = set(re.findall(r"[\w.-]+", line.group(1))) if line else set()
+        if approved and not named & set(approved):
+            found.append(f"the 'Approved by' line names none of the approvers ({', '.join(approved)})")
+        return [f"{mr}: {problem}" for problem in found]
+
+    return verify
 
 
 def _git(*args: str) -> str:

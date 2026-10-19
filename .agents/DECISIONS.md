@@ -227,6 +227,7 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - The job posts to the Releases API with `CI_JOB_TOKEN`; GitLab makes the tag from `ref` (the merged commit). The description has the floor diff, the fix MR and the cosign verify command. The links are the manifest (judge job) and the verify command (attest job).
   - Workflow rule: no pipeline for a `-floor.N` tag. The default-branch pipeline of the same commit already proved and signed it, and a second run would only use runner time.
 - Facts still to check on the first run: whether the job token of that pipeline may create the tag (protected tags are a Maintainer setting, D-010), and who the pipeline user is after an auto-merge (T-05).
+- Fact (2026-10-19, project API as the team account): the merge method is `merge` (a merge commit, so `/repository/commits/<sha>/merge_requests` finds the fix MR from the merge commit). The protected-tags API refuses the Developer role (403), so the team cannot see which tag names are protected. A refusal shows on the first release as an API error (rc 1) in the `release` job log.
 - PRD impact: F4.4 (the default-branch pipeline makes the release; no merge-bot token, D-010).
 
 ## D-025 (2026-10-19) T-46: Herald starts as a template; the agent part waits for T-04
@@ -236,4 +237,16 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - The text comes only from the manifest: the CPU level in plain words, the emulated CPU models that ran (with the ggml variant) or did not run, the smallest memory limit per model, the offline download and network attempts, notices, what is not measured, and SCI. If a floor rose, it says that the gate blocks the build; it never says "nobody" then.
   - The `release` job puts the section first in the release description.
 - Not yet: the agent summary (Duo CLI, T-04) and the pinned issue (F12.3). If T-04 fails, the submission says that Herald is a template.
+- Fact (2026-10-19, GitLab docs "Set up the GitLab Duo CLI" and the glab authentication page): headless `duo run` reads an access token from `GITLAB_TOKEN` or `GITLAB_OAUTH_TOKEN`. glab sends that value as `PRIVATE-TOKEN`, which refuses a CI job token. The documented CI pattern uses a service account's personal access token (scopes `api`, `ai_features`). D-010 forbids a personal token of a person in CI, and only a group owner can make a service account. So T-04 is blocked unless the user gives such a token; until then Herald is the template.
 - PRD impact: F12.1 runs as a template for now (§9.2 fallback).
+
+## D-026 (2026-10-19) T-35: a notice counts only with a human code-owner approval in GitLab
+- PRD F6.1: only a human code owner approves a Leave-Behind Notice; agents and the merge-bot cannot. Until now the ratchet read the "Approved by" line, which is text that an agent can write.
+- Fact (2026-10-19): on this public project, `GET /merge_requests/:iid/approvals` answers with no token (checked on MR !2). So a CI job can read the approvals without a token (D-010 holds).
+- Decision (`floor ratchet --approvals URL --default-branch BRANCH`, `ratchet.approval`, the check job, tested in `test_ratchet.py`):
+  - The check is at the decision point: the MR or push that loosens the policy. The notice MR merged earlier, so its approvals are final.
+  - For each notice that would cover a looser change, git finds the commit on the base that added the file. The API gives the merged MR into the default branch that has the commit, and its approvers.
+  - Deny by default, as `floor paths` (D-014): every approver must be in `FLOOR_HUMANS`, one must own `/.floor/notices/` in CODEOWNERS (as it is on the base), and the "Approved by" line must name one of them. If git or the API gives no answer, the notice does not count.
+  - A notice that fails covers nothing, and the job log says why. A stricter policy needs no notice, as before.
+- Not checked on GitLab yet: no notice MR exists. The first test needs a human approval of a real notice MR (a code owner acts; the agent does not).
+- PRD impact: none; this makes F6.1 true in CI and not only in the text.

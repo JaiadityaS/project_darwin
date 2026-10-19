@@ -16,7 +16,9 @@ echo "tools image tag $TOOLS_TAG matches its recipe"
 set -- .floor/notices/[0-9]*.md
 if [ -e "$1" ]; then floor notice "$@"; else echo "no notices"; fi
 
-# 3. A looser policy needs a notice that is already merged on the base.
+# 3. A looser policy needs a notice that is already merged on the base, and the GitLab approvals of
+#    its MR must show a human code owner and no other account (F6.1). The approvals of a public
+#    project need no token.
 zero=0000000000000000000000000000000000000000
 base=""
 if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-}" ]; then
@@ -25,7 +27,11 @@ if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-}" ]; then
 elif [ "${CI_COMMIT_BEFORE_SHA:-$zero}" != "$zero" ] && git cat-file -e "$CI_COMMIT_BEFORE_SHA:.floor/policy.yml" 2> /dev/null; then
   base="$CI_COMMIT_BEFORE_SHA"
 fi
-if [ -n "$base" ]; then floor ratchet --base "$base"; else echo "no earlier policy to compare with"; fi
+if [ -n "$base" ]; then
+  floor ratchet --base "$base" --approvals "$CI_API_V4_URL/projects/$CI_PROJECT_ID" --default-branch "$CI_DEFAULT_BRANCH"
+else
+  echo "no earlier policy to compare with"
+fi
 
 # 4. Merge requests: deny by default. The pipeline user and the MR author (from the API) must
 #    both be in FLOOR_HUMANS. Otherwise the MR counts as an agent MR, and an agent may change

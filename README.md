@@ -111,7 +111,7 @@ Status on 2026-10-19. "Runs" means that it runs in this project's GitLab pipelin
 | Stage | What Rieux does | GitLab feature | Status |
 |---|---|---|---|
 | Plan | Leave-Behind Notices are planned, reviewed decisions | MR templates, labels | Runs (`floor notice` in the check job) |
-| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the flow or a code owner commits them | Merge requests, MR widget artifacts, flows | The notice-draft job runs (pipeline 2960804030); the fallback job wrote the patch (pipeline 2960896128) |
+| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: the flow opened fix MRs !2 and !3 about 1.5 min after the failed pipelines 2961083963 and 2961094614 |
 | Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs (pipelines 2958271425, 2958309699) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; signed attestations | Container registry, keyless signing | Partly runs; signing is planned |
 | Package | The image of the release, checked by its digest | Container registry | Runs |

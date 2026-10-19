@@ -41,6 +41,7 @@ Last update: 2026-10-19 · @JaiadityaS · session 7 (T-40 flow run, D-022)
 - [ ] Sync to GitLab after each finished step. In PowerShell, from `project_darwin`: `& "C:\Program Files\Git\bin\bash.exe" scripts/assemble-gitlab.sh --push` (plain `bash` there is WSL). The push is in your name. The Showcase project is public, so a push is publishing. On 2026-10-19 the user gave a standing yes for the sync script only, after a dry run and a residue check (author and committer are the user; no trailer; no tool or vendor names in the diff or the paths). Never push this repo itself to GitLab.
 - [ ] Add the GitLab usernames of teammates to `FLOOR_HUMANS` in `.gitlab-ci.yml`. Every other pipeline user counts as an agent (D-014).
 - [ ] T-05: decide whether to turn on "Pipelines must succeed" (Settings → Merge requests). Now it is off, so an auto-merge set before the MR pipeline exists can merge at once (D-010).
+- [ ] T-04: the Duo CLI in CI needs a service-account access token (scopes `api`, `ai_features`) as a masked CI variable. A group owner makes service accounts. Without it, Herald stays a template (D-025), and the submission says so.
 - [ ] T-06: Google Cloud project with billing and a budget alert, for Cloud Run and WIF.
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
