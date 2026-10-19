@@ -112,6 +112,18 @@ def _cmd_timeline(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_backtest_footprint(args: argparse.Namespace) -> int:
+    registry = Registry(args.repo)
+    result = backtest.footprint({Path(path).name: _load_timeline(path) for path in args.timelines},
+                                [_read_json(path) for path in args.runs],
+                                lambda digest: backtest.download_sizes(registry, digest))
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", "repo": args.repo, **result})
+    print(f"Images: {result['images']}  downloaded: {result['download_mb']} MB  "
+          f"runner time: {result['runner_minutes']} min in {len(result['runs'])} run(s)")
+    return 0
+
+
 def _load_timeline(path: str) -> list[dict]:
     return json.loads(Path(path).read_text(encoding="utf-8"))["images"]
 
@@ -791,6 +803,14 @@ def main(argv: list[str] | None = None) -> int:
     tl.add_argument("paths", nargs="+", help="report files or directories")
     tl.add_argument("--out", metavar="FILE", help="write the timeline as JSON")
     tl.set_defaults(func=_cmd_timeline)
+
+    bf = sub.add_parser("backtest-footprint", help="downloads and runner time of the backtest (PRD F14.4)")
+    bf.add_argument("timelines", nargs="+", metavar="TIMELINE", help="floor timeline --out files")
+    bf.add_argument("--runs", nargs="+", required=True, metavar="FILE",
+                    help="gh run view <id> --json databaseId,jobs output, one file per sweep run")
+    bf.add_argument("--repo", default=DEFAULT_REPO, help="image repository")
+    bf.add_argument("--out", metavar="FILE", help="write the result as JSON")
+    bf.set_defaults(func=_cmd_backtest_footprint)
 
     hyp = sub.add_parser("h1", help="H-1 analysis: flips in a timeline vs changes in the floor paths (PRD F10.3)")
     hyp.add_argument("timeline", help="timeline JSON from floor timeline")

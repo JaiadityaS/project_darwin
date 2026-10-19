@@ -2,7 +2,8 @@
 
 The sampler picks published `main-<sha>` images spread across time, plus every image
 near the dates of known crash reports. The timeline joins the per-image JSON reports
-of `floor image --out` into one list, ordered by build date.
+of `floor image --out` into one list, ordered by build date. The footprint (F14.4) adds
+the bytes that the scans downloaded and the runner time of the sweep runs.
 """
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ from pathlib import Path
 
 import requests
 
-from .oci import DEFAULT_REPO, Registry
+from .oci import DEFAULT_REPO, Registry, app_layer
 
 MAIN_TAG_RE = re.compile(r"^main-[0-9a-f]{40}$")
 DEFAULT_PREFIX = "main-"
@@ -107,3 +108,46 @@ def timeline(paths: list[str]) -> list[dict]:
             "highest_level_found": summary["highest_level_found"],
         })
     return sorted(rows, key=lambda row: (row["created"] or "", row["ref"]))
+
+
+def download_sizes(registry: Registry, digest: str) -> dict:
+    """The sizes of the two blobs that `floor image` downloads for one image: its config and its /app layer."""
+    manifest, _ = registry.manifest(digest)
+    config = registry.blob(manifest["config"]["digest"]).json()
+    layer, _ = app_layer(manifest, config)
+    return {"config": manifest["config"].get("size"), "app_layer": layer.get("size")}
+
+
+def _seconds(job: dict) -> float:
+    started = datetime.fromisoformat(job["startedAt"].replace("Z", "+00:00"))
+    return (datetime.fromisoformat(job["completedAt"].replace("Z", "+00:00")) - started).total_seconds()
+
+
+def footprint(timelines: dict[str, list[dict]], runs: list[dict], sizes, workers: int = 8) -> dict:
+    """The one-off footprint of the backtest (PRD F14.4): downloaded bytes and runner time.
+
+    `timelines` maps a timeline file to its images; `runs` are the jobs of the sweep runs
+    (`gh run view <id> --json databaseId,jobs`); `sizes(digest)` gives the blob sizes of one image.
+    """
+    by_file, total = [], 0
+    for name, images in timelines.items():
+        digests = [image["manifest_digest"] for image in images]
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            found = list(pool.map(sizes, digests))
+        size = sum((row["config"] or 0) + (row["app_layer"] or 0) for row in found)
+        by_file.append({"timeline": name, "images": len(images), "download_bytes": size})
+        total += size
+    run_rows = [{"run": run["databaseId"], "jobs": len(run["jobs"]),
+                 "runner_seconds": round(sum(_seconds(job) for job in run["jobs"]))} for run in runs]
+    seconds = sum(row["runner_seconds"] for row in run_rows)
+    return {
+        "images": sum(row["images"] for row in by_file),
+        "download_bytes": total,
+        "download_mb": round(total / 1e6, 1),
+        "runner_seconds": seconds,
+        "runner_minutes": round(seconds / 60, 1),
+        "timelines": by_file,
+        "runs": run_rows,
+        "counted": "the config blob and the /app layer of each image (the blobs that the scan downloads); "
+                   "manifests are not counted. Runner time is the sum of the job times (start to end).",
+    }

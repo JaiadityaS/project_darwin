@@ -47,6 +47,8 @@ def test_page_from_repo_evidence(tmp_path):
     assert "H-1: the build machine sets the floor." in html
     assert "SIGILL" in html and "sandybridge" in html
     assert "**" not in html
+    # F14.4: the one-off footprint of the backtest (floor backtest-footprint).
+    assert "the scans downloaded 27.5 GB (one config and one /app layer per image) in 18 runner-minutes" in html
 
 
 def test_page_without_evidence(tmp_path):

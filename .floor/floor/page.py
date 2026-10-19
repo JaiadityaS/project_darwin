@@ -134,7 +134,7 @@ def _section_h1(h1: dict | None, h1_cuda: dict | None) -> str:
     return "".join(html)
 
 
-def _section_timeline(timelines: dict[str, list[dict]]) -> str:
+def _section_timeline(timelines: dict[str, list[dict]], cost: dict | None = None) -> str:
     series = [(name, timelines[name], colour) for name, _, colour in SERIES if timelines.get(name)]
     if not series:
         return '<div class="card">Backtest: not measured yet.</div>'
@@ -147,7 +147,17 @@ def _section_timeline(timelines: dict[str, list[dict]]) -> str:
             f'<div class="card stat"><b>{raised}</b>need AVX-512 (x86-64-v4)</div>'
             f'<div class="card stat"><b>{escape(newest["floor"])}</b>newest image, {escape(newest["created"][:10])}</div></div>'
             f'<div class="card"><p class="legend">{legend}</p>{timeline_svg(series)}'
-            f'<p class="mute">Each dot is one published image. Hover for the tag and the extra instruction sets.</p></div>')
+            f'<p class="mute">Each dot is one published image. Hover for the tag and the extra instruction sets.</p>'
+            f'{_backtest_cost(cost)}</div>')
+
+
+def _backtest_cost(cost: dict | None) -> str:
+    """F14.4: the one-off footprint of the backtest, in bytes and runner time."""
+    if not cost:
+        return ""
+    return (f'<p class="mute">The backtest is a one-off cost: the scans downloaded {cost["download_mb"] / 1000:.1f} GB '
+            f'(one config and one /app layer per image) in {cost["runner_minutes"]:.0f} runner-minutes '
+            f'({len(cost.get("runs", []))} sweep runs).</p>')
 
 
 def _section_cpu(proofs: list[dict]) -> str:
@@ -300,7 +310,9 @@ def collect(evidence: Path, notices_dir: Path | None = None) -> dict:
     notices = {}
     if notices_dir and notices_dir.is_dir():
         notices = {p.name: p.read_text(encoding="utf-8") for p in sorted(notices_dir.glob("[0-9]*.md"))}
+    costs = sorted((evidence / "backtest").glob("footprint-*.json")) if (evidence / "backtest").is_dir() else []
     return {"timelines": timelines, "h1": h1, "h1_cuda": h1_cuda, "proofs": proofs, "diff": diff, "notices": notices,
+            "backtest_cost": _load(costs[-1]) if costs else None,
             "energy": _load(evidence / "energy" / "energy.json"), "sci": _load(evidence / "footprint" / "sci.json")}
 
 
@@ -313,7 +325,7 @@ def render(data: dict, generated: str) -> str:
 <p class="lead">Every release of whisper.cpp says which machines it still runs on, with proof. If a change would leave
 people behind, the gate stops it, an agent repairs it, and only a human can accept the loss.</p>
 <h2>Does the build machine set the floor?</h2>{_section_h1(data["h1"], data["h1_cuda"])}
-<h2>Backtest: published images over time</h2>{_section_timeline(data["timelines"])}
+<h2>Backtest: published images over time</h2>{_section_timeline(data["timelines"], data.get("backtest_cost"))}
 <h2>CPU proof: three builds, four old CPUs</h2>{_section_cpu(data["proofs"])}
 <h2>Latest release</h2>{_section_manifest(data["diff"])}
 <h2>Languages</h2>{_section_languages()}

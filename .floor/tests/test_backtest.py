@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from datetime import date
 
+from floor import backtest
 from floor.backtest import batches, choose, main_tags, parse_around, timeline
 from floor.cli import main
 
@@ -66,3 +67,33 @@ def test_timeline_orders_by_date_and_ignores_other_json(tmp_path, capsys):
     assert main(["timeline", str(tmp_path), "--out", str(out)]) == 0
     assert len(json.loads(out.read_text(encoding="utf-8"))["images"]) == 3 - 1
     assert "main-b" in capsys.readouterr().out
+
+
+def test_footprint_adds_the_downloaded_blobs_and_the_job_times():
+    """F14.4: one config blob and one /app layer per image; runner time is the sum of the job times."""
+    sizes = {"sha256:a": {"config": 1000, "app_layer": 2_000_000}, "sha256:b": {"config": 900, "app_layer": None},
+             "sha256:c": {"config": 1100, "app_layer": 3_000_000}}
+    timelines = {"main.json": [{"manifest_digest": "sha256:a"}, {"manifest_digest": "sha256:b"}],
+                 "cuda.json": [{"manifest_digest": "sha256:c"}]}
+    runs = [{"databaseId": 1, "jobs": [{"startedAt": "2026-10-15T10:00:00Z", "completedAt": "2026-10-15T10:01:30Z"},
+                                       {"startedAt": "2026-10-15T10:00:10Z", "completedAt": "2026-10-15T10:02:10Z"}]},
+            {"databaseId": 2, "jobs": [{"startedAt": "2026-10-15T11:00:00Z", "completedAt": "2026-10-15T11:00:45Z"}]}]
+    result = backtest.footprint(timelines, runs, sizes.__getitem__)
+    assert result["images"] == 3 and result["download_bytes"] == 5_003_000 and result["download_mb"] == 5.0
+    assert [row["download_bytes"] for row in result["timelines"]] == [2_001_900, 3_001_100]
+    assert result["runs"] == [{"run": 1, "jobs": 2, "runner_seconds": 210}, {"run": 2, "jobs": 1, "runner_seconds": 45}]
+    assert result["runner_seconds"] == 255 and result["runner_minutes"] == 4.2
+
+
+def test_download_sizes_reads_the_manifest_and_the_config():
+    class FakeRegistry:
+        def manifest(self, ref):
+            return {"config": {"digest": "sha256:cfg", "size": 1234},
+                    "layers": [{"digest": "sha256:l1", "size": 10}, {"digest": "sha256:l2", "size": 99}]}, ref
+
+        def blob(self, digest):
+            class Answer:
+                def json(self):
+                    return {"history": [{"created_by": "FROM ubuntu"}, {"created_by": "COPY /app /app # buildkit"}]}
+            return Answer()
+    assert backtest.download_sizes(FakeRegistry(), "sha256:m") == {"config": 1234, "app_layer": 99}

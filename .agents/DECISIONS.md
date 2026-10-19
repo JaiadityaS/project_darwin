@@ -271,4 +271,14 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
   - `GET /floor` gives `host_cpu`, `host_level`, `ggml_cpu_variant` and the source. With no variant, a note says why: whisper-server is not ready, or its log has no backend-loader line (a build without `GGML_BACKEND_DL` has none).
   - The upload page shows the two values in one line.
 - Deviation: there is no deployed service yet (T-06 is parked), so no nightly job. The `service` job of each pipeline asks `GET /floor` after the transcription and keeps `out/service/floor.json`. The job fails if the answer has no host level. The nightly job comes with the deploy (T-51).
+- Evidence 1 (2026-10-19): main pipeline 2961779904, service job 17274060434, the upstream image: `host_level` x86-64-v4 (an 8581C, the same as `cpu.txt`), `ggml_cpu_variant` null, with the note about the backend-loader line. That is right for a static CPU backend.
 - PRD impact: F13.4 ("the nightly job records it" becomes "the service job of each pipeline records it" until T-51).
+
+## D-029 (2026-10-19) T-23: the backtest footprint counts blob bytes and runner time
+- PRD F14.4: the backtest's downloads and CPU time are reported as a one-off footprint.
+- Decision (`floor backtest-footprint`, `backtest.footprint`, tested in `test_backtest.py`):
+  - Downloads: for each image of the timelines, the sizes of the config blob and the `/app` layer, from the registry manifests. These are the two blobs that `floor image` downloads, and `pull_layer` reads a layer to its end to check its digest. Blobs are content-addressed, so a size read later is the size that the sweep downloaded. Manifests (a few kB) are not counted.
+  - Time: the sum of the job times (start to end) of the sweep runs, from `gh run view <id> --json databaseId,jobs`. The job files are kept in `.floor/evidence/backtest/sweep-jobs-<run>.json`.
+- Deviation: F14.4 says CPU time. The jobs do not record CPU time, so the footprint gives runner time (job wall time), which is an upper bound per vCPU. No conversion to carbon: the footprint is bytes and minutes only.
+- Evidence (2026-10-19): `.floor/evidence/backtest/footprint-2026-10-15.json`: 121 images, 27,470 MB (main 61 images, 9,343 MB, about 153 MB each; main-cuda 60 images, 18,127 MB, about 302 MB each), 18.4 runner-minutes in sweep runs 38700707825 (9 jobs, 476 s) and 38701134589 (8 jobs, 625 s). The Rieux page shows it under the backtest.
+- PRD impact: F14.4 (runner time in place of CPU time).

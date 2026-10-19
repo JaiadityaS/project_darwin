@@ -1,0 +1,34 @@
+{
+  "tool": "floor 0.1.0",
+  "repo": "ggml-org/whisper.cpp",
+  "images": 121,
+  "download_bytes": 27470017066,
+  "download_mb": 27470.0,
+  "runner_seconds": 1101,
+  "runner_minutes": 18.4,
+  "timelines": [
+    {
+      "timeline": "main-2026-10-15.json",
+      "images": 61,
+      "download_bytes": 9342927949
+    },
+    {
+      "timeline": "main-cuda-2026-10-15.json",
+      "images": 60,
+      "download_bytes": 18127089117
+    }
+  ],
+  "runs": [
+    {
+      "run": 38700707825,
+      "jobs": 9,
+      "runner_seconds": 476
+    },
+    {
+      "run": 38701134589,
+      "jobs": 8,
+      "runner_seconds": 625
+    }
+  ],
+  "counted": "the config blob and the /app layer of each image (the blobs that the scan downloads); manifests are not counted. Runner time is the sum of the job times (start to end)."
+}
