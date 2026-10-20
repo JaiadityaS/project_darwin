@@ -1,4 +1,4 @@
-"""The 20-issue spot check of the keyword counts (PRD §3.2, T-64).
+"""The 20-issue spot check of the keyword counts (§3.2, D-030).
 
 A keyword hit is not a confirmed bug. The spot check takes a seeded sample of the GitHub search hits and
 gives each sampled hit one label, read from its thread. This module draws the sample again, checks that

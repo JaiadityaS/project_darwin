@@ -164,7 +164,7 @@ def test_service_image_recipe():
 
 
 def test_service_ci_job():
-    """T-52: GitLab CI runs the service image with the real whisper-server (a smoke test)."""
+    """D-019: GitLab CI runs the service image with the real whisper-server (a smoke test)."""
     from pathlib import Path
 
     import yaml

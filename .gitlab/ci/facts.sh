@@ -2,7 +2,7 @@
 # Facts about the machine of a CI job: CPU and its x86-64 level, memory, kernel, cgroups,
 # privileges and tools. The build job records the build machine (H-1: with GGML_NATIVE ON,
 # the build machine sets the floor). The scan job records a job container; the memory and
-# offline jobs (F7, F8) are designed from these facts (DECISIONS D-014).
+# offline jobs (F7, F8) are designed from these facts (D-014).
 #   sh .gitlab/ci/facts.sh          all facts
 #   sh .gitlab/ci/facts.sh --cpu    one line: CPU model and x86-64 level
 # A failed check prints its result and the script continues. The only change it makes is one

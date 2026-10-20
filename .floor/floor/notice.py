@@ -1,4 +1,4 @@
-"""Leave-Behind Notice (PRD F6, §11.2): parse, check that it is complete, check who approved it, and
+"""Leave-Behind Notice (F6, §11.2): parse, check that it is complete, check who approved it, and
 draft one when the fix and the fallback did not hold a floor (F4.5)."""
 
 from __future__ import annotations

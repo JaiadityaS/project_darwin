@@ -833,21 +833,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=f"floor {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    scan = sub.add_parser("scan", help="static CPU-floor scan of ELF files (PRD F2)")
+    scan = sub.add_parser("scan", help="static CPU-floor scan of ELF files (F2)")
     scan.add_argument("paths", nargs="+", help="files or directories to scan")
     scan.add_argument("--json", metavar="FILE", help="write the full report as JSON")
     scan.add_argument("--role", choices=ROLES, help="use one role for every file (for example distro)")
     scan.add_argument("--quiet", action="store_true", help="do not print the table")
     scan.set_defaults(func=_cmd_scan)
 
-    image = sub.add_parser("image", help="pull the /app layer of published images and scan it (PRD F10.1)")
+    image = sub.add_parser("image", help="pull the /app layer of published images and scan it (F10.1)")
     image.add_argument("refs", nargs="+", help="tags or digests, for example main-a1867e0")
     image.add_argument("--repo", default=DEFAULT_REPO, help=f"repository on ghcr.io (default {DEFAULT_REPO})")
     image.add_argument("--out", metavar="DIR", help="write one JSON report per image into DIR")
     image.add_argument("--verbose", action="store_true", help="print the file table of each image")
     image.set_defaults(func=_cmd_image)
 
-    sample = sub.add_parser("sample", help="choose main-<sha> images for the backtest (PRD F10.1)")
+    sample = sub.add_parser("sample", help="choose main-<sha> images for the backtest (F10.1)")
     sample.add_argument("--repo", default=DEFAULT_REPO, help=f"repository on ghcr.io (default {DEFAULT_REPO})")
     sample.add_argument("--prefix", default=backtest.DEFAULT_PREFIX,
                         help=f"tag prefix before the commit hash (default {backtest.DEFAULT_PREFIX}; or main-cuda-)")
@@ -859,12 +859,12 @@ def main(argv: list[str] | None = None) -> int:
     sample.add_argument("--out", metavar="FILE", help="write the choice as JSON")
     sample.set_defaults(func=_cmd_sample)
 
-    tl = sub.add_parser("timeline", help="join floor image reports into one timeline (PRD F10.1)")
+    tl = sub.add_parser("timeline", help="join floor image reports into one timeline (F10.1)")
     tl.add_argument("paths", nargs="+", help="report files or directories")
     tl.add_argument("--out", metavar="FILE", help="write the timeline as JSON")
     tl.set_defaults(func=_cmd_timeline)
 
-    bf = sub.add_parser("backtest-footprint", help="downloads and runner time of the backtest (PRD F14.4)")
+    bf = sub.add_parser("backtest-footprint", help="downloads and runner time of the backtest (F14.4)")
     bf.add_argument("timelines", nargs="+", metavar="TIMELINE", help="floor timeline --out files")
     bf.add_argument("--runs", nargs="+", required=True, metavar="FILE",
                     help="gh run view <id> --json databaseId,jobs output, one file per sweep run")
@@ -872,7 +872,7 @@ def main(argv: list[str] | None = None) -> int:
     bf.add_argument("--out", metavar="FILE", help="write the result as JSON")
     bf.set_defaults(func=_cmd_backtest_footprint)
 
-    lg = sub.add_parser("language", help="served / not-served table on FLEURS, f16 and one quantization (PRD F9.1)")
+    lg = sub.add_parser("language", help="served / not-served table on FLEURS, f16 and one quantization (F9.1)")
     lg.add_argument("action", choices=["choose", "score", "table"],
                     help="choose: a seeded sample of clips; score: WER and CER of the whisper-cli -otxt output; "
                          "table: the served / not-served table from the score files")
@@ -892,18 +892,18 @@ def main(argv: list[str] | None = None) -> int:
     lg.add_argument("--out", metavar="FILE", help="write the result as JSON")
     lg.set_defaults(func=_cmd_language)
 
-    sc = sub.add_parser("spotcheck", help="true-positive rate of the keyword counts from a labelled sample (PRD §3.2)")
+    sc = sub.add_parser("spotcheck", help="true-positive rate of the keyword counts from a labelled sample (§3.2)")
     sc.add_argument("labels", help="the spot-check file: the search hits, the seed and one label per sampled hit")
     sc.set_defaults(func=_cmd_spotcheck)
 
-    hyp = sub.add_parser("h1", help="H-1 analysis: flips in a timeline vs changes in the floor paths (PRD F10.3)")
+    hyp = sub.add_parser("h1", help="H-1 analysis: flips in a timeline vs changes in the floor paths (F10.3)")
     hyp.add_argument("timeline", help="timeline JSON from floor timeline")
     hyp.add_argument("--git", metavar="DIR", help="a whisper.cpp clone (--filter=blob:none is enough)")
     hyp.add_argument("--pair", metavar="TIMELINE", help="a second timeline (for example main-cuda-) to join on the commit")
     hyp.add_argument("--out", metavar="FILE", help="write the analysis as JSON")
     hyp.set_defaults(func=_cmd_h1)
 
-    pr = sub.add_parser("probe", help="run a command under QEMU on old CPU models, with controls (PRD F3)")
+    pr = sub.add_parser("probe", help="run a command under QEMU on old CPU models, with controls (F3)")
     pr.add_argument("--cpu", action="append", choices=list(qemu.CPU_MODELS), help="CPU model (repeat; default: all)")
     pr.add_argument("--expect", help="text that the output must contain (the reference transcript)")
     pr.add_argument("--sysroot", help="root of an extracted image filesystem (qemu -L)")
@@ -914,13 +914,13 @@ def main(argv: list[str] | None = None) -> int:
     pr.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     pr.set_defaults(func=_cmd_probe)
 
-    pol = sub.add_parser("policy", help="validate .floor/policy.yml against its JSON Schema (PRD F1.1)")
+    pol = sub.add_parser("policy", help="validate .floor/policy.yml against its JSON Schema (F1.1)")
     pol.add_argument("file", nargs="?", default=str(policy.DEFAULT_POLICY), help="policy file (default: .floor/policy.yml)")
     pol.add_argument("--schema", default=str(policy.DEFAULT_SCHEMA), help="JSON Schema file")
     pol.add_argument("--artifact", help="print the resolved policy for this artifact")
     pol.set_defaults(func=_cmd_policy)
 
-    jd = sub.add_parser("judge", help="mark each floor held, lowered, raised or inconclusive (PRD F5)")
+    jd = sub.add_parser("judge", help="mark each floor held, lowered, raised or inconclusive (F5)")
     jd.add_argument("--policy", default=str(policy.DEFAULT_POLICY), help="policy file")
     jd.add_argument("--artifact", help="artifact name, for per-artifact floors")
     jd.add_argument("--scan", metavar="FILE", help="floor scan --json output")
@@ -933,7 +933,7 @@ def main(argv: list[str] | None = None) -> int:
     jd.add_argument("--out", metavar="FILE", help="write the result as JSON")
     jd.set_defaults(func=_cmd_judge)
 
-    rt = sub.add_parser("ratchet", help="a looser policy needs a merged Leave-Behind Notice (PRD F1.2)")
+    rt = sub.add_parser("ratchet", help="a looser policy needs a merged Leave-Behind Notice (F1.2)")
     rt.add_argument("new", nargs="?", default=str(policy.DEFAULT_POLICY), help="the changed policy file")
     rt.add_argument("--base", metavar="REF", help="target branch: read the old policy and the notices from git")
     rt.add_argument("--old", metavar="FILE", help="old policy file (without git)")
@@ -944,13 +944,13 @@ def main(argv: list[str] | None = None) -> int:
     rt.add_argument("--humans", metavar="NAMES", help="human usernames, space-separated (default: $FLOOR_HUMANS)")
     rt.set_defaults(func=_cmd_ratchet)
 
-    nt = sub.add_parser("notice", help="check that Leave-Behind Notices are complete (PRD F6, §11.2)")
+    nt = sub.add_parser("notice", help="check that Leave-Behind Notices are complete (F6, §11.2)")
     nt.add_argument("files", nargs="+", help="notice files")
     nt.add_argument("--draft", action="store_true", help="allow an empty 'Approved by' (open notice MR)")
     nt.set_defaults(func=_cmd_notice)
 
     nd = sub.add_parser("notice-draft", help="draft a Leave-Behind Notice when the fix and the fallback "
-                        "did not hold a floor (PRD F4.5)")
+                        "did not hold a floor (F4.5)")
     nd.add_argument("--judge", required=True, metavar="FILE", help="floor judge output for the branch")
     nd.add_argument("--policy", default=str(policy.DEFAULT_POLICY), help="policy file")
     nd.add_argument("--root", default=".", help="repository root (is the canned config on the branch?)")
@@ -963,7 +963,7 @@ def main(argv: list[str] | None = None) -> int:
     nd.add_argument("--out", default="out/notice", metavar="DIR", help="folder for the draft")
     nd.set_defaults(func=_cmd_notice_draft)
 
-    mem = sub.add_parser("memory", help="smallest cgroup memory limit that passes, and peak RSS (PRD F7; Linux)")
+    mem = sub.add_parser("memory", help="smallest cgroup memory limit that passes, and peak RSS (F7; Linux)")
     mem.add_argument("--model", required=True, help="model name, for example tiny")
     mem.add_argument("--limits", default=",".join(map(str, memory.DEFAULT_LIMITS_MB)), help="MB, comma-separated")
     mem.add_argument("--expect", help="text that the output must contain")
@@ -977,7 +977,7 @@ def main(argv: list[str] | None = None) -> int:
     mem.add_argument("cmd", nargs=argparse.REMAINDER, help="-- command and arguments")
     mem.set_defaults(func=_cmd_memory)
 
-    off = sub.add_parser("offline", help="run with no network under strace; count network attempts (PRD F8; Linux)")
+    off = sub.add_parser("offline", help="run with no network under strace; count network attempts (F8; Linux)")
     off.add_argument("--expect", help="text that the output must contain")
     off.add_argument("--artifact", action="append", metavar="FILE", help="file a user must download (repeat)")
     off.add_argument("--timeout", type=float, default=900, help="seconds")
@@ -987,7 +987,7 @@ def main(argv: list[str] | None = None) -> int:
     off.set_defaults(func=_cmd_offline)
 
     au = sub.add_parser("audio", help="repeat a WAV file with silence between the copies: the energy test audio "
-                                      "(PRD F14.2)")
+                                      "(F14.2)")
     au.add_argument("src", help="WAV file, for example samples/jfk.wav")
     au.add_argument("out", help="output WAV file")
     au.add_argument("--copies", type=int, default=11, help="number of copies")
@@ -995,7 +995,7 @@ def main(argv: list[str] | None = None) -> int:
     au.set_defaults(func=_cmd_audio)
 
     en = sub.add_parser("energy", help="time each build on the same audio with GNU time: the medians of the runs "
-                                       "(PRD F14.2; Linux)")
+                                       "(F14.2; Linux)")
     en.add_argument("--build", action="append", required=True, metavar="NAME=EXE",
                     help="a build and its whisper-cli (repeat). Each run is EXE ARGS -f AUDIO")
     en.add_argument("--audio", required=True, help="WAV file, for example the floor audio output")
@@ -1008,7 +1008,7 @@ def main(argv: list[str] | None = None) -> int:
     en.add_argument("cmd", nargs=argparse.REMAINDER, help="-- the arguments of each build, for example -m MODEL -t 4")
     en.set_defaults(func=_cmd_energy)
 
-    mt = sub.add_parser("meter", help="CPU and memory use of one release check (PRD F14.1 R2; Linux)")
+    mt = sub.add_parser("meter", help="CPU and memory use of one release check (F14.1 R2; Linux)")
     mt.add_argument("action", choices=["start", "sample", "stop", "join"],
                     help="start: write the state file and start the sampler; sample: the sampler itself; "
                          "stop: stop the sampler and give the totals; join: add the totals of the jobs of one "
@@ -1022,7 +1022,7 @@ def main(argv: list[str] | None = None) -> int:
     mt.add_argument("--out", metavar="FILE", help="write the totals as JSON (stop, join)")
     mt.set_defaults(func=_cmd_meter)
 
-    pa = sub.add_parser("paths", help="path allowlist for agent MRs and merge-bot merges (PRD F4.2, §10.1)")
+    pa = sub.add_parser("paths", help="path allowlist for agent MRs and merge-bot merges (F4.2, §10.1)")
     pa.add_argument("--actor", required=True, choices=["agent", "merge-bot", "auto"],
                     help="who will change or merge; auto: an agent unless the pipeline user and the MR author "
                          "are in FLOOR_HUMANS (CI variables)")
@@ -1030,7 +1030,7 @@ def main(argv: list[str] | None = None) -> int:
     pa.add_argument("files", nargs="*", help="changed paths (default: git diff BASE...HEAD)")
     pa.set_defaults(func=_cmd_paths)
 
-    fb = sub.add_parser("fallback", help="apply the canned inclusive config to the build files (PRD F4.3)")
+    fb = sub.add_parser("fallback", help="apply the canned inclusive config to the build files (F4.3)")
     fb.add_argument("--root", default=".", help="repository root")
     fb.add_argument("--dockerfile", action="append", help="Dockerfile path relative to root (default: .devops/*.Dockerfile)")
     fb.add_argument("--artifact", default="main", help="override file name in .floor/overrides/")
@@ -1039,19 +1039,19 @@ def main(argv: list[str] | None = None) -> int:
     fb.add_argument("--patch", metavar="FILE", help="write the changes as a patch for git apply; change no file")
     fb.set_defaults(func=_cmd_fallback)
 
-    pg = sub.add_parser("page", help="build the Floor page from the evidence files (PRD F12.2)")
+    pg = sub.add_parser("page", help="build the Floor page from the evidence files (F12.2)")
     pg.add_argument("--evidence", default=".floor/evidence", help="evidence folder")
     pg.add_argument("--notices", default=".floor/notices", help="notices folder")
     pg.add_argument("--out", default="site", help="output folder (index.html)")
     pg.set_defaults(func=_cmd_page)
 
-    dm = sub.add_parser("delta-m", help="ΔM scenario: range and sensitivity table (PRD F14.3, §13.3)")
+    dm = sub.add_parser("delta-m", help="ΔM scenario: range and sensitivity table (F14.3, §13.3)")
     dm.add_argument("scenario", help="scenario YAML (see .floor/scenarios/TEMPLATE.yml)")
     dm.add_argument("--judge", metavar="FILE", help="floor judge output: ΔM is 0 when every floor holds")
     dm.add_argument("--out", metavar="FILE", help="write the result as JSON")
     dm.set_defaults(func=_cmd_delta_m)
 
-    mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (PRD F5.3)")
+    mf = sub.add_parser("manifest", help="write floor-manifest.json (in-toto Statement) and the diff (F5.3)")
     mf.add_argument("--judge", required=True, metavar="FILE", help="floor judge --out output")
     mf.add_argument("--subject", required=True, help="image name, for example registry.gitlab.com/g/whisper.cpp/server")
     mf.add_argument("--digest", required=True, help="image digest (sha256:...)")
@@ -1074,7 +1074,7 @@ def main(argv: list[str] | None = None) -> int:
     mf.add_argument("--footprint", metavar="FILE", help="floor footprint check --out output (the SCI values)")
     mf.set_defaults(func=_cmd_manifest)
 
-    fp = sub.add_parser("footprint", help="SCI with Impact Framework manifests (PRD F14.1)")
+    fp = sub.add_parser("footprint", help="SCI with Impact Framework manifests (F14.1)")
     fp.add_argument("action", choices=["write", "stale", "check"],
                     help="write: make the manifests from the evidence; stale: fail when the manifests in --out-dir "
                          "differ from the evidence; check: recompute every if-run output")
@@ -1092,7 +1092,7 @@ def main(argv: list[str] | None = None) -> int:
     df.add_argument("new", help="new floor-manifest.json")
     df.set_defaults(func=_cmd_diff)
 
-    at = sub.add_parser("attest", help="inputs and check of the signed floor manifest (PRD F5.4; cosign signs)")
+    at = sub.add_parser("attest", help="inputs and check of the signed floor manifest (F5.4; cosign signs)")
     at.add_argument("action", choices=["predicate", "identity", "check"],
                     help="predicate: write the predicate for cosign attest and print its type; identity: print the "
                          "certificate identity of this CI job; check: compare cosign verify-attestation output "
@@ -1104,7 +1104,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="the variable with the GitLab ID token (identity; default SIGSTORE_ID_TOKEN)")
     at.set_defaults(func=_cmd_attest)
 
-    rl = sub.add_parser("release", help="cut <tag>-floor.N after a fix MR of a tag pipeline merged (PRD F4.4)")
+    rl = sub.add_parser("release", help="cut <tag>-floor.N after a fix MR of a tag pipeline merged (F4.4)")
     rl.add_argument("--sha", required=True, help="the commit of this default-branch pipeline")
     rl.add_argument("--default-branch", required=True, help="the default branch, for example main")
     rl.add_argument("--api", required=True, metavar="URL", help="GitLab API URL ($CI_API_V4_URL)")
@@ -1117,12 +1117,12 @@ def main(argv: list[str] | None = None) -> int:
     rl.add_argument("--dry-run", action="store_true", help="decide and print, but create no release")
     rl.set_defaults(func=_cmd_release)
 
-    hd = sub.add_parser("herald", help="\"Who this release serves\" from the floor manifest (PRD F12.1, template)")
+    hd = sub.add_parser("herald", help="\"Who this release serves\" from the floor manifest (F12.1, template)")
     hd.add_argument("--manifest", required=True, metavar="FILE", help="floor-manifest.json")
     hd.add_argument("--out", metavar="FILE", help="also write the section to this Markdown file")
     hd.set_defaults(func=_cmd_herald)
 
-    sm = sub.add_parser("summary", help="the pinned-issue summary of a release, at most 7 lines (PRD F12.3)")
+    sm = sub.add_parser("summary", help="the pinned-issue summary of a release, at most 7 lines (F12.3)")
     sm.add_argument("--manifest", required=True, metavar="FILE", help="floor-manifest.json")
     sm.add_argument("--who", required=True, metavar="FILE", help="the \"Who this release serves\" file (floor herald --out)")
     sm.add_argument("--out", metavar="FILE", help="also write the summary to this Markdown file")

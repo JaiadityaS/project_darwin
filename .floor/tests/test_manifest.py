@@ -114,7 +114,7 @@ def test_cli_manifest_and_diff(tmp_path, capsys):
 
 
 def test_judge_job_reads_the_committed_footprint(tmp_path):
-    """T-54: the judge job passes the committed SCI summary, so the manifest's footprint fields are not null."""
+    """The judge job passes the committed SCI summary, so the manifest's footprint fields are not null."""
     from pathlib import Path
 
     import yaml

@@ -1,4 +1,4 @@
-"""Memory floor (PRD F7): the smallest cgroup memory limit at which a run still passes, and peak RSS.
+"""Memory floor (F7): the smallest cgroup memory limit at which a run still passes, and peak RSS.
 
 Linux only. Each run gets a memory limit and no swap, under /usr/bin/time -v for the peak RSS.
 Two ways to set the limit:

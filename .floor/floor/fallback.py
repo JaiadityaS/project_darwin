@@ -1,4 +1,4 @@
-"""Canned inclusive config (PRD F4.3): a script, not an agent, applies it when the agent's fix fails.
+"""Canned inclusive config (F4.3): a script, not an agent, applies it when the agent's fix fails.
 
 It changes only paths in the agent allowlist, so the gate and the merge-bot treat it the same way:
 - every `make` command in a RUN instruction of .devops/*.Dockerfile gets CMAKE_ARGS with the canned

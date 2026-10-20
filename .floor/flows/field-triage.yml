@@ -1,4 +1,4 @@
-# Rieux field triage (task T-63, PRD F11.1, F11.2, D-033).
+# Rieux field triage (F11.1, F11.2, D-033).
 # A private AI Catalog flow of the Showcase project, started by the project trigger "Work item: Created".
 # 1. gate: no tools. It sorts the new issue into "cpu", "memory", "language" or "skip". Any other answer ends the flow.
 # 2. reply: it posts one note. It names the CPU model of the gate's emulated probe (F3) that matches the reporter's

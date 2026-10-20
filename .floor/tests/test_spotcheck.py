@@ -1,4 +1,4 @@
-"""Tests for the spot check of the keyword counts (PRD §3.2)."""
+"""Tests for the spot check of the keyword counts (§3.2)."""
 
 from __future__ import annotations
 

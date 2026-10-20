@@ -1,4 +1,4 @@
-<!-- A Leave-Behind Notice (PRD F6, §11.2). Add it as .floor/notices/NNNN-<dimension>.md in this MR.
+<!-- A Leave-Behind Notice (F6, §11.2). Add it as .floor/notices/NNNN-<dimension>.md in this MR.
      Code owners approve. Agent accounts and the merge-bot cannot approve or merge it.
      After this MR merges, the policy or release change that it covers can pass the gate. -->
 

@@ -1,4 +1,4 @@
-"""Energy per audio-minute (PRD F14.2, G7): native vs folk fix vs all-variants on the same hardware.
+"""Energy per audio-minute (F14.2, G7): native vs folk fix vs all-variants on the same hardware.
 
 `floor audio` makes the test audio: the same speech file, repeated, with silence between the copies.
 The helpers below are for `floor energy`: GNU time gives the wall time, the CPU time and the peak RSS

@@ -1,7 +1,7 @@
-"""The -floor.N release (PRD F4.4, AC-F4a, D-010, D-024): what the default-branch pipeline cuts after a fix merged.
+"""The -floor.N release (F4.4, AC-F4a, D-010, D-024): what the default-branch pipeline cuts after a fix merged.
 
 A person pushes an upstream tag. Its pipeline fails at the judge, and the floor-repair flow opens a fix MR
-from `floor-fix/<pipeline id>` into the default branch (D-021). GitLab merges it when the gate passes (T-05).
+from `floor-fix/<pipeline id>` into the default branch (D-021). GitLab merges it when the gate passes (D-010).
 The pipeline of the merged commit passes the judge and signs the manifest (`attest`, D-023). Then this
 module cuts `<tag>-floor.N` from that commit, through the Releases API with the job token (GitLab makes
 the tag from `ref`).

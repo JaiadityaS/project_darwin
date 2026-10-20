@@ -1,4 +1,4 @@
-# Inputs for SCI (PRD §13.1): SCI = (E × I + M) / R. Every value has a source. Fetched 2026-10-16.
+# Inputs for SCI (§13.1): SCI = (E × I + M) / R. Every value has a source. Fetched 2026-10-16.
 # `floor footprint write` copies the values that it uses into the Impact Framework manifests
 # (sci-*.yml in this folder). Do not edit those manifests by hand.
 version: 1
@@ -52,13 +52,13 @@ sites:
   # Where each functional unit is served. Cloud Run does not publish its CPU platform, so the service
   # uses the GCP provider watts. GitLab does not publish the CPU of its hosted runners either, but
   # `floor meter` records the CPU of each job: the release check uses its microarchitecture row when
-  # the table has it (DECISIONS D-015). The n2d-standard host is an assumption for both sites.
+  # the table has it (D-015). The n2d-standard host is an assumption for both sites.
   service:
     unit: audio-minutes
     provider: gcp
     host: n2d-standard
     region: northamerica-northeast1  # the lowest grid intensity in the 2025 data; Cloud Run lists it as Low CO2
-    compare_region: us-central1      # a common default region (PRD §13.2, lever 5)
+    compare_region: us-central1      # a common default region (§13.2, lever 5)
   release-check:
     unit: release-checks
     provider: gcp

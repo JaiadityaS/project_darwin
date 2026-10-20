@@ -1,4 +1,4 @@
-"""Policy ratchet (PRD F1.2): a stricter policy needs a normal MR; a looser one needs a merged notice.
+"""Policy ratchet (F1.2): a stricter policy needs a normal MR; a looser one needs a merged notice.
 
 "Merged" means the notice file is already on the target branch. So the notice MR merges
 first, and the policy MR that loosens the floor follows it.

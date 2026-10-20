@@ -1,4 +1,4 @@
-"""Connectivity tripwire (PRD F8): the run must pass with no network, and it must not try to connect.
+"""Connectivity tripwire (F8): the run must pass with no network, and it must not try to connect.
 
 Linux only. The command runs in a new network namespace (only a down loopback) under strace.
 Every connect/sendto/sendmsg to an AF_INET or AF_INET6 address counts as a network attempt.

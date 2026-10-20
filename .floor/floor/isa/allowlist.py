@@ -1,4 +1,4 @@
-"""Instructions that a static scan finds but that do not raise the CPU floor (PRD F2.2).
+"""Instructions that a static scan finds but that do not raise the CPU floor (F2.2).
 
 Every entry needs a reason and a unit test (tests/test_isa.py). The QEMU runs (F3)
 corroborate the list. Keys are iced-x86 mnemonic names.

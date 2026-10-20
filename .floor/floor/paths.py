@@ -1,4 +1,4 @@
-"""Path allowlist (PRD F4.2, §5, §10.1). Defense in depth: code-owner approval is the main control.
+"""Path allowlist (F4.2, §5, §10.1). Defense in depth: code-owner approval is the main control.
 
 - An agent MR may change only AGENT_ALLOWED paths. None of them has a code owner.
 - Agents never change engine code.
@@ -20,7 +20,7 @@ CODE_OWNED = (
     ".floor/floor/**",          # the Judge and the gate scripts
     ".floor/pyproject.toml",
     ".floor/notices/**",
-    ".floor/flows/**",          # the flow definitions (AI Catalog, T-03, T-40)
+    ".floor/flows/**",          # the flow definitions (AI Catalog, D-020, D-021)
     "CODEOWNERS",
     ".gitlab/CODEOWNERS",
     ".gitlab-ci.yml",

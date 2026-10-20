@@ -1,4 +1,4 @@
-"""SCI (PRD F14.1, §13.1): SCI = (E × I + M) / R, computed with Impact Framework manifests.
+"""SCI (F14.1, §13.1): SCI = (E × I + M) / R, computed with Impact Framework manifests.
 
 `write` turns the measured evidence into Impact Framework (IF) manifests, `.floor/impact/sci-*.yml`.
 CI runs `if-run` on them. `check` then recomputes every IF output from its own inputs with
@@ -34,7 +34,7 @@ INPUTS = ("duration", "cpu/vcpus", "cpu/busy-seconds", "memory/gb-seconds", "cpu
           "memory/watts-per-gb", "pue", "grid/carbon-intensity", "host/vcpus")
 HEADER = ("# Made by `python -m floor footprint write` from {source}.\n"
           "# Do not edit. Change the evidence or .floor/impact/footprint.yml, then run the command again.\n"
-          "# CI runs if-run ({package}) on this file and checks every output (PRD F14.1).\n")
+          "# CI runs if-run ({package}) on this file and checks every output (F14.1).\n")
 
 # CPU model name -> CCF microarchitecture. A CPU that is not here gets the provider average.
 _ARCH = (
@@ -183,7 +183,7 @@ def write(config: dict, energy: dict | None = None, meter: dict | None = None) -
             f"runner ({energy.get('cpu_model')}, {energy['vcpus']} vCPUs), median of {energy['runs_per_build']} runs. "
             f"Site: Cloud Run in {service['region']} (F13.1). Cloud Run does not publish its CPU platform, so the "
             f"GCP average watts and an {service['host']} host are assumptions. The '{SHIPPED}' child is the shipped "
-            f"build; '{SHIPPED}-{compare}' is the same work in {compare} (PRD §13.2, lever 5).")
+            f"build; '{SHIPPED}-{compare}' is the same work in {compare} (§13.2, lever 5).")
         files[FILES["audio-minutes"]] = _dump(_manifest(config, "audio-minutes", "service", children, description),
                                               energy.get("evidence"))
     if meter:

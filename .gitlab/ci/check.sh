@@ -1,6 +1,6 @@
 #!/bin/sh
 # Gate checks that need git: the tools image tag, the Leave-Behind Notices (F6), the policy
-# ratchet (F1.2) and, on merge requests, the agent path allowlist (F4.2, PRD §10.1, D-010).
+# ratchet (F1.2) and, on merge requests, the agent path allowlist (F4.2, §10.1, D-010).
 # The check job runs it from the repository root, with the full history.
 set -eu
 

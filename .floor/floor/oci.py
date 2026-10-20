@@ -1,4 +1,4 @@
-"""Minimal client for public images on an OCI registry such as ghcr.io (PRD F10.1).
+"""Minimal client for public images on an OCI registry such as ghcr.io (F10.1).
 
 It fetches only what the backtest needs: tags, the linux/amd64 manifest, the image
 config, and the one layer that holds /app. The layer is streamed. Only its ELF files

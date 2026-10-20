@@ -1,4 +1,4 @@
-"""Floor Manifest (PRD F5.3, §11.1): an in-toto Statement and a diff against the previous release.
+"""Floor Manifest (F5.3, §11.1): an in-toto Statement and a diff against the previous release.
 
 The Judge sets every status. This module only copies the Judge output into the manifest
 and compares two manifests. Signing (F5.4, `cosign attest`) happens in CI on the result.

@@ -1,8 +1,8 @@
-"""Herald, the template part (PRD F12.1, T-46): "Who this release serves", from the Floor Manifest.
+"""Herald, the template part (F12.1, D-025): "Who this release serves", from the Floor Manifest.
 
 Every value in the text comes from the manifest, so a script (the Judge) set it. The agent part of Herald
-(T-04: a short summary with the Duo CLI) is optional. When it is not there, this section is the whole
-Herald output (PRD §9.2), and the release says so.
+(a short summary with the Duo CLI) is optional. When it is not there, this section is the whole
+Herald output (§9.2, D-025), and the release says so.
 """
 
 from __future__ import annotations
@@ -92,7 +92,7 @@ def who(statement: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-# F12.3 (T-61, D-032): the flow adds one line (the release tag), so the summary has at most 7.
+# F12.3 (D-032): the flow adds one line (the release tag), so the summary has at most 7.
 SUMMARY_MAX_LINES = 7
 
 
@@ -105,7 +105,7 @@ def _bullet(who_md: str, label: str) -> str | None:
 
 
 def summary(statement: dict, who_md: str) -> str:
-    """The pinned-issue summary of one release (PRD F12.3): at most SUMMARY_MAX_LINES lines.
+    """The pinned-issue summary of one release (F12.3): at most SUMMARY_MAX_LINES lines.
 
     The floors come from the signed manifest, in short form. The language, "Left behind" and "Not measured"
     lines are copied from `who_md`, so the summary and the release notes say the same thing.

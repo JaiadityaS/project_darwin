@@ -1,4 +1,4 @@
-"""Static CPU-floor scan of ELF files (PRD F2).
+"""Static CPU-floor scan of ELF files (F2).
 
 The floor of a build is the highest x86-64 level in the code that always loads,
 joined with the lowest ggml CPU variant (the variant that the backend loader
@@ -181,7 +181,7 @@ def scan_path(root: str | os.PathLike, role: str | None = None) -> list[FileRepo
 
 
 def summarize(reports: list[FileReport]) -> dict:
-    """Joins file reports into the floor of one build (PRD F2.1)."""
+    """Joins file reports into the floor of one build (F2.1)."""
     ok = [r for r in reports if r.error is None]
     core = [r for r in ok if r.role == "core"]
     variants = [r for r in ok if r.role == "variant"]

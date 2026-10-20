@@ -1,6 +1,6 @@
 # Made by `python -m floor footprint write` from https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960804030.
 # Do not edit. Change the evidence or .floor/impact/footprint.yml, then run the command again.
-# CI runs if-run (@grnsft/if@1.1.1) on this file and checks every output (PRD F14.1).
+# CI runs if-run (@grnsft/if@1.1.1) on this file and checks every output (F14.1).
 name: floor-sci-release-check
 description: 'SCI per release check (R2): every Floor probe of one release. CPU time and memory: `floor meter` (the
   cgroup of each job container), the sum of 8 jobs (judge, memory, offline, probe-epyc-milan, probe-nehalem, probe-qemu64,

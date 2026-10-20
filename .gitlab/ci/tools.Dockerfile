@@ -1,4 +1,4 @@
-# Tools image for the gate jobs scan, probe and judge (.gitlab-ci.yml, DECISIONS D-014).
+# Tools image for the gate jobs scan, probe and judge (.gitlab-ci.yml, D-014).
 # The build job builds and pushes it when its tag is missing. The tag is the first 12 hex digits
 # of the SHA-256 of this file (TOOLS_TAG in .gitlab-ci.yml); .gitlab/ci/check.sh checks them.
 #

@@ -187,7 +187,7 @@ def test_fallback_ci_job():
     assert job["artifacts"]["paths"] == ["out/fallback/"]
     script = job["script"][0]
     assert "floor fallback --judge out/judge/judge.json --patch out/fallback/fallback.patch" in script
-    # T-40: the floor-repair flow copies the patch from the job log, between these markers.
+    # D-021: the floor-repair flow copies the patch from the job log, between these markers.
     assert 'echo "--- BEGIN fallback.patch ---"; cat out/fallback/fallback.patch' in script
     assert "--- END fallback.patch ---" in script
     assert "git push" not in script

@@ -1,4 +1,4 @@
-# Rieux release summary (task T-61, PRD F12.3, D-032).
+# Rieux release summary (F12.3, D-032).
 # A private AI Catalog flow of the Showcase project. The trigger "Pipeline events: Passed" starts it. CI has no token
 # that can post a note (D-010), so the herald job prints the summary in its log, and this flow copies it.
 # 1. gate: no tools. It answers "passed" only when a default-branch pipeline passed and its release build passed.

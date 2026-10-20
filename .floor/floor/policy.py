@@ -1,4 +1,4 @@
-"""Floor policy: load, validate against the JSON Schema, and resolve per artifact (PRD F1.1)."""
+"""Floor policy: load, validate against the JSON Schema, and resolve per artifact (F1.1)."""
 
 from __future__ import annotations
 

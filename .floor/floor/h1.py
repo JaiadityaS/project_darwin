@@ -1,4 +1,4 @@
-"""H-1 analysis (PRD F10.3): does the build machine set the floor?
+"""H-1 analysis (F10.3): does the build machine set the floor?
 
 For every flip in a backtest timeline (two images next to each other in time with
 different floors), the analysis lists the files that changed between the two commits

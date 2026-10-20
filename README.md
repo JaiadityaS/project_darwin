@@ -121,7 +121,7 @@ judge (a script): each floor held, lowered, raised or inconclusive
 - The policy is [`.floor/policy.yml`](.floor/policy.yml): CPU x86-64-v1, the memory limits, offline required. A looser policy needs a merged and approved notice (`floor ratchet`).
 - Code owners own the gate: the policy, the tools, `.gitlab-ci.yml` and `.gitlab/ci/` ([`.gitlab/CODEOWNERS`](.gitlab/CODEOWNERS)). An agent MR may change only `.devops/*.Dockerfile`, `deploy/` and `.floor/overrides/` (`floor paths`).
 - The judge is a script, not a model. Scripts decide floors.
-- Two more flows use the proof and never set a floor ([`.floor/flows/`](.floor/flows/)). Field triage answers a new issue about a CPU, memory or language problem with one note: the CPU model of the gate's probe that matches the reporter's CPU, and where the proof is. Release summary posts the "Who this release serves" lines of each release as one note on a pinned issue.
+- Two more flows use the proof and never set a floor ([`.floor/flows/`](.floor/flows/)). Field triage answers a new issue about a CPU, memory or language problem with one note: the CPU model of the gate's probe that matches the reporter's CPU, and where the proof is. Release summary posts the "Who this release serves" lines of each release as one note on the issue [Rieux release summaries](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2).
 
 ## DevSecOps stages
 
@@ -134,7 +134,7 @@ Status on 2026-10-21. "Runs" means that it runs in this project's GitLab pipelin
 | Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5 and !6 held every floor (pipelines 2961110649, 2961210282 and 2961810145) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; the Floor Manifest signed as an attestation | Container registry, keyless signing (GitLab ID token, Sigstore) | Runs: the attest job signed and verified the manifest (pipeline 2961110649, job 17270217868) |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
-| Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet. The release summary for the pinned issue (`floor summary`) is local |
+| Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet. The release summary goes to issue [#2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2) after the first release; it has not run yet |
 | Configure | The service image (the checked image plus an upload gateway: 30 s cap, rate limits, no storage) with a smoke test; Cloud Run in a low-carbon region | Container registry, OpenTofu state, environments | The `service` job transcribes `samples/jfk.wav` in 3.3 s (pipeline 2960909623). Its `GET /floor` gives the host level and the ggml CPU variant that loaded: x86-64-v4 and `sapphirerapids` for the canned image (pipeline 2961810145, job 17274238498). Cloud Run is planned |
 | Monitor | The Rieux page with the backtest, the floors, the languages and SCI | Pages | Runs |
 | Govern | The ratchet, code owners, the agent path allowlist, the human-only notice | CODEOWNERS, approval rules | Runs (`floor ratchet`, `floor paths`) |
@@ -186,6 +186,7 @@ On GitLab, the pipeline in [`.gitlab-ci.yml`](.gitlab-ci.yml) runs on each push 
 | `.floor/scenarios/` | ΔM scenarios |
 | `.floor/overrides/` | Build overrides that the repair step may change |
 | `.floor/flows/` | The flow definitions: floor repair, field triage, release summary and the trigger probe |
+| `.floor/DECISIONS.md` | What the IDs in brackets mean, such as `F4.3` or `D-018`: the requirements, the plan sections and the design decisions |
 | `.gitlab-ci.yml`, `.gitlab/ci/` | The GitLab pipeline |
 | Everything else | whisper.cpp at `0c7be696` |
 

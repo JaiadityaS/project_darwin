@@ -1,4 +1,4 @@
-# ΔM scenario (PRD §13.3): ΔM = N_affected × e × p × (Δ / L).
+# ΔM scenario (§13.3): ΔM = N_affected × e × p × (Δ / L).
 # A scenario, not a measurement. Every range needs a source; `floor delta-m` refuses a missing one.
 # Copy this file for one notice, for example .floor/scenarios/0001-cpu.yml, and fill every value.
 dimension: <cpu | memory | connectivity>

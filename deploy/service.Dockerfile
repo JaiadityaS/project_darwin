@@ -1,9 +1,9 @@
-# The Rieux demo service (PRD F13.1, F13.3, task T-52): the held whisper.cpp image plus the gateway.
+# The Rieux demo service (F13.1, F13.3, D-019): the held whisper.cpp image plus the gateway.
 # Build from the repository root with the digest of the image that the gate held:
 #   docker build -f deploy/service.Dockerfile --build-arg IMAGE=registry.gitlab.com/<project>/main@sha256:<digest> .
 # The gateway is code-owned (.floor/floor/gateway.py). This recipe only adds python3 and starts it.
 # whisper-server listens on 127.0.0.1:8081 only. The gateway on $PORT caps the audio at 30 s and
-# limits the requests. Cloud Run caps the instances (infra/, T-50). No audio is stored.
+# limits the requests. Cloud Run caps the instances (infra/). No audio is stored.
 ARG IMAGE
 FROM ${IMAGE}
 

@@ -1,4 +1,4 @@
-# Rieux trigger probe (task T-03, PRD F4.1 and §9.1).
+# Rieux trigger probe (F4.1, §9.1, D-020).
 # A private AI Catalog flow of the Showcase project. A trigger on "Pipeline events: Failed" starts it.
 # It answers one question: does a failed pipeline start a flow, and who is the actor?
 # It has no tools and no repository clone. It only copies fields of the pipeline event (context:goal is

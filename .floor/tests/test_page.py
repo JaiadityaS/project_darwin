@@ -64,7 +64,7 @@ def test_page_energy_and_sci(tmp_path):
     html = page.build(tmp_path, tmp_path / "out", generated="x").read_text(encoding="utf-8")
     assert "<script" not in html and html.count("not measured yet") == 4  # H-1, backtest, CPU proof, languages
     energy = html.split("the cost of inclusion</h2>")[1].split("<h2>")[0]
-    # The builds in the PRD order. native has a failed run, so it has no medians and no ratio.
+    # The builds in the order of F14.2. native has a failed run, so it has no medians and no ratio.
     assert [energy.index(f"<b>{n}</b>") for n in page.BUILDS] == sorted(energy.index(f"<b>{n}</b>") for n in page.BUILDS)
     assert "no result" in energy and "1 of 2 runs failed" in energy
     # all-variants against folk-fix: CPU time 150 / 120, energy (0.25 / 2) / (0.2 / 2) Wh per audio-minute.

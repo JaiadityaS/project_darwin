@@ -1,4 +1,4 @@
-"""Backtest sampling and timeline (PRD F10.1).
+"""Backtest sampling and timeline (F10.1).
 
 The sampler picks published `main-<sha>` images spread across time, plus every image
 near the dates of known crash reports. The timeline joins the per-image JSON reports
@@ -21,7 +21,7 @@ from .oci import DEFAULT_REPO, Registry, app_layer
 MAIN_TAG_RE = re.compile(r"^main-[0-9a-f]{40}$")
 DEFAULT_PREFIX = "main-"
 
-# Crash reports that the backtest must cover (PRD §3.6): opening date and label.
+# Crash reports that the backtest must cover (§3.6): opening date and label.
 DEFAULT_AROUND = (("2025-11-10", "#3510"), ("2026-05-18", "#3814"))
 
 
@@ -124,7 +124,7 @@ def _seconds(job: dict) -> float:
 
 
 def footprint(timelines: dict[str, list[dict]], runs: list[dict], sizes, workers: int = 8) -> dict:
-    """The one-off footprint of the backtest (PRD F14.4): downloaded bytes and runner time.
+    """The one-off footprint of the backtest (F14.4): downloaded bytes and runner time.
 
     `timelines` maps a timeline file to its images; `runs` are the jobs of the sweep runs
     (`gh run view <id> --json databaseId,jobs`); `sizes(digest)` gives the blob sizes of one image.

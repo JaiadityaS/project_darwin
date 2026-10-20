@@ -1,4 +1,4 @@
-"""The Floor page (PRD F12.2): one static HTML file built only from evidence files.
+"""The Floor page (F12.2): one static HTML file built only from evidence files.
 
 Sections: the H-1 verdict, the backtest timeline, same-commit pairs, the CPU proof under QEMU,
 the latest manifest diff, the languages, the energy per audio-minute of each build, SCI, and the

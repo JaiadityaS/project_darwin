@@ -1,1 +1,1 @@
-"""Static CPU-floor scanner (PRD F2)."""
+"""Static CPU-floor scanner (F2)."""

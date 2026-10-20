@@ -1,4 +1,4 @@
-"""Upload page and gateway of the Rieux demo service (PRD F13.3, NFR-7, task T-52).
+"""Upload page and gateway of the Rieux demo service (F13.3, NFR-7, D-019).
 
 whisper-server lets a client set its own parameters (for example `duration`) in the form, and it has
 no rate limit. So whisper-server listens only on 127.0.0.1, and this gateway is the public port:
@@ -7,9 +7,9 @@ no rate limit. So whisper-server listens only on 127.0.0.1, and this gateway is 
                  the data size, then sends fixed parameters to whisper-server;
 - GET /healthz   "ok" while whisper-server runs;
 - GET /floor     the x86-64 level of the host CPU and the ggml CPU variant that whisper-server loaded,
-                 from its log (PRD F13.4).
+                 from its log (F13.4).
 Limits: a request rate per client and per instance, one transcription at a time per instance, and a
-body size cap. Cloud Run caps the instances (infra/, T-50). Audio stays in memory: no file, no log
+body size cap. Cloud Run caps the instances (infra/). Audio stays in memory: no file, no log
 line, no copy after the answer. The log has the method, the path and the status only.
 
 Standard library only, so the service image needs only python3 next to the held image:
@@ -175,7 +175,7 @@ def relay(stream, out, found: dict) -> None:
 
 
 def floor_doc(host: dict, variant: str | None, ready: bool) -> dict:
-    """The answer of GET /floor (PRD F13.4). It reports only what the host and the log show."""
+    """The answer of GET /floor (F13.4). It reports only what the host and the log show."""
     doc = {"host_cpu": host.get("model"), "host_level": host.get("level"), "ggml_cpu_variant": variant,
            "source": "the flags of /proc/cpuinfo; the ggml backend-loader line of the whisper-server log"}
     if variant is None:

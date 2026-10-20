@@ -1,4 +1,4 @@
-"""ΔM calculator (PRD F14.3, §13.3): a consequential scenario reported beside SCI, never inside it.
+"""ΔM calculator (F14.3, §13.3): a consequential scenario reported beside SCI, never inside it.
 
     ΔM(r) = N_affected(r) × e × p(r) × (Δ(r) / L)
 

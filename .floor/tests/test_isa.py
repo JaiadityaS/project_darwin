@@ -1,4 +1,4 @@
-"""Tests for the static CPU-floor scanner (PRD F2, AC-F2 on synthetic files)."""
+"""Tests for the static CPU-floor scanner (F2, AC-F2 on synthetic files)."""
 
 from __future__ import annotations
 

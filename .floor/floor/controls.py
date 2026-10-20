@@ -1,4 +1,4 @@
-"""Control programs for the QEMU runs (PRD F3.2).
+"""Control programs for the QEMU runs (F3.2).
 
 Each control is a tiny static x86-64 executable: one instruction of a given level,
 then exit(0). On a CPU model at or above that level it exits with 0. On a lower CPU

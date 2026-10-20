@@ -1,6 +1,6 @@
-"""The Judge (PRD F5.1, F5.2): marks each floor held, lowered, raised or inconclusive.
+"""The Judge (F5.1, F5.2): marks each floor held, lowered, raised or inconclusive.
 
-Only this script sets a floor status (PRD §9.2). Inputs are measurements from the
+Only this script sets a floor status (§9.2). Inputs are measurements from the
 scanner, the QEMU probe, and the memory and offline jobs; the previous release
 and the policy are the references.
 

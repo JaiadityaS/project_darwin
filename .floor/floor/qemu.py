@@ -1,4 +1,4 @@
-"""Dynamic CPU-floor check under QEMU user mode (PRD F3).
+"""Dynamic CPU-floor check under QEMU user mode (F3).
 
 Every CPU model gets a positive control (an instruction at the model's level, must pass)
 and a negative control (one level higher, must fail). If a control gives the wrong

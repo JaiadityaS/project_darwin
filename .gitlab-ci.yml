@@ -1,4 +1,4 @@
-# Rieux release gate for whisper.cpp (PRD §7.1, task T-47, DECISIONS D-014).
+# Rieux release gate for whisper.cpp (§7.1, D-014). The IDs in brackets are in .floor/DECISIONS.md.
 # Every pipeline proves the CPU floor of the image that .devops/main.Dockerfile builds: a static
 # scan of every ELF file (the proof) and whisper-cli runs under QEMU on old CPU models (the
 # corroboration). The Judge, a script, decides. No LLM output sets a floor status.
@@ -20,8 +20,8 @@
 #
 # Evidence: the artifacts below out/ (the judge job keeps all of them).
 # SCI per release check (R2): each job that uses the tools image meters its own container, and
-# the judge job adds the meters into out/judge/meter.json (DECISIONS D-015).
-# Not here yet: the agent part of herald (T-04), deploy.
+# the judge job adds the meters into out/judge/meter.json (D-015).
+# Not here yet: the agent part of herald (D-025), deploy.
 
 workflow:
   rules:
@@ -43,8 +43,9 @@ variables:
   TOOLS_TAG: "348395c3ee88"
   # GitLab usernames of the humans, space-separated. Every other pipeline user counts as an agent.
   FLOOR_HUMANS: "jaiadityasinghr"
-  # The IID of the pinned issue that gets the release summary (F12.3, D-032). Empty: the flow posts nothing.
-  FLOOR_SUMMARY_ISSUE: ""
+  # The IID of the issue that gets the release summary, #2 "Rieux release summaries" (F12.3, D-032).
+  # Empty: the flow posts nothing.
+  FLOOR_SUMMARY_ISSUE: "2"
   # Reference transcript of samples/jfk.wav.
   EXPECT: "ask not what your country can do for you"
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
@@ -164,9 +165,9 @@ build:
     reports:
       dotenv: out/build/image.env
 
-# F13.3 (T-52, D-019): the service image is the pushed image plus the gateway. The job runs it with
+# F13.3 (D-019): the service image is the pushed image plus the gateway. The job runs it with
 # the real whisper-server and checks the upload path: samples/jfk.wav gives the reference text, and
-# a body that is not WAV gets 400. It pushes nothing; the deploy jobs (T-51) build it again.
+# a body that is not WAV gets 400. It pushes nothing; the deploy jobs (not here yet) build it again.
 service:
   stage: floors
   extends: .evidence
@@ -362,13 +363,13 @@ judge:
       rc=0
       floor judge --scan out/scan/scan.json "$@" --out out/judge/judge.json > out/judge/judge.txt || rc=$?
       cat out/judge/judge.txt
-      # Each floor links the job that measured it (PRD §11.1). The pipeline is the link for the others.
+      # Each floor links the job that measured it (§11.1). The pipeline is the link for the others.
       set --
       for pair in scan=cpu memory=memory offline=connectivity; do
         f="out/${pair%%=*}/job-url.txt"
         if [ -s "$f" ]; then set -- "$@" --floor-evidence "${pair#*=}=$(cat "$f")"; fi
       done
-      # T-54: the SCI values come from the committed footprint summary (floor footprint check --out).
+      # The SCI values come from the committed footprint summary (floor footprint check --out).
       sci=.floor/evidence/footprint/sci.json
       if [ -s "$sci" ]; then set -- "$@" --footprint "$sci"; fi
       floor manifest --judge out/judge/judge.json --scan out/scan/scan.json \
@@ -404,7 +405,7 @@ fallback:
       if [ ! -s out/judge/judge.json ]; then echo "no fallback: the judge wrote no result"; exit 0; fi
       pip install -q -e ./.floor
       floor fallback --judge out/judge/judge.json --patch out/fallback/fallback.patch
-      # The floor-repair flow reads job logs, not artifacts (T-40), so the log carries the patch too.
+      # The floor-repair flow reads job logs, not artifacts (D-021), so the log carries the patch too.
       if [ -s out/fallback/fallback.patch ]; then
         echo "--- BEGIN fallback.patch ---"; cat out/fallback/fallback.patch; echo "--- END fallback.patch ---"
       fi
@@ -440,7 +441,7 @@ notice-draft:
     expose_as: Leave-Behind Notice draft
     paths: [out/notice/]
 
-# F5.4 (T-34, D-023): the gate passed, so cosign signs the Floor Manifest as an in-toto attestation on the
+# F5.4 (D-023): the gate passed, so cosign signs the Floor Manifest as an in-toto attestation on the
 # image digest. Keyless: cosign trades this job's GitLab ID token for a short-lived Sigstore certificate
 # for this pipeline definition at this ref, and the public Rekor log records the signature. Then the job
 # verifies the attestation with that exact identity and compares it with the manifest (floor attest check).
@@ -484,9 +485,9 @@ attest:
   artifacts:
     paths: [out/attest/]
 
-# F12.1 (T-46, D-025): "Who this release serves" from the signed manifest. A template, so every value in it
-# comes from the manifest. The agent summary (Duo CLI, T-04) is not here yet.
-# F12.3 (T-61, D-032): the pinned-issue summary, at most 7 lines. CI has no token that can post a note, so the
+# F12.1 (D-025): "Who this release serves" from the signed manifest. A template, so every value in it
+# comes from the manifest. The agent summary (Duo CLI) is not here yet.
+# F12.3 (D-032): the pinned-issue summary, at most 7 lines. CI has no token that can post a note, so the
 # job log carries it, and the release-summary flow copies it to the pinned issue after a release.
 herald:
   stage: publish
@@ -504,7 +505,7 @@ herald:
   artifacts:
     paths: [out/herald/]
 
-# F4.4 (T-42, D-024): a fix MR merged and the gate held again, so cut <tag>-floor.N from the merged commit.
+# F4.4 (D-024): a fix MR merged and the gate held again, so cut <tag>-floor.N from the merged commit.
 # floor release finds the fix MR of this commit and the tag pipeline that the fix repaired. Any other
 # commit gets no release. The Releases API makes the tag from ref, with CI_JOB_TOKEN (D-010).
 release:

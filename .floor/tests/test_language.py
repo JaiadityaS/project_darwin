@@ -1,4 +1,4 @@
-"""Tests for the language table (PRD F9.1, F9.2), without network access or whisper-cli."""
+"""Tests for the language table (F9.1, F9.2), without network access or whisper-cli."""
 
 from __future__ import annotations
 

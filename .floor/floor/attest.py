@@ -1,4 +1,4 @@
-"""Signing the Floor Manifest (PRD F5.4, AC-F5): the inputs of `cosign attest` and a check of its output.
+"""Signing the Floor Manifest (F5.4, AC-F5): the inputs of `cosign attest` and a check of its output.
 
 cosign signs in CI, keyless: it trades the job's GitLab ID token for a short-lived Sigstore certificate.
 The identity in that certificate is the pipeline definition at one ref, from the `ci_config_ref_uri`

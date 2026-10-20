@@ -1,7 +1,7 @@
 # Backtest evidence
 
 `<prefix>-<date>.json` is the output of `python -m floor timeline` from one run of `.github/workflows/sweep.yml`.
-`h1-<prefix>-<date>.json` is the output of `python -m floor h1` on that timeline (PRD F10.3).
+`h1-<prefix>-<date>.json` is the output of `python -m floor h1` on that timeline (F10.3).
 Do not edit these files by hand. Run the sweep again and add new files.
 
 To make the H-1 files again:
@@ -17,9 +17,9 @@ python -m floor h1 .floor/evidence/backtest/main-2026-10-15.json --git ../whispe
 | `main-cuda-2026-10-15.json` | sweep run 38701134589 (`main-cuda-` tags) | 60 |
 | `h1-main-2026-10-15.json`, `h1-main-cuda-2026-10-15.json` | `floor h1` on the two timelines above | - |
 | `sweep-jobs-38700707825.json`, `sweep-jobs-38701134589.json` | the job times of the two sweep runs (`gh run view <id> --json databaseId,jobs`) | - |
-| `footprint-2026-10-15.json` | `floor backtest-footprint` (PRD F14.4): the downloaded bytes and the runner time of the backtest | 121 |
+| `footprint-2026-10-15.json` | `floor backtest-footprint` (F14.4): the downloaded bytes and the runner time of the backtest | 121 |
 
-To make the footprint again (PRD F14.4). It reads the blob sizes from the registry and the job times from the two files:
+To make the footprint again (F14.4). It reads the blob sizes from the registry and the job times from the two files:
 
 ```bash
 python -m floor backtest-footprint .floor/evidence/backtest/main-2026-10-15.json .floor/evidence/backtest/main-cuda-2026-10-15.json --runs .floor/evidence/backtest/sweep-jobs-38700707825.json .floor/evidence/backtest/sweep-jobs-38701134589.json --out .floor/evidence/backtest/footprint-2026-10-15.json

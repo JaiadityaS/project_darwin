@@ -1,4 +1,4 @@
-"""Language table (PRD F9.1, F9.2, T-62): which languages and model sizes whisper.cpp serves, on FLEURS.
+"""Language table (F9.1, F9.2, D-031): which languages and model sizes whisper.cpp serves, on FLEURS.
 
 The `language` workflow runs whisper-cli on a seeded sample of FLEURS test clips per language, with each
 model size at f16 and at one quantization level, and with pinned decoding (F9.2). This module chooses the

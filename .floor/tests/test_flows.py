@@ -8,7 +8,7 @@ FLOWS = Path(__file__).resolve().parents[1] / "flows"
 
 
 def test_trigger_probe_flow():
-    """T-03: the probe flow (AI Catalog flow 1018639) has no tools and no clone, and only reads the event."""
+    """D-020: the probe flow (AI Catalog flow 1018639) has no tools and no clone, and only reads the event."""
     flow = yaml.safe_load((FLOWS / "trigger-probe.yml").read_text(encoding="utf-8"))
     assert flow["version"] == "v1" and flow["environment"] == "ambient" and flow["coding_environment"] == "none"
     for key in ("name", "description", "product_group"):
@@ -23,7 +23,7 @@ def test_trigger_probe_flow():
 
 
 def test_floor_repair_flow():
-    """T-40, D-021: a gate with no tools, then a repair agent that can only read logs and files and open the fix MR."""
+    """D-021: a gate with no tools, then a repair agent that can only read logs and files and open the fix MR."""
     flow = yaml.safe_load((FLOWS / "floor-repair.yml").read_text(encoding="utf-8"))
     assert flow["version"] == "v1" and flow["environment"] == "ambient" and flow["coding_environment"] == "none"
     for key in ("name", "description", "product_group"):
@@ -52,7 +52,7 @@ def test_floor_repair_flow():
 
 
 def test_release_summary_flow():
-    """T-61, D-032: a gate with no tools, then an agent that can only read job logs and post one issue note."""
+    """D-032: a gate with no tools, then an agent that can only read job logs and post one issue note."""
     flow = yaml.safe_load((FLOWS / "release-summary.yml").read_text(encoding="utf-8"))
     assert flow["version"] == "v1" and flow["environment"] == "ambient" and flow["coding_environment"] == "none"
     for key in ("name", "description", "product_group"):
@@ -82,7 +82,7 @@ def test_release_summary_flow():
 
 
 def test_field_triage_flow():
-    """T-63, D-033: a gate with no tools sorts the issue; the reply agent can only post one note."""
+    """D-033: a gate with no tools sorts the issue; the reply agent can only post one note."""
     flow = yaml.safe_load((FLOWS / "field-triage.yml").read_text(encoding="utf-8"))
     assert flow["version"] == "v1" and flow["environment"] == "ambient" and flow["coding_environment"] == "none"
     for key in ("name", "description", "product_group"):

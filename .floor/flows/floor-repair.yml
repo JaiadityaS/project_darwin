@@ -1,6 +1,6 @@
-# Rieux floor repair (task T-40, PRD F4.1 to F4.3, D-018, D-021).
+# Rieux floor repair (F4.1 to F4.3, D-018, D-021).
 # A private AI Catalog flow of the Showcase project. The trigger "Pipeline events: Failed" starts it, and only an
-# action by a person fires a trigger, so the flow makes at most one attempt per human action (PRD §9.1).
+# action by a person fires a trigger, so the flow makes at most one attempt per human action (§9.1).
 # 1. gate: no tools. It answers "raised" only when the judge build of the pipeline failed. Any other answer ends the flow.
 # 2. repair: it reads the judge log (the scripts' verdict) and the fallback job log (the canned config patch), applies the
 #    patch to the files at the pipeline commit, commits it, and opens the fix MR. The MR pipeline runs the gate again.

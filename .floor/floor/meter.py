@@ -1,9 +1,9 @@
-"""CPU and memory use of one release check (PRD F14.1: the R2 input of SCI).
+"""CPU and memory use of one release check (F14.1: the R2 input of SCI).
 
 `floor meter start` writes a state file and starts a sampler process. Every few seconds the sampler
 adds the used memory to a GB-seconds total (trapezoid rule). `floor meter stop` stops the sampler,
 adds the last interval and gives the totals that `footprint.release_inputs` reads. `floor meter join`
-adds the totals of the jobs of one release check (DECISIONS D-015).
+adds the totals of the jobs of one release check (D-015).
 
 Linux only. Two scopes:
 - the whole machine: the busy CPU time from /proc/stat, the used memory from /proc/meminfo. Use it on
