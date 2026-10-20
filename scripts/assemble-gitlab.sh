@@ -26,7 +26,8 @@ esac
 # Product paths (D-002, D-017). Everything else in this repo is dev-only.
 PRODUCT=(.floor .gitlab .gitlab-ci.yml deploy infra README.md)
 # Paths that the repair agent may change on GitLab (.floor/floor/paths.py AGENT_ALLOWED).
-# A sync adds new files there, but never overwrites or deletes the agent's files.
+# A sync never overwrites or deletes a file there that an agent changed after the last sync. A file that only
+# a sync wrote follows this repo's HEAD (D-034).
 AGENT_OWNED=(.floor/overrides deploy)
 
 die() { echo "assemble: $*" >&2; exit 1; }
@@ -102,8 +103,18 @@ for p in "${PRODUCT[@]}"; do
   rm -rf "${WORK:?}/$p"
 done
 [ ${#present[@]} -eq 0 ] || git -c core.autocrlf=false archive --format=tar HEAD -- "${present[@]}" | tar -x -C "$WORK"
+# An agent changed a file when its GitLab blob differs from the blob of the dev commit of the last sync.
+last="$(G log -1 --format=%s --grep='^chore(floor): sync Floor files from dev ' | sed -n 's/^chore(floor): sync Floor files from dev //p')"
+git cat-file -e "${last:-none}^{commit}" 2>/dev/null || last=""
 for p in "${AGENT_OWNED[@]}"; do
-  [ -e "$keep/$p" ] && mkdir -p "$WORK/$p" && cp -a "$keep/$p/." "$WORK/$p/"
+  [ -e "$keep/$p" ] || continue
+  while IFS= read -r -d '' f; do
+    rel="${f#"$keep/"}"
+    if [ -n "$last" ] && [ "$(git rev-parse -q --verify "$last:$rel" || true)" = "$(G rev-parse -q --verify "HEAD:$rel" || true)" ]; then
+      continue
+    fi
+    mkdir -p "$WORK/$(dirname "$rel")" && cp -a "$f" "$WORK/$rel"
+  done < <(find "$keep/$p" -type f -print0)
 done
 G add -A
 if G diff --cached --quiet; then

@@ -113,7 +113,8 @@ def test_limits(service):
     wav = make_wav(1)
     # The size cap comes first, before the body is read, and it does not count as a request.
     assert call(service + "/transcribe", make_wav(31))[0] == 413
-    req = urllib.request.Request(service + "/transcribe", data=b"x", method="POST",
+    # No body bytes: a close with unread bytes sends a reset, which can come before the 413 (WinError 10053, 2 in 25).
+    req = urllib.request.Request(service + "/transcribe", data=b"", method="POST",
                                  headers={"Content-Length": str(gateway.DRAIN_BYTES + 1)})  # not read
     with pytest.raises(urllib.error.HTTPError) as too_big:
         urllib.request.urlopen(req, timeout=10)
