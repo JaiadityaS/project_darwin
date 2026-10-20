@@ -54,6 +54,7 @@ Last update: 2026-10-20 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync,
 
 ## Facts learned (measured)
 
+- **TOOLS_TAG miss (main pipeline 2969295146, 2026-10-20).** A comment edit in `.gitlab/ci/tools.Dockerfile` changes TOOLS_TAG too: `check` failed. `test_tools_tag_is_the_recipe_hash` now catches it locally (D-034).
 - **Sync of dev f99e097 (main pipeline 2969163382, 2026-10-20).** Every job passed except the judge, which failed as planned (cpu raised). fallback and notice-draft passed; attest, herald and release were skipped. The flow opened MR !7 at 20:19Z, about 4.3 min after the failure, with the same 8 files as before.
 - **Field triage, negative check (issue #2, session 9777724, CI job 17329007768, 2026-10-20).** The new issue started the flow in about 54 s of job time. The gate answered "skip", and the reply agent did not run. The platform posted its own "Rieux field triage has started" note and two system notes.
 - **T-40 first run (pipeline 2960990129, session 9657869, MR !1, 2026-10-19).** The flow went from the failed pipeline to the fix MR in about 2 min. The 8 files equal `floor fallback` byte for byte. The MR author shows as the person; the commit author and the MR pipeline user are the service account. Only an action by a person fires a trigger, so the MR pipeline cannot start the flow again (D-021).

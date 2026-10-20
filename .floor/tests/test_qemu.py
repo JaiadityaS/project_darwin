@@ -91,6 +91,19 @@ def test_probe_ci_job():
     assert int(job["timeout"].rstrip("m")) * 60 > 2700 + 300  # room for the model, the export and the controls
 
 
+def test_tools_tag_is_the_recipe_hash():
+    """check.sh: TOOLS_TAG is the first 12 hex digits of the SHA-256 of the tools recipe.
+
+    A change to a comment in the recipe changes the tag too (main pipeline 2969295146)."""
+    import hashlib
+    from pathlib import Path
+
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    tag = yaml.safe_load((root / ".gitlab-ci.yml").read_text(encoding="utf-8"))["variables"]["TOOLS_TAG"]
+    assert tag == hashlib.sha256((root / ".gitlab" / "ci" / "tools.Dockerfile").read_bytes()).hexdigest()[:12]
+
+
 def test_timeout_keeps_partial_output(monkeypatch):
     """MR pipeline 2961093570: a timed-out run had no output; now it keeps what the run printed."""
     import subprocess

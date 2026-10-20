@@ -40,7 +40,7 @@ stages: [check, build, floors, judge, repair, publish]
 variables:
   IMAGE_REPO: $CI_REGISTRY_IMAGE/main
   # The first 12 hex digits of the SHA-256 of .gitlab/ci/tools.Dockerfile (check.sh compares them).
-  TOOLS_TAG: "348395c3ee88"
+  TOOLS_TAG: "7b72645f2a09"
   # GitLab usernames of the humans, space-separated. Every other pipeline user counts as an agent.
   FLOOR_HUMANS: "jaiadityasinghr"
   # The IID of the issue that gets the release summary, #2 "Rieux release summaries" (F12.3, D-032).
