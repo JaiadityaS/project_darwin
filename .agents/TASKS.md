@@ -89,7 +89,7 @@ Status values: `ready` · `doing` · `done` · `blocked` (waits on another task)
 
 | ID | Task | PRD | Status | Owner | Notes |
 |---|---|---|---|---|---|
-| T-90 | Final README: problem, claims, stage table, how to run, sources | §16.2 | doing | @JaiadityaS | Product name Rieux (D-013). Draft done (D-017): `README.md` is a product file and the GitLab front page; whisper.cpp's README moves to `README.whisper.cpp.md` at the next sync. Open: update the stage table and the numbers before submission, and check the page on GitLab after the sync |
+| T-90 | Final README: problem, claims, stage table, how to run, sources | §16.2 | doing | @JaiadityaS | Product name Rieux (D-013). Draft done (D-017): `README.md` is a product file and the GitLab front page; whisper.cpp's README moves to `README.whisper.cpp.md` at the sync. Session 10 (2026-10-20): the language table (T-62), the backtest footprint (T-23), MR !6, `GET /floor` (T-53), the two new flows, the FLEURS source; the stage table has the status of 2026-10-21. Every local path exists, and the 16 web links answer 200. Open: check the front page and the Rieux page on GitLab after each sync, and a last pass before submission |
 | T-91 | Video, under 3:00 | §16.1 | later | - | |
 | T-92 | Devpost text | §16.2 | later | - | |
 | T-99 | Delete `AGENTS.md` and `.agents/`; final hygiene check (`bash scripts/guard.sh tree`) | - | later | - | Last commit before submission |

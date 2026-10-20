@@ -56,7 +56,24 @@ The difference between all-variants and the folk fix (0.4%) is smaller than the 
 
 **The other floors.** The smallest cgroup memory limit that transcribes: tiny 512 MB, base 512 MB, small 768 MB (peak RSS 177, 284 and 750 MB on GitLab). Offline: 0 network attempts in a new network namespace under strace. The download is 81.9 MB (the tiny.en model, `whisper-cli` and its libraries).
 
-**Footprint.** SCI (ISO/IEC 21031, Green Software Foundation Impact Framework 1.1.1): 0.00196 g CO2e per audio-minute for the all-variants build in Google Cloud northamerica-northeast1. Embodied carbon is 84.6% of it. The same work in us-central1 gives 0.0131 g, 6.7 times more. One release check of Rieux itself (the scan, the 4 QEMU probes, the memory, offline and judge jobs of GitLab pipeline 2960804030) gives 0.36 g CO2e on the GitLab runners in us-east1: 486 vCPU-seconds, metered in the cgroup of each job. This is a lower bound, because the build and the unit tests are not in it. ΔM, the embodied carbon of the devices that a floor raise could force people to replace, is a separate scenario with a range. It is never added into SCI.
+**Languages.** whisper.cpp at `0c7be696` transcribed 50 FLEURS test sentences per language with the tiny, base and small models ([`language.json`](.floor/evidence/language/language.json), GitHub Actions run 39233922646). A language is served when its word error rate (WER) with the f16 model is 30% or less (`language.usable_wer` in the policy). f16 WER:
+
+| Language | tiny | base | small | Served |
+|---|---|---|---|---|
+| English (the control) | 14.2% | 9.3% | 7.6% | yes, at every size |
+| Spanish | 18.0% | 12.4% | 8.2% | yes, at every size |
+| Hindi | 134.7% | 108.7% | 58.6% | no |
+| Tamil | 131.4% | 103.4% | 72.9% | no |
+| Swahili | 127.9% | 95.3% | 77.4% | no |
+| Hausa | 121.7% | 190.3% | 90.6% | no |
+| Bengali | 166.6% | 127.9% | 221.5% | no |
+| Yoruba | 202.0% | 115.7% | 199.9% | no |
+
+- A WER above 100% is possible: the transcript has many more words than the reference.
+- The q5_1 models (the smaller download) serve the same two languages at every size. Their WER differs from f16 by at most 1.5 points. Only for Spanish tiny is the difference larger than the noise: +1.5 points (paired-bootstrap 95% interval +0.1 to +3.0).
+- 92 other whisper languages are not measured. The table is one run for this whisper.cpp commit. The release pipeline does not make it again, because each language takes about 25 runner-minutes.
+
+**Footprint.** SCI (ISO/IEC 21031, Green Software Foundation Impact Framework 1.1.1): 0.00196 g CO2e per audio-minute for the all-variants build in Google Cloud northamerica-northeast1. Embodied carbon is 84.6% of it. The same work in us-central1 gives 0.0131 g, 6.7 times more. One release check of Rieux itself (the scan, the 4 QEMU probes, the memory, offline and judge jobs of GitLab pipeline 2960804030) gives 0.36 g CO2e on the GitLab runners in us-east1: 486 vCPU-seconds, metered in the cgroup of each job. This is a lower bound, because the build and the unit tests are not in it. The backtest itself downloaded 27,470 MB (the config blob and the `/app` layer of 121 images) and used 18.4 runner-minutes in two sweep runs ([`footprint-2026-10-15.json`](.floor/evidence/backtest/footprint-2026-10-15.json)). We give it in bytes and minutes only, with no carbon value. ΔM, the embodied carbon of the devices that a floor raise could force people to replace, is a separate scenario with a range. It is never added into SCI.
 
 ## What Rieux adds
 
@@ -104,21 +121,22 @@ judge (a script): each floor held, lowered, raised or inconclusive
 - The policy is [`.floor/policy.yml`](.floor/policy.yml): CPU x86-64-v1, the memory limits, offline required. A looser policy needs a merged and approved notice (`floor ratchet`).
 - Code owners own the gate: the policy, the tools, `.gitlab-ci.yml` and `.gitlab/ci/` ([`.gitlab/CODEOWNERS`](.gitlab/CODEOWNERS)). An agent MR may change only `.devops/*.Dockerfile`, `deploy/` and `.floor/overrides/` (`floor paths`).
 - The judge is a script, not a model. Scripts decide floors.
+- Two more flows use the proof and never set a floor ([`.floor/flows/`](.floor/flows/)). Field triage answers a new issue about a CPU, memory or language problem with one note: the CPU model of the gate's probe that matches the reporter's CPU, and where the proof is. Release summary posts the "Who this release serves" lines of each release as one note on a pinned issue.
 
 ## DevSecOps stages
 
-Status on 2026-10-19. "Runs" means that it runs in this project's GitLab pipeline. "Local" means that it is written and tested, but has not run on GitLab yet.
+Status on 2026-10-21. "Runs" means that it runs in this project's GitLab pipeline. "Local" means that it is written and tested, but has not run on GitLab yet.
 
 | Stage | What Rieux does | GitLab feature | Status |
 |---|---|---|---|
-| Plan | Leave-Behind Notices are planned, reviewed decisions | MR templates, labels | Runs (`floor notice` in the check job) |
+| Plan | Leave-Behind Notices are planned, reviewed decisions. The field triage flow answers each new floor issue | MR templates, labels, issues, flow triggers | Runs (`floor notice` in the check job). The field triage flow is saved and on, with the trigger "Work item: Created". It has not answered an issue yet |
 | Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: the flow opened fix MRs !2 and !3 about 1.5 min after the failed pipelines 2961083963 and 2961094614 |
-| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3 and !5 held every floor (pipelines 2961110649 and 2961210282) |
+| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5 and !6 held every floor (pipelines 2961110649, 2961210282 and 2961810145) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; the Floor Manifest signed as an attestation | Container registry, keyless signing (GitLab ID token, Sigstore) | Runs: the attest job signed and verified the manifest (pipeline 2961110649, job 17270217868) |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
-| Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet |
-| Configure | The service image (the checked image plus an upload gateway: 30 s cap, rate limits, no storage) with a smoke test; Cloud Run in a low-carbon region | Container registry, OpenTofu state, environments | The `service` job transcribes `samples/jfk.wav` in 3.3 s (pipeline 2960909623); Cloud Run is planned |
-| Monitor | The Rieux page with the backtest, the floors and SCI | Pages | Runs |
+| Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet. The release summary for the pinned issue (`floor summary`) is local |
+| Configure | The service image (the checked image plus an upload gateway: 30 s cap, rate limits, no storage) with a smoke test; Cloud Run in a low-carbon region | Container registry, OpenTofu state, environments | The `service` job transcribes `samples/jfk.wav` in 3.3 s (pipeline 2960909623). Its `GET /floor` gives the host level and the ggml CPU variant that loaded: x86-64-v4 and `sapphirerapids` for the canned image (pipeline 2961810145, job 17274238498). Cloud Run is planned |
+| Monitor | The Rieux page with the backtest, the floors, the languages and SCI | Pages | Runs |
 | Govern | The ratchet, code owners, the agent path allowlist, the human-only notice | CODEOWNERS, approval rules | Runs (`floor ratchet`, `floor paths`) |
 
 The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4), and the policy asks for x86-64-v1. The repair loop must make it green.
@@ -167,6 +185,7 @@ On GitLab, the pipeline in [`.gitlab-ci.yml`](.gitlab-ci.yml) runs on each push 
 | `.floor/notices/` | Approved Leave-Behind Notices |
 | `.floor/scenarios/` | ΔM scenarios |
 | `.floor/overrides/` | Build overrides that the repair step may change |
+| `.floor/flows/` | The flow definitions: floor repair, field triage, release summary and the trigger probe |
 | `.gitlab-ci.yml`, `.gitlab/ci/` | The GitLab pipeline |
 | Everything else | whisper.cpp at `0c7be696` |
 
@@ -177,6 +196,7 @@ On GitLab, the pipeline in [`.gitlab-ci.yml`](.gitlab-ci.yml) runs on each push 
 - [ggml CMake options](https://github.com/ggml-org/whisper.cpp/blob/master/ggml/CMakeLists.txt) (`GGML_NATIVE`, `GGML_CPU_ALL_VARIANTS`, `GGML_BACKEND_DL`)
 - Official images: `ghcr.io/ggml-org/whisper.cpp`
 - [x86-64 microarchitecture levels](https://gitlab.com/x86-psABIs/x86-64-ABI)
+- [FLEURS](https://huggingface.co/datasets/google/fleurs) speech dataset (test split), for the language table
 - [Software Carbon Intensity (SCI)](https://sci.greensoftware.foundation/) and the [Impact Framework](https://if.greensoftware.foundation/)
 - [Google Cloud region carbon data](https://cloud.google.com/sustainability/region-carbon)
 - [in-toto attestation framework](https://github.com/in-toto/attestation)

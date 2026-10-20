@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-19 · @JaiadityaS · session 9 (T-62 done, T-63 trigger check)
+Last update: 2026-10-20 · @JaiadityaS · session 10 (T-90 numbers, T-99 check, GitLab sync)
 
 ## Where we are
 
@@ -38,13 +38,19 @@ Last update: 2026-10-19 · @JaiadityaS · session 9 (T-62 done, T-63 trigger che
 3. T-63 (F11, D-033): a draft only, `.floor/flows/field-triage.yml` and its test. Not in the catalog. Saved on 2026-10-19 as private catalog flow 1018718 (the stored definition equals the file) and enabled with the trigger "Work item (Created)", on (D-033). Open: AC-F11 (a test issue about a crash on a Sandy Bridge desktop; an answer in under 15 min). The test issue is new public content: it needs the user's yes.
 4. GitLab sync: the T-23, T-64, T-62, T-61 and T-63 changes (the page, the README, the evidence) are not on GitLab yet. Only a local session syncs (standing yes, after a dry run and a residue check). Sync once after item 1, because each sync starts a fix MR.
 5. MR !6 (pipeline 2961810145, the canned image) passed every job (EPYC-Milan 1449 s, attest, herald). It is in the log. The user decides whether to close or merge it.
-6. T-90 README: update the numbers before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
+6. T-90 README: the numbers are in (session 10). Each one names a file, a run or a pipeline. Do the last pass before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
+7. T-99 check (session 10, nothing deleted). T-99 deletes `AGENTS.md` and `.agents/` (STATE, TASKS, DECISIONS, log/) in this repo. They never go to GitLab: `scripts/assemble-gitlab.sh` copies only `.floor`, `.gitlab`, `.gitlab-ci.yml`, `deploy`, `infra` and `README.md`. `bash scripts/guard.sh tree` passes, and no tracked file is in `__pycache__`. `scripts/guard.sh` needs no change: its allowlists only permit those names. Owner decision: 83 files that go to GitLab cite IDs that a reader there cannot open: D-0xx in 26 files, "PRD" in 50, T-xx in 17, F- and AC-numbers in 52. Choose one: (a) add a short public decisions file to `.floor/`, (b) remove the IDs from the comments and docstrings, (c) keep them as they are.
 
 ## Needs a human (agents cannot do these)
 
 - [ ] T-01: access is confirmed (D-010). Still open: the Duo credit pool.
 - [ ] Sync to GitLab after each finished step. In PowerShell, from `project_darwin`: `& "C:\Program Files\Git\bin\bash.exe" scripts/assemble-gitlab.sh --push` (plain `bash` there is WSL). The push is in your name. The Showcase project is public, so a push is publishing. On 2026-10-19 the user gave a standing yes for the sync script only, after a dry run and a residue check (author and committer are the user; no trailer; no tool or vendor names in the diff or the paths). Never push this repo itself to GitLab.
-- [ ] T-61: make and pin the issue "Rieux release summaries" in the Showcase project, and save the release-summary flow with the trigger "Pipeline events: Passed" (STATE item 2, D-032).
+- [ ] T-61: make and pin the issue "Rieux release summaries" in the Showcase project, and save the release-summary flow with the trigger "Pipeline events: Passed" (STATE item 2, D-032). The issue and its pin are public content: an agent needs the owner's yes. Click by click, if no local session can do it (after the sync; T-63 used the same steps):
+  1. Open `.floor/flows/release-summary.yml` in the Showcase project, and copy the raw text.
+  2. Automate > Flows > New flow. Write the name and the description, select "Private flow", put the text in the editor, and click "Create flow".
+  3. Open the saved flow. Compare its YAML with the file: the form can keep its example YAML below yours (D-020).
+  4. Click "Enable". Remove the three default conditions (Mention, Assign, Assign reviewer). Add condition > On an event > Pipeline events > Passed. Click "Enable".
+  5. Automate > Triggers: the new trigger shows "Pipeline events (Passed)" and is on.
 - [ ] T-63: say yes to a test issue for AC-F11 (STATE item 3, D-033). The flow and its trigger are on. Note: every new work item in the Showcase project now starts the flow; its gate answers "skip" for an issue that is not about a floor.
 - [ ] Add the GitLab usernames of teammates to `FLOOR_HUMANS` in `.gitlab-ci.yml`. Every other pipeline user counts as an agent (D-014).
 - [ ] T-05: decide whether to turn on "Pipelines must succeed" (Settings → Merge requests). Now it is off, so an auto-merge set before the MR pipeline exists can merge at once (D-010).
