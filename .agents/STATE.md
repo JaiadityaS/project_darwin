@@ -55,7 +55,7 @@ Last update: 2026-10-20 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync,
 ## Facts learned (measured)
 
 - **TOOLS_TAG miss (main pipeline 2969295146, 2026-10-20).** A comment edit in `.gitlab/ci/tools.Dockerfile` changes TOOLS_TAG too: `check` failed. `test_tools_tag_is_the_recipe_hash` now catches it locally (D-034).
-- **Agent-owned miss (main pipeline 2969339383, 2026-10-20).** The sync never overwrote `.floor/overrides` and `deploy` on GitLab, so the old text with internal IDs stayed there and `test_no_internal_ids` failed. The sync now updates a file there when no agent changed it since the last sync (D-034).
+- **Agent-owned miss (main pipeline 2969339383, 2026-10-20).** The sync never overwrote `.floor/overrides` and `deploy` on GitLab, so the old text with internal IDs stayed there and `test_no_internal_ids` failed. The sync now updates a file there when only sync commits changed it on GitLab (D-034).
 - **MR !7 gate (pipeline 2969259993, 2026-10-20).** Every job passed: the four probes (EPYC-Milan 1192 s), memory, offline, judge, attest and herald. So the flow's fix of a raised CPU floor passes the full gate on the current files.
 - **Flaky gateway test (Windows).** `test_limits` failed 2 in 25 local runs with WinError 10053: the server closed with an unread body byte, which sends a reset before the 413. The test now sends no body bytes (0 in 40).
 - **Sync of dev f99e097 (main pipeline 2969163382, 2026-10-20).** Every job passed except the judge, which failed as planned (cpu raised). fallback and notice-draft passed; attest, herald and release were skipped. The flow opened MR !7 at 20:19Z, about 4.3 min after the failure, with the same 8 files as before.
