@@ -40,6 +40,8 @@ Last update: 2026-10-20 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync,
 6. T-90 README: the numbers are in (session 10). Each one names a file, a run or a pipeline. Do the last pass before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
 7. T-99 check (session 10, nothing deleted). T-99 deletes `AGENTS.md` and `.agents/` (STATE, TASKS, DECISIONS, log/) in this repo. They never go to GitLab: `scripts/assemble-gitlab.sh` copies only `.floor`, `.gitlab`, `.gitlab-ci.yml`, `deploy`, `infra` and `README.md`. `bash scripts/guard.sh tree` passes, and no tracked file is in `__pycache__`. `scripts/guard.sh` needs no change: its allowlists only permit those names. The owner chose (a), done (D-034): `.floor/DECISIONS.md` defines every cited ID, and `.floor/tests/test_ids.py` checks it. A new D-ID in a product file needs its public entry in the same commit. The catalog copies of the four flows were updated on 2026-10-20 and equal the files (D-034).
 
+8. T-92 draft: `docs/devpost.md`. Risk: for Path B, a public deployed URL that is live until about 2026-11-16 is mandatory (planning/RESEARCH.md §1, the rules). Now the only deployed URL is the GitLab Pages page. The Cloud Run service needs T-06 (GCP, the user).
+
 ## Needs a human (agents cannot do these)
 
 - [ ] T-01: access is confirmed (D-010). Still open: the Duo credit pool.
