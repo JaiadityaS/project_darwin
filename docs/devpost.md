@@ -78,10 +78,10 @@ Measured on GitLab:
 
 ### How we built it
 
-- One Python package, `floor`, with 34 modules and 25 test files. 270 tests passed in the `check` job of pipeline 2970309488.
+- One Python package, `floor`, with 35 modules and 26 test files. 274 tests passed in the `check` job of pipeline 2970403846.
 - `.gitlab-ci.yml`: check, build, service, scan, probe ×4, memory, offline, judge, fallback, notice-draft, attest, herald, release and pages.
 - Four flows in `.floor/flows/`, saved as private AI Catalog flows: floor repair (trigger: a failed pipeline), field triage (trigger: a new work item), release summary (trigger: a passed pipeline) and a trigger probe.
-- The Rieux page on GitLab Pages: the backtest timeline, the floors, the languages and SCI.
+- The Rieux page on GitLab Pages: the backtest timeline, the floors, the languages, SCI, ΔM and the repair loop.
 
 ### What we added after Oct 5
 

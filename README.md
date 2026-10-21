@@ -129,14 +129,14 @@ Status on 2026-10-21. "Runs" means that it runs in this project's GitLab pipelin
 
 | Stage | What Rieux does | GitLab feature | Status |
 |---|---|---|---|
-| Plan | Leave-Behind Notices are planned, reviewed decisions. The field triage flow answers each new floor issue | MR templates, labels, issues, flow triggers | Runs (`floor notice` in the check job). The field triage flow is saved and on, with the trigger "Work item: Created". It has not answered an issue yet |
+| Plan | Leave-Behind Notices are planned, reviewed decisions. The field triage flow answers each new floor issue | MR templates, labels, issues, flow triggers | Runs (`floor notice` in the check job). The field triage flow is saved and on, with the trigger "Work item: Created". On issue [#2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2), which is not a floor report, its gate answered "skip" and it posted no reply, as planned. It has not answered a floor issue yet |
 | Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: on 2026-10-21, the flow had opened 11 fix MRs (!1 to !11) for 11 failed `main` pipelines. 9 came 1.6 to 2.9 min after the failed pipeline ended, and the other two after 4.3 and 8.9 min ([`repairs.json`](.floor/evidence/repair/repairs.json), from the GitLab API) |
 | Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5, !6, !7, !10 and !11 held every floor (pipelines 2961110649, 2961210282, 2961810145, 2969259993, 2969425658 and 2970335928) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; the Floor Manifest signed as an attestation | Container registry, keyless signing (GitLab ID token, Sigstore) | Runs: the attest job signed and verified the manifest (pipeline 2961110649, job 17270217868) |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
 | Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet. The release summary goes to issue [#2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2) after the first release; it has not run yet |
 | Configure | The service image (the checked image plus an upload gateway: 30 s cap, rate limits, no storage) with a smoke test; Cloud Run in a low-carbon region | Container registry, OpenTofu state, environments | The `service` job transcribes `samples/jfk.wav` in 3.3 s (pipeline 2960909623). Its `GET /floor` gives the host level and the ggml CPU variant that loaded: x86-64-v4 and `sapphirerapids` for the canned image (pipeline 2961810145, job 17274238498). Cloud Run is planned |
-| Monitor | The Rieux page with the backtest, the floors, the languages and SCI | Pages | Runs |
+| Monitor | The Rieux page with the backtest, the floors, the languages, SCI, ΔM and the repair loop | Pages | Runs |
 | Govern | The ratchet, code owners, the agent path allowlist, the human-only notice | CODEOWNERS, approval rules | Runs (`floor ratchet`, `floor paths`) |
 
 The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4), and the policy asks for x86-64-v1. The repair loop must make it green.
@@ -182,10 +182,10 @@ On GitLab, the pipeline in [`.gitlab-ci.yml`](.gitlab-ci.yml) runs on each push 
 | `.floor/tests/` | Unit tests |
 | `.floor/policy.yml` | The floor policy and its JSON Schema |
 | `.floor/evidence/` | Measured results, with the run that made each file |
+| `.floor/evidence/repair/` | The repair loop on GitLab: each fix MR, its time and its gate (`floor repairs`), with a note for each gate that failed |
 | `.floor/impact/` | Impact Framework manifests and the coefficients for SCI |
 | `.floor/notices/` | Approved Leave-Behind Notices |
 | `.floor/scenarios/` | ΔM scenarios |
-| `.floor/evidence/repair/` | The repair loop on GitLab: each fix MR, its time and its gate (`floor repairs`), with a note for each gate that failed |
 | `.floor/overrides/` | Build overrides that the repair step may change |
 | `.floor/flows/` | The flow definitions: floor repair, field triage, release summary and the trigger probe |
 | `.floor/DECISIONS.md` | What the IDs in brackets mean, such as `F4.3` or `D-018`: the requirements, the plan sections and the design decisions |
