@@ -57,8 +57,8 @@ When a floor rises, the floor-repair flow of the GitLab Duo Agent Platform start
 Measured on GitLab:
 
 - The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4, AVX-512). The policy asks for x86-64-v1.
-- The flow opened fix MRs !2 and !3 about 1.5 minutes after the failed pipelines 2961083963 and 2961094614, and MR !7 about 4.3 minutes after pipeline 2969163382.
-- The gate of fix MR !7 (pipeline 2969259993) passed every job: the four QEMU probes, memory, offline, the Judge, attest and herald.
+- The flow worked every time: from 10 failed `main` pipelines, the flow opened 10 fix MRs (!1 to !10). 8 of them came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (the MR time minutesus the pipeline end time, from the GitLab API).
+- The gates of fix MRs !3, !5, !6, !7 and !10 passed every floor. For MR !10 (pipeline 2969425658) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
 - The attest job signed and verified the manifest (pipeline 2961110649, job 17270217868).
 - OPEN: the release loop. PRD §16.2 asks for 3 complete loops: a repair of the default flags, a repair of the folk fix, and one notice. Each needs a merged fix MR and a `-floor.N` tag (T-05, T-42).
 
@@ -66,7 +66,7 @@ Measured on GitLab:
 
 - **The build machine decides.** We scanned 61 official `main-<sha>` images from 2025-04 to 2026-10. 52 have the floor x86-64-v3, and 9 have x86-64-v4. The floor changed 15 times, and 10 of these changes came with no change to the Dockerfiles, the CMake files or the ggml CPU code. For 38 commits, upstream built a `main` and a `main-cuda` image from the same source in the same workflow run. In 11 of them, the two images have different floors.
 - **The folk fix does not fix it.** Under QEMU, the native build and the folk fix crash on qemu64, Nehalem and SandyBridge. The all-variants build runs on all four CPU models.
-- **Inclusion costs nothing on a modern CPU.** All variants: 20.0 CPU seconds per audio-minute. Native: 20.1. The difference (0.4%) is smaller than the noise between runs (up to 5.1%).
+- **Inclusion costs nothing on a modern CPU.** All variants: 20.0 CPU seconds per audio-minute. Native: 20.1. The difference (0.4%) is smaller than the noise between runs (up to 5.1%). The image costs a little more to download: 518.7 MB for all variants and 506.4 MB for native, 12.3 MB (2.4%) more (the compressed size in the container registry, images `8db56978` and `40cc4d9b`, the fix MR !10 and its main pipeline).
 - **Memory and network.** The smallest memory limit that transcribes: tiny 512 MB, base 512 MB, small 768 MB. Offline: 0 network attempts. The download is 81.9 MB.
 - **Languages.** With 50 FLEURS test sentences per language, whisper.cpp serves English and Spanish at every model size (WER 30% or less). Hindi, Tamil, Swahili, Hausa, Bengali and Yoruba are not served.
 

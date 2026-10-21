@@ -52,7 +52,7 @@ Every number here comes from a script in this project. The outputs are in [`.flo
 | All variants | 20.0 |
 | Baseline x86-64 code only (what an old CPU loads) | 301.9 |
 
-The difference between all-variants and the folk fix (0.4%) is smaller than the noise between runs (up to 5.1%).
+The difference between all-variants and the folk fix (0.4%) is smaller than the noise between runs (up to 5.1%). The image costs a little more to download: 518.7 MB for all variants and 506.4 MB for native, 12.3 MB (2.4%) more (the compressed size in the container registry, images `8db56978` and `40cc4d9b`, the fix MR !10 and its main pipeline).
 
 **The other floors.** The smallest cgroup memory limit that transcribes: tiny 512 MB, base 512 MB, small 768 MB (peak RSS 177, 284 and 750 MB on GitLab). Offline: 0 network attempts in a new network namespace under strace. The download is 81.9 MB (the tiny.en model, `whisper-cli` and its libraries).
 
@@ -130,8 +130,8 @@ Status on 2026-10-21. "Runs" means that it runs in this project's GitLab pipelin
 | Stage | What Rieux does | GitLab feature | Status |
 |---|---|---|---|
 | Plan | Leave-Behind Notices are planned, reviewed decisions. The field triage flow answers each new floor issue | MR templates, labels, issues, flow triggers | Runs (`floor notice` in the check job). The field triage flow is saved and on, with the trigger "Work item: Created". It has not answered an issue yet |
-| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: the flow opened fix MRs !2 and !3 about 1.5 min after the failed pipelines 2961083963 and 2961094614 |
-| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5 and !6 held every floor (pipelines 2961110649, 2961210282 and 2961810145) |
+| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: from 10 failed `main` pipelines, the flow opened 10 fix MRs (!1 to !10). 8 of them came 1.6 to 2.9 min after the failed pipeline ended, and the other two after 4.3 and 8.9 min (the MR time minus the pipeline end time, from the GitLab API) |
+| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5, !6, !7 and !10 held every floor (pipelines 2961110649, 2961210282, 2961810145, 2969259993 and 2969425658) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; the Floor Manifest signed as an attestation | Container registry, keyless signing (GitLab ID token, Sigstore) | Runs: the attest job signed and verified the manifest (pipeline 2961110649, job 17270217868) |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
 | Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet. The release summary goes to issue [#2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2) after the first release; it has not run yet |

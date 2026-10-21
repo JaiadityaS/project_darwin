@@ -53,6 +53,7 @@ Last update: 2026-10-21 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync,
 - [ ] T-05: decide whether to turn on "Pipelines must succeed" (Settings → Merge requests). Now it is off, so an auto-merge set before the MR pipeline exists can merge at once (D-010).
 - [ ] T-04: the Duo CLI in CI needs a service-account access token (scopes `api`, `ai_features`) as a masked CI variable. A group owner makes service accounts. Without it, Herald stays a template (D-025), and the submission says so.
 - [ ] T-06: Google Cloud project with billing and a budget alert, for Cloud Run and WIF.
+- [ ] Notice beat (video 1:35, PRD §16.2 "≥ 1 Leave-Behind Notice"): the `notice-draft` job drafts only when the canned config is on the branch and the gate still fails, and the canned config has held every floor. So a notice needs a real trade-off that the owner decides. Options: (a) an MR that raises the main image to x86-64-v2, with a notice and a `cpu-v2` ΔM scenario (no SSE4.2: about 11 per 10,000 x86 users, Steam September 2026, 1 - 98.21/98.32). The measured gain is small: 12.3 MB (2.4%) of image and 0.4% CPU time. So the reviewer may refuse it, and the refusal is the demo; (b) the same MR, and the owner signs and merges it, so the notice goes into the release notes; (c) no notice: the video shows the template, `floor ratchet` and the ΔM section only. The MR and the notice are public content: they need the owner's yes.
 - [ ] Add teammates as collaborators on GitHub `JaiadityaS/project_darwin`.
 
 ## Facts learned (measured)
