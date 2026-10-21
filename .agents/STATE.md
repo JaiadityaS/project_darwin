@@ -126,7 +126,7 @@ Last update: 2026-10-21 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync,
   - 2026-05-25: v4 at 10:56Z (`b3877e10`), v3 at 18:57Z (`865ec171`), v4 at 21:04Z (`44a50ca4`), v3 at 23:24Z (`f14ae77f`).
   - 2026-05-31: v4 at 12:47Z (`f39cc712`), v3 at 13:11Z (`2e045a96`).
   - The newest image, `main-0c7be696…` (2026-10-15T04:29Z), is v4 + AVX512_BF16, AVX512_VNNI, GFNI. Today's published `main` crashes on every CPU without AVX-512.
-- **H-1 on GitLab (signal 5, D-038).** `floor runners` (`.floor/evidence/runners/runners.json`): of 21 main pipelines, 19 built on an Intel Xeon Platinum 8581C (x86-64-v4) and 2 on an AMD EPYC 7B13 (x86-64-v3: pipelines 2969163382 and 2970859268). The judged floor equals the level of the build machine in all 21. `main-0f7d064e` (v4) to `main-86e5dc5d` (v3): 1 commit, 7 files in `.floor/` and `README.md`, no build input. QEMU on the AMD runner is about 4x faster for EPYC-Milan (353 s in MR !15).
+- **H-1 on GitLab (signal 5, D-038).** `floor runners` (`.floor/evidence/runners/runners.json`): of 22 main pipelines, 19 built on an Intel Xeon Platinum 8581C (x86-64-v4) and 3 on an AMD EPYC 7B13 (x86-64-v3: pipelines 2969163382, 2970859268 and 2973711384). The judged floor equals the level of the build machine in all 21. `main-0f7d064e` (v4) to `main-86e5dc5d` (v3): 1 commit, 7 files in `.floor/` and `README.md`, no build input. QEMU on the AMD runner is about 4x faster for EPYC-Milan (353 s in MR !15).
 - **Same commit, different floors (H-1 signal 4).** The CPU image and the CUDA image of one commit can have different floors:
   - `6227a0ef`: `main` v4, `main-cuda` v3.
   - `46ca43d6` and `968eebe7`: `main` v3, `main-cuda` v4.

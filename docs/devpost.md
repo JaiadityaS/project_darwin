@@ -57,15 +57,15 @@ When a floor rises, the floor-repair flow of the GitLab Duo Agent Platform start
 Measured on GitLab:
 
 - The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4 on an Intel Xeon Platinum 8581C, x86-64-v3 on an AMD EPYC 7B13). The policy asks for x86-64-v1.
-- The flow answered every failed pipeline: on 2026-10-21, it had opened 14 fix MRs (!1 to !12, !14 and !15) for 14 failed `main` pipelines. 12 came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (`.floor/evidence/repair/repairs.json`, from the GitLab API; the Rieux page shows the table).
-- The gates of fix MRs !3, !5, !6, !7, !10, !11, !12, !14 and !15 passed every floor. For MR !15 (pipeline 2970973362) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
+- The flow answered every failed pipeline: on 2026-10-21, it had opened 15 fix MRs (!1 to !12 and !14 to !16) for 15 failed `main` pipelines. 13 came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (`.floor/evidence/repair/repairs.json`, from the GitLab API; the Rieux page shows the table).
+- The gates of fix MRs !3, !5, !6, !7, !10, !11, !12, !14, !15 and !16 passed every floor. For MRs !15 and !16 (pipelines 2970973362 and 2973807759) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
 - The attest job signed and verified the manifest (pipeline 2961110649, job 17270217868).
 - The notice path ran once, on a real trade-off. MR !13, a proposal by the owner, removed the baseline CPU variant of ggml (about 1 MB) from the image. The gate raised the CPU floor to x86-64-v2 (on qemu64 the image stopped), the fallback had no patch, and the `notice-draft` job wrote the Leave-Behind Notice draft: 11 to 12 of each 10,000 x86 users affected, ΔM 0.7 to 35 kg CO2e. The owner refused it and closed the MR. The Rieux page shows the decision.
 - OPEN: the release loop. PRD §16.2 asks for 3 complete loops: a repair of the default flags, a repair of the folk fix, and one notice. The notice path ran on MR !13; the owner refused it, so it made no release. Each repair loop needs a merged fix MR and a `-floor.N` tag (T-05, T-42).
 
 ### What we measured
 
-- **The build machine decides.** We scanned 61 official `main-<sha>` images from 2025-04 to 2026-10. 52 have the floor x86-64-v3, and 9 have x86-64-v4. The floor changed 15 times, and 10 of these changes came with no change to the Dockerfiles, the CMake files or the ggml CPU code. For 38 commits, upstream built a `main` and a `main-cuda` image from the same source in the same workflow run. In 11 of them, the two images have different floors. Our own `main` pipelines on GitLab show it too: 19 of 21 got x86-64-v4 and 2 got x86-64-v3, always the level of the runner. One commit that changed only 7 files in `.floor/` and `README.md` moved the floor from x86-64-v4 to x86-64-v3 (pipelines 2970462438 and 2970859268).
+- **The build machine decides.** We scanned 61 official `main-<sha>` images from 2025-04 to 2026-10. 52 have the floor x86-64-v3, and 9 have x86-64-v4. The floor changed 15 times, and 10 of these changes came with no change to the Dockerfiles, the CMake files or the ggml CPU code. For 38 commits, upstream built a `main` and a `main-cuda` image from the same source in the same workflow run. In 11 of them, the two images have different floors. Our own `main` pipelines on GitLab show it too: 19 of 22 got x86-64-v4 and 3 got x86-64-v3, always the level of the runner. One commit that changed only 7 files in `.floor/` and `README.md` moved the floor from x86-64-v4 to x86-64-v3 (pipelines 2970462438 and 2970859268).
 - **The folk fix does not fix it.** Under QEMU, the native build and the folk fix crash on qemu64, Nehalem and SandyBridge. The all-variants build runs on all four CPU models.
 - **Inclusion costs nothing on a modern CPU.** All variants: 20.0 CPU seconds per audio-minute. Native: 20.1. The difference (0.4%) is smaller than the noise between runs (up to 5.1%). The image costs a little more to download: 518.7 MB for all variants and 506.4 MB for native, 12.3 MB (2.4%) more (the compressed size in the container registry, images `8db56978` and `40cc4d9b`, the fix MR !10 and its main pipeline).
 - **Memory and network.** The smallest memory limit that transcribes: tiny 512 MB, base 512 MB, small 768 MB. Offline: 0 network attempts. The download is 81.9 MB.
@@ -79,7 +79,7 @@ Measured on GitLab:
 
 ### How we built it
 
-- One Python package, `floor`, with 36 modules and 27 test files. 274 tests passed in the `check` job of pipeline 2970403846.
+- One Python package, `floor`, with 36 modules and 27 test files. 280 tests passed in the `check` job of pipeline 2973711384.
 - `.gitlab-ci.yml`: check, build, service, scan, probe ×4, memory, offline, judge, fallback, notice-draft, attest, herald, release and pages.
 - Four flows in `.floor/flows/`, saved as private AI Catalog flows: floor repair (trigger: a failed pipeline), field triage (trigger: a new work item), release summary (trigger: a passed pipeline) and a trigger probe.
 - The Rieux page on GitLab Pages: the backtest timeline, the floors, the languages, SCI, ΔM and the repair loop.
@@ -97,9 +97,9 @@ The git history shows where upstream ends: the first Rieux commit on GitLab is `
 
 ### Challenges
 
-- 19 of our 21 `main` builds on GitLab ran on a runner with AVX-512, and 2 did not. So upstream's recipe gave x86-64-v4 or x86-64-v3 on GitLab, and x86-64-v3 on a GitHub runner. The same source gives a different floor on a different cloud machine, even in one project. So the gate must check each build, not each recipe.
+- 19 of our 22 `main` builds on GitLab ran on a runner with AVX-512, and 3 did not. So upstream's recipe gave x86-64-v4 or x86-64-v3 on GitLab, and x86-64-v3 on a GitHub runner. The same source gives a different floor on a different cloud machine, even in one project. So the gate must check each build, not each recipe.
 - QEMU runs the image's own loader and libraries, so the probe needs the image's file system as a sysroot, with its absolute symbolic links made relative.
-- The EPYC-Milan probe is slow under QEMU. In the first gates it passed the 2400-second run limit. We cut the audio context and kept the full 11-second sample. Since then the job takes 1156 to 1464 seconds on the Intel runners (11 MR pipelines) and 353 seconds on an AMD EPYC 7B13 runner (MR !15).
+- The EPYC-Milan probe is slow under QEMU. In the first gates it passed the 2400-second run limit. We cut the audio context and kept the full 11-second sample. Since then the job takes 1156 to 1464 seconds on the Intel runners (11 MR pipelines) and 223 to 353 seconds on an AMD EPYC 7B13 runner (MRs !15 and !16).
 - The AI Catalog does not check the tool names in a flow definition. So after each save we read the stored definition back and compare its SHA-256 with the file in `.floor/flows/`.
 
 ### What we learned

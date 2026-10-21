@@ -1,7 +1,7 @@
 {
   "tool": "floor 0.1.0",
   "project": "87296266",
-  "as_of": "2026-10-21T20:08:23+00:00",
+  "as_of": "2026-10-21T21:02:46+00:00",
   "rows": [
     {
       "mr": 1,
@@ -226,14 +226,30 @@
       "gate_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2970973362",
       "gate_status": "success",
       "gate_judge": "success"
+    },
+    {
+      "mr": 16,
+      "mr_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/merge_requests/16",
+      "state": "opened",
+      "opened_at": "2026-10-21T20:47:22.021Z",
+      "failed_pipeline": 2973711384,
+      "failed_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2973711384",
+      "failed_ref": "main",
+      "failed_at": "2026-10-21T20:45:02.418Z",
+      "failed_judge": "failed",
+      "minutes": 2.3,
+      "gate_pipeline": 2973807759,
+      "gate_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2973807759",
+      "gate_status": "success",
+      "gate_judge": "success"
     }
   ],
   "summary": {
-    "fix_mrs": 14,
-    "under_3_min": 12,
+    "fix_mrs": 15,
+    "under_3_min": 13,
     "median_minutes": 1.9,
     "max_minutes": 8.9,
-    "gate_judge_passed": 11,
+    "gate_judge_passed": 12,
     "merged": 0
   }
 }

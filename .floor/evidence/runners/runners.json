@@ -1,7 +1,7 @@
 {
   "tool": "floor 0.1.0",
   "project": "87296266",
-  "as_of": "2026-10-21T08:24:59+00:00",
+  "as_of": "2026-10-21T20:54:44+00:00",
   "build_paths": [
     ".devops/",
     ".github/workflows/docker.yml",
@@ -245,6 +245,17 @@
       "machine_level": "x86-64-v3",
       "judge_job": 17340197459,
       "floor": "x86-64-v3"
+    },
+    {
+      "pipeline": 2973711384,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2973711384",
+      "sha": "851a724d20e94d1f9afef3766024af2e21fc3f4d",
+      "created_at": "2026-10-21T20:15:52.576Z",
+      "build_job": 17362193861,
+      "machine": "AMD EPYC 7B13",
+      "machine_level": "x86-64-v3",
+      "judge_job": 17362193870,
+      "floor": "x86-64-v3"
     }
   ],
   "flips": [
@@ -305,7 +316,7 @@
     }
   ],
   "summary": {
-    "pipelines": 21,
+    "pipelines": 22,
     "machines": {
       "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz": {
         "level": "x86-64-v4",
@@ -313,10 +324,10 @@
       },
       "AMD EPYC 7B13": {
         "level": "x86-64-v3",
-        "pipelines": 2
+        "pipelines": 3
       }
     },
-    "floor_is_machine_level": 21,
+    "floor_is_machine_level": 22,
     "flips": 3,
     "flips_without_build_changes": 1
   },
