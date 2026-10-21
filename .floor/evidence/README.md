@@ -12,6 +12,8 @@ Measured results that the Floor page (`python -m floor page`) and the README use
 | `language/` | `language.yml` run 39233922646 (whisper.cpp 0c7be696, FLEURS test, 50 sentences per language) | The served / not-served language table (F9.1, D-031): WER and CER of tiny, base and small at f16 and q5_1, the drift with a paired-bootstrap 95% interval, and the pinned decoding (F9.2) |
 | `spotcheck/` | `floor spotcheck` on the GitHub search hits, the seed and one label per sampled hit (§3.2, D-030) | The true-positive rate of the "illegal instruction" hits of whisper.cpp. The labels are a reading of each thread, with a reason and a link |
 | `footprint/` | `floor footprint check` on the if-run output of `.floor/impact/sci-*.yml` | The SCI summary (F14.1). CI runs if-run again and compares the result with this file |
+| `repair/` | `floor repairs --api https://gitlab.com/api/v4 --project 87296266 --out .floor/evidence/repair/repairs.json` (the GitLab API, no token) | The repair loop on GitLab (F4): each fix MR of the floor-repair flow, its minutes and its gate. `notes.json` is a note by a person for each gate that did not pass |
+| `notice/` | The log of the `notice-draft` job (MR pipeline 2970472763, job 17337464293) and MR !13 | Each Leave-Behind Notice draft of a gate (F4.5) and what a code owner did with it (F6). `drafts.json` is written by a person from the MR and the job log |
 
 ```bash
 gh workflow run cpu-proof.yml

@@ -1,0 +1,30 @@
+{
+  "about": "Each Leave-Behind Notice draft of a gate (F4.5) and what a code owner did with it (F6). Written by a person from the MR, its pipeline and the log of the notice-draft job. An accepted draft becomes a file in .floor/notices/.",
+  "drafts": [
+    {
+      "mr": 13,
+      "mr_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/merge_requests/13",
+      "proposal": "Remove the baseline CPU variant of ggml, libggml-cpu-x64.so (985,528 bytes), from the main image.",
+      "pipeline": 2970472763,
+      "pipeline_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2970472763",
+      "job": 17337464293,
+      "job_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17337464293",
+      "draft": "mr-13-0001-cpu.md",
+      "change": "cpu: x86-64-v1 → x86-64-v2",
+      "gate": "judge: cpu raised to x86-64-v2 (static proof), below the policy floor; probe qemu64: SIGABRT, ggml found no CPU backend that it can load; fallback: the canned config was on the branch already, no patch",
+      "n_affected": [
+        11,
+        12
+      ],
+      "n_unit": "per 10,000 x86 users",
+      "delta_m_kgco2e": [
+        0.679,
+        34.6
+      ],
+      "scenario": ".floor/scenarios/cpu-v2.yml",
+      "decision": "refused",
+      "decided_at": "2026-10-21T07:51:27Z",
+      "note": "The owner closed the MR with a comment and did not approve it. The floor stays at x86-64-v1."
+    }
+  ]
+}

@@ -57,10 +57,11 @@ When a floor rises, the floor-repair flow of the GitLab Duo Agent Platform start
 Measured on GitLab:
 
 - The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4, AVX-512). The policy asks for x86-64-v1.
-- The flow answered every failed pipeline: on 2026-10-21, it had opened 11 fix MRs (!1 to !11) for 11 failed `main` pipelines. 9 came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (`.floor/evidence/repair/repairs.json`, from the GitLab API; the Rieux page shows the table).
-- The gates of fix MRs !3, !5, !6, !7, !10 and !11 passed every floor. For MR !11 (pipeline 2970335928) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
+- The flow answered every failed pipeline: on 2026-10-21, it had opened 13 fix MRs (!1 to !12 and !14) for 13 failed `main` pipelines. 11 came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (`.floor/evidence/repair/repairs.json`, from the GitLab API; the Rieux page shows the table).
+- The gates of fix MRs !3, !5, !6, !7, !10, !11, !12 and !14 passed every floor. For MR !14 (pipeline 2970478794) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
 - The attest job signed and verified the manifest (pipeline 2961110649, job 17270217868).
-- OPEN: the release loop. PRD §16.2 asks for 3 complete loops: a repair of the default flags, a repair of the folk fix, and one notice. Each needs a merged fix MR and a `-floor.N` tag (T-05, T-42).
+- The notice path ran once, on a real trade-off. MR !13, a proposal by the owner, removed the baseline CPU variant of ggml (about 1 MB) from the image. The gate raised the CPU floor to x86-64-v2 (on qemu64 the image stopped), the fallback had no patch, and the `notice-draft` job wrote the Leave-Behind Notice draft: 11 to 12 of each 10,000 x86 users affected, ΔM 0.7 to 35 kg CO2e. The owner refused it and closed the MR. The Rieux page shows the decision.
+- OPEN: the release loop. PRD §16.2 asks for 3 complete loops: a repair of the default flags, a repair of the folk fix, and one notice. The notice path ran on MR !13; the owner refused it, so it made no release. Each repair loop needs a merged fix MR and a `-floor.N` tag (T-05, T-42).
 
 ### What we measured
 
@@ -74,7 +75,7 @@ Measured on GitLab:
 
 - SCI (ISO/IEC 21031, Impact Framework 1.1.1): 0.00196 g CO2e per audio-minute for the all-variants build in Google Cloud northamerica-northeast1. Embodied carbon is 84.6% of it. The same work in us-central1 gives 0.0131 g, 6.7 times more.
 - One release check of Rieux itself gives 0.36 g CO2e on the GitLab runners: 486 vCPU-seconds, metered in the cgroup of each job. This is a lower bound.
-- The real lever is the hardware that a release forces people to replace. ΔM is the embodied carbon of the devices that a floor raise could make obsolete. It is a scenario with a range, and it is never added into SCI. Per 10,000 x86 users: a raise from x86-64-v1 to x86-64-v3 (the folk fix) gives 30 to 1,651 kg CO2e; a raise to x86-64-v4 (upstream's recipe on an AVX-512 build machine) gives 889 to 87,338 kg CO2e. Inputs: the Steam Hardware Survey (September 2026), two Dell product carbon footprints, and 1% to 5% of affected people who replace their device. The files are in `.floor/scenarios/`, and the Rieux page shows them.
+- The real lever is the hardware that a release forces people to replace. ΔM is the embodied carbon of the devices that a floor raise could make obsolete. It is a scenario with a range, and it is never added into SCI. Per 10,000 x86 users: a raise from x86-64-v1 to x86-64-v2 (a build without the baseline CPU variant) gives 0.7 to 35 kg CO2e; a raise to x86-64-v3 (the folk fix) gives 30 to 1,651 kg CO2e; a raise to x86-64-v4 (upstream's recipe on an AVX-512 build machine) gives 889 to 87,338 kg CO2e. Inputs: the Steam Hardware Survey (September 2026), two Dell product carbon footprints, and 1% to 5% of affected people who replace their device. The files are in `.floor/scenarios/`, and the Rieux page shows them.
 
 ### How we built it
 
@@ -98,7 +99,7 @@ The git history shows where upstream ends: the first Rieux commit on GitLab is `
 
 - The GitLab runner has AVX-512. So upstream's recipe gives x86-64-v4 on GitLab and x86-64-v3 on a GitHub runner. The same source gives a different floor on a different cloud machine.
 - QEMU runs the image's own loader and libraries, so the probe needs the image's file system as a sysroot, with its absolute symbolic links made relative.
-- The EPYC-Milan probe is slow under QEMU (1192 to 1449 seconds). We cut the audio context and kept the full 11-second sample.
+- The EPYC-Milan probe is slow under QEMU. In the first gates it passed the 2400-second run limit. We cut the audio context and kept the full 11-second sample. Since then the job takes 1156 to 1464 seconds (11 MR pipelines).
 - The AI Catalog does not check the tool names in a flow definition. So after each save we read the stored definition back and compare its SHA-256 with the file in `.floor/flows/`.
 
 ### What we learned
