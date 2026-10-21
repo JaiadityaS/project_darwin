@@ -33,7 +33,8 @@ Every number here comes from a script in this project. The outputs are in [`.flo
 **The build machine decides (hypothesis H-1, supported).** We scanned 61 official `main-<sha>` images from 2025-04 to 2026-10. 52 have the floor x86-64-v3, and 9 have x86-64-v4 (AVX-512). The floor changed 15 times, and 10 of these changes came with no change to the Dockerfiles, the CMake files or the ggml CPU code. For 38 commits, upstream built both a `main` and a `main-cuda` image from the same source, in the same workflow run. In 11 of them, the two images have different floors. Only the runner was different.
 
 - The #3510 pair: `main-a1867e0` is x86-64-v4 + AVX512_VNNI (its `libggml-cpu.so` has EVEX code). `main-c62adfbd` is x86-64-v3.
-- The same recipe gave x86-64-v3 on a GitHub runner (AMD EPYC, no AVX-512 visible) and x86-64-v4 on the GitLab runner (Intel Xeon Platinum 8581C, AVX-512). So the image that you download depends on which cloud machine built it.
+- The same recipe gave x86-64-v3 on a GitHub runner (AMD EPYC, no AVX-512 visible) and x86-64-v4 on a GitLab runner (Intel Xeon Platinum 8581C, AVX-512). So the image that you download depends on which cloud machine built it.
+- It happens on GitLab too. Of the 21 `main` pipelines of this project, 19 built the image on an Intel Xeon Platinum 8581C (x86-64-v4) and 2 on an AMD EPYC 7B13 (x86-64-v3). In each one, the judge found the level of the build machine. `main-0f7d064e` (pipeline 2970462438) is x86-64-v4. The next commit changed 7 files, all in `.floor/` and `README.md`, and `main-86e5dc5d` (pipeline 2970859268) is x86-64-v3 ([`runners/`](.floor/evidence/runners/runners.json)).
 
 **The folk fix does not fix it.** We built whisper.cpp three ways and ran each `whisper-cli` under QEMU on four CPU models, with positive and negative controls:
 
@@ -130,8 +131,8 @@ Status on 2026-10-21. "Runs" means that it runs in this project's GitLab pipelin
 | Stage | What Rieux does | GitLab feature | Status |
 |---|---|---|---|
 | Plan | Leave-Behind Notices are planned, reviewed decisions. The field triage flow answers each new floor issue | MR templates, labels, issues, flow triggers | Runs (`floor notice` in the check job). The field triage flow is saved and on, with the trigger "Work item: Created". On issue [#2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2), which is not a floor report, its gate answered "skip" and it posted no reply, as planned. It has not answered a floor issue yet |
-| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: on 2026-10-21, the flow had opened 13 fix MRs (!1 to !12 and !14) for 13 failed `main` pipelines. 11 came 1.6 to 2.9 min after the failed pipeline ended, and the other two after 4.3 and 8.9 min ([`repairs.json`](.floor/evidence/repair/repairs.json), from the GitLab API). The notice path ran on [!13](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/merge_requests/13), a proposal by the owner to remove the baseline CPU variant: the gate raised the CPU floor to x86-64-v2, `fallback` had no patch, and `notice-draft` wrote the draft (job 17337464293; ΔM 0.7 to 35 kg CO2e per 10,000 x86 users). The owner refused it and closed the MR ([`notice/`](.floor/evidence/notice/drafts.json)) |
-| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5, !6, !7, !10, !11, !12 and !14 held every floor (pipelines 2961110649, 2961210282, 2961810145, 2969259993, 2969425658, 2970335928, 2970418568 and 2970478794) |
+| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: on 2026-10-21, the flow had opened 14 fix MRs (!1 to !12, !14 and !15) for 14 failed `main` pipelines. 12 came 1.6 to 2.9 min after the failed pipeline ended, and the other two after 4.3 and 8.9 min ([`repairs.json`](.floor/evidence/repair/repairs.json), from the GitLab API). The notice path ran on [!13](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/merge_requests/13), a proposal by the owner to remove the baseline CPU variant: the gate raised the CPU floor to x86-64-v2, `fallback` had no patch, and `notice-draft` wrote the draft (job 17337464293; ΔM 0.7 to 35 kg CO2e per 10,000 x86 users). The owner refused it and closed the MR ([`notice/`](.floor/evidence/notice/drafts.json)) |
+| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5, !6, !7, !10, !11, !12, !14 and !15 held every floor (pipelines 2961110649, 2961210282, 2961810145, 2969259993, 2969425658, 2970335928, 2970418568, 2970478794 and 2970973362) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; the Floor Manifest signed as an attestation | Container registry, keyless signing (GitLab ID token, Sigstore) | Runs: the attest job signed and verified the manifest (pipeline 2961110649, job 17270217868) |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
 | Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet. The release summary goes to issue [#2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2) after the first release; it has not run yet |
@@ -139,7 +140,7 @@ Status on 2026-10-21. "Runs" means that it runs in this project's GitLab pipelin
 | Monitor | The Rieux page with the backtest, the floors, the languages, SCI, ΔM and the repair loop | Pages | Runs |
 | Govern | The ratchet, code owners, the agent path allowlist, the human-only notice | CODEOWNERS, approval rules | Runs (`floor ratchet`, `floor paths`) |
 
-The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4), and the policy asks for x86-64-v1. The repair loop must make it green.
+The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4 in 19 of 21 `main` pipelines, x86-64-v3 in 2), and the policy asks for x86-64-v1. The repair loop must make it green.
 
 ## How to run
 
@@ -165,10 +166,11 @@ python -m floor scan build/bin
 python -m floor probe --cpu Nehalem -- build/bin/whisper-cli -m models/ggml-tiny.en.bin -f samples/jfk.wav
 ```
 
-Read the repair loop of a GitLab project from its public API (no token), then make the Rieux page from the evidence:
+Read the repair loop and the build machines of a GitLab project from its public API and job logs (no token), then make the Rieux page from the evidence:
 
 ```bash
 python -m floor repairs --api https://gitlab.com/api/v4 --project 87296266 --out .floor/evidence/repair/repairs.json
+python -m floor runners --api https://gitlab.com/api/v4 --project 87296266 --web https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase --out .floor/evidence/runners/runners.json
 python -m floor page --out site
 ```
 
@@ -183,6 +185,7 @@ On GitLab, the pipeline in [`.gitlab-ci.yml`](.gitlab-ci.yml) runs on each push 
 | `.floor/policy.yml` | The floor policy and its JSON Schema |
 | `.floor/evidence/` | Measured results, with the run that made each file |
 | `.floor/evidence/repair/` | The repair loop on GitLab: each fix MR, its time and its gate (`floor repairs`), with a note for each gate that failed |
+| `.floor/evidence/runners/` | H-1 on GitLab: the build machine and the CPU floor of each `main` pipeline (`floor runners`) |
 | `.floor/impact/` | Impact Framework manifests and the coefficients for SCI |
 | `.floor/notices/` | Approved Leave-Behind Notices |
 | `.floor/scenarios/` | ΔM scenarios |

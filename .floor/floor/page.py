@@ -13,7 +13,7 @@ from datetime import datetime
 from html import escape
 from pathlib import Path
 
-from . import delta_m, repairs
+from . import delta_m, repairs, runners
 
 LEVELS = ("x86-64-v1", "x86-64-v2", "x86-64-v3", "x86-64-v4")
 SERIES = (("main", "main-", "var(--a)"), ("main-cuda", "main-cuda-", "var(--b)"))
@@ -133,6 +133,33 @@ def _section_h1(h1: dict | None, h1_cuda: dict | None) -> str:
             html.append(f'<tr><td><code>{escape(p["commit"][:10])}</code></td><td>{escape(p["a_floor"])}</td>'
                         f'<td>{escape(p["b_floor"])}</td></tr>')
         html.append('</table><p class="mute">Same source, two images, two floors.</p></div>')
+    return "".join(html)
+
+
+def _section_h1_gitlab(doc: dict | None) -> str:
+    """H-1 on this project's own `main` pipelines: the shared runner that built each image and its CPU floor."""
+    if not doc or not (doc.get("summary") or {}).get("pipelines"):
+        return ""
+    ok = str(doc.get("verdict")).startswith("supported")
+    urls = {r["pipeline"]: r.get("url") for r in doc.get("rows") or []}
+    machines = sorted(doc["summary"]["machines"].items(), key=lambda kv: -kv[1]["pipelines"])
+    html = [f'<div class="card verdict{" ok" if ok else ""}"><b>On GitLab too.</b><p>{escape(runners.text(doc))}</p>'
+            '<table><tr><th>Build machine (shared runner)</th><th>x86-64 level</th><th><code>main</code> pipelines</th></tr>']
+    html += [f'<tr><td>{escape(name)}</td><td>{escape(m["level"])}</td><td>{m["pipelines"]}</td></tr>' for name, m in machines]
+    html.append('</table>')
+    if doc.get("flips"):
+        html.append('<table><tr><th>From</th><th>To</th><th>Commits</th><th>Files</th><th>Build inputs changed</th></tr>')
+        for f in doc["flips"]:
+            ends = [f'{_link(urls.get(e["pipeline"]), str(e["pipeline"]))} <code>{escape(e["sha"][:8])}</code> '
+                    f'{escape(e["floor"])}' for e in (f["from"], f["to"])]
+            changed = ", ".join(f"<code>{escape(p)}</code>" for p in f["build_changes"]) or "<b>none</b>"
+            html.append(f'<tr><td>{ends[0]}</td><td>{ends[1]}</td><td>{f["commits"]}</td><td>{f["changed_files"]}</td>'
+                        f'<td>{changed}</td></tr>')
+        html.append('</table>')
+    html.append('<p class="mute">Each <code>main</code> pipeline builds the upstream recipe <code>.devops/main.Dockerfile</code> '
+                'on a shared runner. The build job prints the build machine; the judge finds the CPU floor in the image. '
+                'Build inputs: the Dockerfiles, the CMake files, the ggml CPU code and <code>.gitlab-ci.yml</code>. From the GitLab API and the job '
+                f'logs on {escape(str(doc.get("as_of") or "-")[:10])}.</p></div>')
     return "".join(html)
 
 
@@ -430,6 +457,7 @@ def collect(evidence: Path, notices_dir: Path | None = None, scenarios_dir: Path
             "language": _load(evidence / "language" / "language.json"),
             "energy": _load(evidence / "energy" / "energy.json"), "sci": _load(evidence / "footprint" / "sci.json"),
             "delta_m": scenarios, "repairs": _load(evidence / "repair" / "repairs.json"),
+            "runners": _load(evidence / "runners" / "runners.json"),
             "repair_notes": _load(evidence / "repair" / "notes.json"),
             "notice_drafts": _load(evidence / "notice" / "drafts.json")}
 
@@ -442,7 +470,7 @@ def render(data: dict, generated: str) -> str:
 <h1>Rieux</h1>
 <p class="lead">Every release of whisper.cpp says which machines it still runs on, with proof. If a change would leave
 people behind, the gate stops it, an agent repairs it, and only a human can accept the loss.</p>
-<h2>Does the build machine set the floor?</h2>{_section_h1(data["h1"], data["h1_cuda"])}
+<h2>Does the build machine set the floor?</h2>{_section_h1(data["h1"], data["h1_cuda"])}{_section_h1_gitlab(data.get("runners"))}
 <h2>Backtest: published images over time</h2>{_section_timeline(data["timelines"], data.get("backtest_cost"))}
 <h2>CPU proof: three builds, four old CPUs</h2>{_section_cpu(data["proofs"])}
 <h2>The repair loop on GitLab</h2>{_section_repairs(data.get("repairs"), data.get("repair_notes"))}

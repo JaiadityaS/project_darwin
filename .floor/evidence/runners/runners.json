@@ -1,0 +1,324 @@
+{
+  "tool": "floor 0.1.0",
+  "project": "87296266",
+  "as_of": "2026-10-21T08:24:59+00:00",
+  "build_paths": [
+    ".devops/",
+    ".github/workflows/docker.yml",
+    "CMakeLists.txt",
+    "Makefile",
+    "cmake/",
+    "ggml/CMakeLists.txt",
+    "ggml/cmake/",
+    "ggml/src/CMakeLists.txt",
+    "ggml/src/ggml-cpu/",
+    ".gitlab-ci.yml"
+  ],
+  "rows": [
+    {
+      "pipeline": 2958271425,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2958271425",
+      "sha": "6d9de13da3dd47b9cd33ac29eef0235a08a9b554",
+      "created_at": "2026-10-17T10:07:36.589Z",
+      "build_job": 17254170139,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17254170145,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2958309699,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2958309699",
+      "sha": "84388f56c442195bc1cd8fdbafee3c0e91abf254",
+      "created_at": "2026-10-17T10:31:13.180Z",
+      "build_job": 17254337575,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17254337583,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2960804030,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960804030",
+      "sha": "643299271c35e066cdba1134a5b084fb61e832ed",
+      "created_at": "2026-10-18T20:13:07.494Z",
+      "build_job": 17268313177,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17268313185,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2960896128,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960896128",
+      "sha": "04bddeb5f718a3ab6b9e01d2371e8223f0edd786",
+      "created_at": "2026-10-18T21:27:01.031Z",
+      "build_job": 17268884277,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17268884286,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2960909623,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960909623",
+      "sha": "3c576ef4f231a0c45df809650a8daabef573d211",
+      "created_at": "2026-10-18T21:38:22.659Z",
+      "build_job": 17268972446,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17268972455,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2960926378,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960926378",
+      "sha": "3c576ef4f231a0c45df809650a8daabef573d211",
+      "created_at": "2026-10-18T21:54:39.143Z",
+      "build_job": 17269079360,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17269079369,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2960962126,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960962126",
+      "sha": "3c576ef4f231a0c45df809650a8daabef573d211",
+      "created_at": "2026-10-18T22:15:18.813Z",
+      "build_job": 17269276803,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17269276812,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2960990129,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2960990129",
+      "sha": "80563cd8106afda99428c81dd6cd365cba976702",
+      "created_at": "2026-10-18T22:37:28.244Z",
+      "build_job": 17269451709,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17269451718,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2961083963,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2961083963",
+      "sha": "e3d75a492a4638db5f238696d5d4d2751d0536fd",
+      "created_at": "2026-10-18T23:46:42.495Z",
+      "build_job": 17270054350,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17270054359,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2961094614,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2961094614",
+      "sha": "988858c0fd1041d8e585d0ac82aa6b36020f674f",
+      "created_at": "2026-10-18T23:57:10.841Z",
+      "build_job": 17270123532,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17270123541,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2961114166,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2961114166",
+      "sha": "354db463220cd68af54bd0f286e174653497ea8e",
+      "created_at": "2026-10-19T00:07:43.901Z",
+      "build_job": 17270237227,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17270237236,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2961183840,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2961183840",
+      "sha": "0185f00749e42e48ae3e1cdb9bd5f91a9ce672fe",
+      "created_at": "2026-10-19T00:56:15.126Z",
+      "build_job": 17270664523,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17270664532,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2961779904,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2961779904",
+      "sha": "f5f6650d03f1b4df3afd5430438786a44dee9002",
+      "created_at": "2026-10-19T06:03:46.938Z",
+      "build_job": 17274060433,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17274060442,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2969163382,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2969163382",
+      "sha": "46bec195bd6f58e3652888963d81871432137704",
+      "created_at": "2026-10-20T19:46:44.270Z",
+      "build_job": 17328563674,
+      "machine": "AMD EPYC 7B13",
+      "machine_level": "x86-64-v3",
+      "judge_job": 17328563683,
+      "floor": "x86-64-v3"
+    },
+    {
+      "pipeline": 2969295146,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2969295146",
+      "sha": "61c5075fd7df28aaa21cd21323c0a25056b9c20a",
+      "created_at": "2026-10-20T20:30:31.888Z",
+      "build_job": 17329574746,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17329574755,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2969339383,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2969339383",
+      "sha": "f8945f0df0645f7d251fcc170161e23822c07bba",
+      "created_at": "2026-10-20T20:44:23.664Z",
+      "build_job": 17329884679,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17329884688,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2969385744,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2969385744",
+      "sha": "40cc4d9bbb77046f16c0fe83e5d05bcd146855b2",
+      "created_at": "2026-10-20T20:58:24.652Z",
+      "build_job": 17330199443,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17330199452,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2970309488,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2970309488",
+      "sha": "fbe3ff12a1a87597d7cb488d8941368bbd301f7d",
+      "created_at": "2026-10-21T04:06:10.782Z",
+      "build_job": 17336422993,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17336423002,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2970403846,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2970403846",
+      "sha": "51459d621e127d6331242dabe5f374f94d87868f",
+      "created_at": "2026-10-21T04:54:01.429Z",
+      "build_job": 17337024002,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17337024011,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2970462438,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2970462438",
+      "sha": "0f7d064ecbdea991825b2ad157ceb7251702420c",
+      "created_at": "2026-10-21T05:21:56.947Z",
+      "build_job": 17337393642,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17337393651,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2970859268,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2970859268",
+      "sha": "86e5dc5db5a946b4e2375f152f02c91ea86ada13",
+      "created_at": "2026-10-21T07:55:14.305Z",
+      "build_job": 17340197450,
+      "machine": "AMD EPYC 7B13",
+      "machine_level": "x86-64-v3",
+      "judge_job": 17340197459,
+      "floor": "x86-64-v3"
+    }
+  ],
+  "flips": [
+    {
+      "from": {
+        "pipeline": 2961779904,
+        "sha": "f5f6650d03f1b4df3afd5430438786a44dee9002",
+        "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "pipeline": 2969163382,
+        "sha": "46bec195bd6f58e3652888963d81871432137704",
+        "machine": "AMD EPYC 7B13",
+        "floor": "x86-64-v3"
+      },
+      "commits": 1,
+      "changed_files": 25,
+      "build_changes": [
+        ".gitlab-ci.yml"
+      ]
+    },
+    {
+      "from": {
+        "pipeline": 2969163382,
+        "sha": "46bec195bd6f58e3652888963d81871432137704",
+        "machine": "AMD EPYC 7B13",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "pipeline": 2969295146,
+        "sha": "61c5075fd7df28aaa21cd21323c0a25056b9c20a",
+        "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+        "floor": "x86-64-v4"
+      },
+      "commits": 1,
+      "changed_files": 59,
+      "build_changes": [
+        ".gitlab-ci.yml"
+      ]
+    },
+    {
+      "from": {
+        "pipeline": 2970462438,
+        "sha": "0f7d064ecbdea991825b2ad157ceb7251702420c",
+        "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "pipeline": 2970859268,
+        "sha": "86e5dc5db5a946b4e2375f152f02c91ea86ada13",
+        "machine": "AMD EPYC 7B13",
+        "floor": "x86-64-v3"
+      },
+      "commits": 1,
+      "changed_files": 7,
+      "build_changes": []
+    }
+  ],
+  "summary": {
+    "pipelines": 21,
+    "machines": {
+      "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz": {
+        "level": "x86-64-v4",
+        "pipelines": 19
+      },
+      "AMD EPYC 7B13": {
+        "level": "x86-64-v3",
+        "pipelines": 2
+      }
+    },
+    "floor_is_machine_level": 21,
+    "flips": 3,
+    "flips_without_build_changes": 1
+  },
+  "verdict": "supported: in each main pipeline the CPU floor is the level of the build machine, and 1 floor change came with no change to the build inputs"
+}

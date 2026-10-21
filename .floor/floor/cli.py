@@ -15,7 +15,7 @@ import requests
 
 from . import __version__
 from . import (attest, backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice,
-               herald, language, offline, page, paths, policy, qemu, ratchet, release, repairs, spotcheck)
+               herald, language, offline, page, paths, policy, qemu, ratchet, release, repairs, runners, spotcheck)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -414,6 +414,25 @@ def _cmd_repairs(args: argparse.Namespace) -> int:
         (f"!{r['mr']}", str(r["failed_pipeline"]), r["failed_judge"] or "-", _g(r["minutes"]),
          str(r["gate_pipeline"] or "-"), r["gate_judge"] or "-", r["state"]) for r in doc["rows"]])
     print(repairs.text(doc))
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **doc})
+    return 0
+
+
+def _cmd_runners(args: argparse.Namespace) -> int:
+    try:
+        doc = runners.collect(args.api, args.project, args.web)
+    except requests.RequestException as exc:
+        print(f"floor: GitLab gave no answer: {exc}", file=sys.stderr)
+        return 2
+    _print_rows([("PIPELINE", "COMMIT", "BUILD MACHINE", "LEVEL", "CPU FLOOR")] + [
+        (str(r["pipeline"]), r["sha"][:8], r["machine"] or "-", r["machine_level"] or "-", r["floor"] or "-")
+        for r in doc["rows"]])
+    for f in doc["flips"]:
+        print(f"flip {f['from']['pipeline']} -> {f['to']['pipeline']}: {f['from']['floor']} -> {f['to']['floor']}, "
+              f"{f['commits']} commits, {f['changed_files']} files, build inputs: {', '.join(f['build_changes']) or 'none'}")
+    print(runners.text(doc))
+    print(f"H-1 on GitLab: {doc['verdict']}")
     if args.out:
         _write_json(Path(args.out), {"tool": f"floor {__version__}", **doc})
     return 0
@@ -1067,6 +1086,13 @@ def main(argv: list[str] | None = None) -> int:
     rp.add_argument("--project", required=True, help="project id ($CI_PROJECT_ID)")
     rp.add_argument("--out", help="write the rows as JSON (.floor/evidence/repair/repairs.json)")
     rp.set_defaults(func=_cmd_repairs)
+
+    rn = sub.add_parser("runners", help="H-1 on GitLab: the build machine and the CPU floor of each main pipeline (F10.3)")
+    rn.add_argument("--api", required=True, metavar="URL", help="GitLab API URL ($CI_API_V4_URL)")
+    rn.add_argument("--project", required=True, help="project id ($CI_PROJECT_ID)")
+    rn.add_argument("--web", required=True, metavar="URL", help="project web URL, for the job logs ($CI_PROJECT_URL)")
+    rn.add_argument("--out", help="write the rows as JSON (.floor/evidence/runners/runners.json)")
+    rn.set_defaults(func=_cmd_runners)
 
     dm = sub.add_parser("delta-m", help="ΔM scenario: range and sensitivity table (F14.3, §13.3)")
     dm.add_argument("scenario", help="scenario YAML (see .floor/scenarios/TEMPLATE.yml)")

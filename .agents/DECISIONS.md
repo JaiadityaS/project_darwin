@@ -365,3 +365,11 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Outcome (2026-10-21): the gate of MR !13 (pipeline 2970472763) failed as planned, `fallback` made no patch, and `notice-draft` (job 17337464293) wrote the draft with ΔM 0.679–34.6 kg CO2e. On qemu64 the image stopped with SIGABRT, not SIGILL: without the x64 variant ggml finds no CPU backend that it can load. The owner refused: a comment, then "Close merge request" at 07:51:27Z. Recorded in `.floor/evidence/notice/` and on the page (`_section_notices`).
 - Public entry: none needed. No product file cites D-037.
 - PRD impact: F4.5, F6, §16.2 (loop 3: the notice).
+
+## D-038 (2026-10-21) H-1 on GitLab: `floor runners`
+- Fact: the build job of main pipeline 2970859268 (dev 7b44fab, GitLab `86e5dc5d`) ran on an AMD EPYC 7B13 (no AVX-512), so the image got x86-64-v3. The main pipelines before it ran on an Intel Xeon Platinum 8581C and got x86-64-v4. The README said "the GitLab runner has AVX-512".
+- Decision: `floor runners --api --project --web --out` reads the public GitLab API and the raw job logs (no token; the trace API needs one) and writes `.floor/evidence/runners/runners.json`: for each main pipeline, the build machine ("build machine:" line of the build job) and the CPU floor (the judge table). For each floor change between two pipelines next to each other, the compare API lists the changed files in the build inputs (h1.FLOOR_PATHS plus `.gitlab-ci.yml`, a strict choice). The page shows it as a card in the H-1 section.
+- Measured (2026-10-21): 21 main pipelines, 19 on the Intel runner (v4), 2 on the AMD runner (v3: 2969163382 and 2970859268). In all 21 the floor equals the level of the build machine. 3 floor changes; 1 with no change to the build inputs (0f7d064e to 86e5dc5d: 1 commit, 7 files, all in `.floor/` and `README.md`). The other 2 changed `.gitlab-ci.yml`, so the strict rule counts them as explained.
+- Side fact: QEMU on the AMD runner ran the EPYC-Milan probe of MR !15 in 353 s (the Intel runners: 1156 to 1464 s).
+- Public entry: none needed. No product file cites D-038.
+- PRD impact: F10.3 (H-1 on the submission project itself), F12.2.

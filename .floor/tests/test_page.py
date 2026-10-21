@@ -160,6 +160,24 @@ def test_page_repairs(tmp_path):
     assert "Repair loop: no fix MR yet." in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
 
 
+def test_page_runners(tmp_path):
+    """H-1 on GitLab: the runner of each main pipeline, and a flip with no change to the build inputs."""
+    from test_runners import _doc
+
+    doc = {"as_of": "2026-10-21T09:00:00+00:00", **_doc()}
+    (tmp_path / "ev" / "runners").mkdir(parents=True)
+    (tmp_path / "ev" / "runners" / "runners.json").write_text(json.dumps(doc), encoding="utf-8")
+    html = page.build(tmp_path / "ev", tmp_path / "out", generated="x").read_text(encoding="utf-8")
+    h1 = html.split("<h2>Does the build machine set the floor?</h2>")[1].split("<h2>")[0]
+    assert '<div class="card verdict ok"><b>On GitLab too.</b><p>3 main pipelines: 2 on AMD EPYC 7B13 (x86-64-v3)' in h1
+    assert "<tr><td>AMD EPYC 7B13</td><td>x86-64-v3</td><td>2</td></tr>" in h1
+    assert ('<td><a href="https://gitlab.example/p/-/pipelines/20">20</a> <code>bbbbbbbb</code> x86-64-v4</td>'
+            '<td><a href="https://gitlab.example/p/-/pipelines/30">30</a> <code>cccccccc</code> x86-64-v3</td>'
+            '<td>1</td><td>2</td><td><b>none</b></td>') in h1
+    assert "<td><code>.gitlab-ci.yml</code></td>" in h1 and "job logs on 2026-10-21" in h1
+    assert "On GitLab too." not in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
+
+
 def test_page_notice_drafts(tmp_path):
     """F4.5 and F6: a draft that a code owner refused is on the page, and no accepted notice."""
     (tmp_path / "ev" / "notice").mkdir(parents=True)
