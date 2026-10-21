@@ -14,7 +14,7 @@ Draft for the submission form. Every number comes from `README.md` or from a pip
 | GitLab project | https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase |
 | Deployed URL | OPEN: the Cloud Run URL (T-06, T-50, T-51). It must be live until 2026-11-16. Now: the Rieux page, https://showcase-9a1941.gitlab.io/ |
 | Video | OPEN: the YouTube URL (T-91), public, under 3:00 |
-| Built with | python, gitlab-ci, gitlab-duo-agent-platform, qemu, docker, sigstore, in-toto, impact-framework, gitlab-pages, opentofu, google-cloud-run |
+| Built with | python, gitlab-ci, gitlab-duo-agent-platform, qemu, docker, sigstore, in-toto, impact-framework, gitlab-pages, opentofu, google-cloud-run (OPEN: keep opentofu and google-cloud-run only if the Cloud Run service is live) |
 
 The pitch is 190 characters. Count it again after each change.
 
