@@ -15,7 +15,7 @@ import requests
 
 from . import __version__
 from . import (attest, backtest, delta_m, energy, fallback, footprint, h1, judge, manifest, memory, meter, notice,
-               herald, language, offline, page, paths, policy, qemu, ratchet, release, spotcheck)
+               herald, language, offline, page, paths, policy, qemu, ratchet, release, repairs, spotcheck)
 from .isa.levels import level_name
 from .isa.scan import ROLES, FileReport, scan_path, summarize
 from .oci import DEFAULT_REPO, Registry, inspect_image, pull_layer
@@ -401,6 +401,21 @@ def _cmd_fallback(args: argparse.Namespace) -> int:
 
 def _cmd_page(args: argparse.Namespace) -> int:
     print(f"wrote {page.build(args.evidence, args.out, args.notices, scenarios_dir=args.scenarios)}")
+    return 0
+
+
+def _cmd_repairs(args: argparse.Namespace) -> int:
+    try:
+        doc = repairs.collect(args.api, args.project)
+    except requests.RequestException as exc:
+        print(f"floor: the GitLab API gave no answer: {exc}", file=sys.stderr)
+        return 2
+    _print_rows([("MR", "FAILED PIPELINE", "JUDGE", "MINUTES", "GATE", "GATE JUDGE", "STATE")] + [
+        (f"!{r['mr']}", str(r["failed_pipeline"]), r["failed_judge"] or "-", _g(r["minutes"]),
+         str(r["gate_pipeline"] or "-"), r["gate_judge"] or "-", r["state"]) for r in doc["rows"]])
+    print(repairs.text(doc))
+    if args.out:
+        _write_json(Path(args.out), {"tool": f"floor {__version__}", **doc})
     return 0
 
 
@@ -1046,6 +1061,12 @@ def main(argv: list[str] | None = None) -> int:
     pg.add_argument("--scenarios", default=".floor/scenarios", help="ΔM scenarios folder")
     pg.add_argument("--out", default="site", help="output folder (index.html)")
     pg.set_defaults(func=_cmd_page)
+
+    rp = sub.add_parser("repairs", help="the repair loop on GitLab: each fix MR, its time and its gate (F4)")
+    rp.add_argument("--api", required=True, metavar="URL", help="GitLab API URL ($CI_API_V4_URL)")
+    rp.add_argument("--project", required=True, help="project id ($CI_PROJECT_ID)")
+    rp.add_argument("--out", help="write the rows as JSON (.floor/evidence/repair/repairs.json)")
+    rp.set_defaults(func=_cmd_repairs)
 
     dm = sub.add_parser("delta-m", help="ΔM scenario: range and sensitivity table (F14.3, §13.3)")
     dm.add_argument("scenario", help="scenario YAML (see .floor/scenarios/TEMPLATE.yml)")

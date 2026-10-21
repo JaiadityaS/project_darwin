@@ -140,6 +140,25 @@ def test_page_delta_m(tmp_path):
     assert "No ΔM scenario yet" in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
 
 
+def test_page_repairs(tmp_path):
+    """The repair loop: one row for each fix MR, with links to GitLab."""
+    import json
+
+    from test_repairs import API
+
+    from floor import repairs
+    found = repairs.rows(API.__getitem__)
+    (tmp_path / "ev" / "repair").mkdir(parents=True)
+    (tmp_path / "ev" / "repair" / "repairs.json").write_text(json.dumps(
+        {"as_of": "2026-10-21T04:00:00+00:00", "rows": found, "summary": repairs.summary(found)}), encoding="utf-8")
+    (tmp_path / "ev" / "repair" / "notes.json").write_text(json.dumps({"notes": {"3": "a <note>"}}), encoding="utf-8")
+    html = page.build(tmp_path / "ev", tmp_path / "out", generated="x").read_text(encoding="utf-8")
+    assert '<a href="https://gitlab.example/p/-/merge_requests/10">!10</a></td><td>2.1</td>' in html
+    assert "2 fix MRs." in html and "From the GitLab API on 2026-10-21" in html
+    assert '<td class="mute">a &lt;note&gt;</td>' in html
+    assert "Repair loop: no fix MR yet." in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
+
+
 def test_cli(tmp_path):
     assert main(["page", "--evidence", str(tmp_path), "--out", str(tmp_path / "site")]) == 0
     assert (tmp_path / "site" / "index.html").exists()

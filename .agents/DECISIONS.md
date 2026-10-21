@@ -349,3 +349,11 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Not done: a memory scenario. The Steam proxy (0.02% under 4 GB) does not count the 1 GB devices and small VPS that a 768 MB floor would affect, so no sourced N exists yet.
 - Public entry: none needed. No product file cites D-035.
 - PRD impact: F14.3, §13.3 (sourced demo values for CPU).
+
+## D-036 (2026-10-21) The repair loop on the Rieux page
+- Fact: the page (the deployed URL for now) did not show the repair loop, which is the core of the Hands-off story. The proof was only in the MR list.
+- Decision: `floor repairs --api --project --out` reads the public GitLab API (no token) and writes `.floor/evidence/repair/repairs.json`: for each `floor-fix/<pipeline>` MR, the failed pipeline and its judge, the minutes from the pipeline end to the MR, and the latest MR pipeline with its judge. `notes.json` holds a note, written by a person from the job logs, for each gate that failed (MRs !1, !2, !4: harness, D-022 and D-027; !8, !9: check failures on old main commits). The page shows a table after the CPU proof.
+- The file is a dated snapshot, committed like the other evidence. The pages job does not call the API.
+- Measured (2026-10-21): 10 fix MRs; 8 under 3 min (median 2.2, slowest 8.9); the judge passed in 7 MR gates; none merged.
+- Public entry: none needed. No product file cites D-036.
+- PRD impact: F12.2 (the page shows F4 on GitLab).

@@ -1,0 +1,10 @@
+{
+  "about": "A note for each fix MR whose gate did not pass, written by a person from the job logs. The keys are MR numbers.",
+  "notes": {
+    "1": "A fault of the harness, not of the fix: the chroot jobs had no /proc, so ggml loaded no CPU backend (D-022). Fixed, then MR !3 held every floor.",
+    "2": "EPYC-Milan passed the 2400 s run limit under QEMU, so the judge said cpu inconclusive. Fixed with a smaller audio context (D-027).",
+    "4": "EPYC-Milan passed the 2400 s run limit, as in MR !2 (D-027).",
+    "8": "The judge passed. The check job failed: on that main commit, TOOLS_TAG did not match the edited tools recipe. Fixed on main later.",
+    "9": "The judge passed. The check job failed: on that main commit, a test found old text in two files. Fixed on main later."
+  }
+}

@@ -184,6 +184,7 @@ On GitLab, the pipeline in [`.gitlab-ci.yml`](.gitlab-ci.yml) runs on each push 
 | `.floor/impact/` | Impact Framework manifests and the coefficients for SCI |
 | `.floor/notices/` | Approved Leave-Behind Notices |
 | `.floor/scenarios/` | ΔM scenarios |
+| `.floor/evidence/repair/` | The repair loop on GitLab: each fix MR, its time and its gate (`floor repairs`), with a note for each gate that failed |
 | `.floor/overrides/` | Build overrides that the repair step may change |
 | `.floor/flows/` | The flow definitions: floor repair, field triage, release summary and the trigger probe |
 | `.floor/DECISIONS.md` | What the IDs in brackets mean, such as `F4.3` or `D-018`: the requirements, the plan sections and the design decisions |

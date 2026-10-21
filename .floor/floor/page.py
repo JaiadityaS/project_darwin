@@ -1,7 +1,7 @@
 """The Floor page (F12.2): one static HTML file built only from evidence files.
 
 Sections: the H-1 verdict, the backtest timeline, same-commit pairs, the CPU proof under QEMU,
-the latest manifest diff, the languages, the energy per audio-minute of each build, SCI, the ΔM
+the repair loop on GitLab, the latest manifest diff, the languages, the energy per audio-minute of each build, SCI, the ΔM
 scenarios and the notices. A section with no evidence says "not measured yet".
 No scripts, no external requests: the page works offline, like the product it describes.
 """
@@ -13,7 +13,7 @@ from datetime import datetime
 from html import escape
 from pathlib import Path
 
-from . import delta_m
+from . import delta_m, repairs
 
 LEVELS = ("x86-64-v1", "x86-64-v2", "x86-64-v3", "x86-64-v4")
 SERIES = (("main", "main-", "var(--a)"), ("main-cuda", "main-cuda-", "var(--b)"))
@@ -189,6 +189,37 @@ def _section_cpu(proofs: list[dict]) -> str:
             '<p class="mute">whisper-cli transcribes the JFK sample under QEMU user mode. Each CPU model also runs '
             'a positive control (must pass) and a negative control one level higher (must crash); a run counts only '
             'when both controls behave.</p></div>')
+
+
+def _link(url: str | None, label: str) -> str:
+    return f'<a href="{escape(url)}">{escape(label)}</a>' if url else escape(label)
+
+
+def _status(value: str | None) -> str:
+    cls = {"success": "pass", "failed": "fail"}.get(value or "", "inc")
+    return f'<span class="{cls}">{escape(value or "-")}</span>'
+
+
+def _section_repairs(doc: dict | None, notes: dict | None = None) -> str:
+    """F4 on GitLab: each fix MR of the floor-repair flow, its time and its gate."""
+    if not doc or not doc.get("rows"):
+        return '<div class="card">Repair loop: no fix MR yet.</div>'
+    notes = (notes or {}).get("notes", {})
+    rows = "".join(
+        f'<tr><td>{_link(r.get("failed_url"), str(r["failed_pipeline"]))}</td><td>{_status(r.get("failed_judge"))}</td>'
+        f'<td>{_link(r.get("mr_url"), "!" + str(r["mr"]))}</td>'
+        f'<td>{"-" if r.get("minutes") is None else format(r["minutes"], ".1f")}</td>'
+        f'<td>{_link(r.get("gate_url"), str(r.get("gate_pipeline") or "-"))}</td><td>{_status(r.get("gate_judge"))}</td>'
+        f'<td>{_status(r.get("gate_status"))}</td><td>{escape(r.get("state") or "-")}</td>'
+        f'<td class="mute">{escape(notes.get(str(r["mr"]), ""))}</td></tr>'
+        for r in doc["rows"])
+    return (f'<div class="card"><p>{escape(repairs.text(doc))}</p>'
+            '<table><tr><th>Failed pipeline</th><th>Its judge</th><th>Fix MR</th><th>Minutes</th><th>MR pipeline</th>'
+            f'<th>Its judge</th><th>Its status</th><th>MR state</th><th>Note</th></tr>{rows}</table>'
+            '<p class="mute">The judge (a script) failed the pipeline because a floor rose. The floor-repair flow read the '
+            'judge log and the patch of the fallback job, and opened the fix MR. Minutes: from the end of the failed '
+            'pipeline to the MR. The MR pipeline runs the same gate again. A person decides the merge. '
+            f'From the GitLab API on {escape((doc.get("as_of") or "?")[:10])}.</p></div>')
 
 
 def _section_manifest(diff: str | None) -> str:
@@ -379,7 +410,8 @@ def collect(evidence: Path, notices_dir: Path | None = None, scenarios_dir: Path
             "backtest_cost": _load(costs[-1]) if costs else None,
             "language": _load(evidence / "language" / "language.json"),
             "energy": _load(evidence / "energy" / "energy.json"), "sci": _load(evidence / "footprint" / "sci.json"),
-            "delta_m": scenarios}
+            "delta_m": scenarios, "repairs": _load(evidence / "repair" / "repairs.json"),
+            "repair_notes": _load(evidence / "repair" / "notes.json")}
 
 
 def render(data: dict, generated: str) -> str:
@@ -393,6 +425,7 @@ people behind, the gate stops it, an agent repairs it, and only a human can acce
 <h2>Does the build machine set the floor?</h2>{_section_h1(data["h1"], data["h1_cuda"])}
 <h2>Backtest: published images over time</h2>{_section_timeline(data["timelines"], data.get("backtest_cost"))}
 <h2>CPU proof: three builds, four old CPUs</h2>{_section_cpu(data["proofs"])}
+<h2>The repair loop on GitLab</h2>{_section_repairs(data.get("repairs"), data.get("repair_notes"))}
 <h2>Latest release</h2>{_section_manifest(data["diff"])}
 <h2>Languages</h2>{_section_languages(data.get("language"))}
 <h2>Energy per audio-minute: the cost of inclusion</h2>{_section_energy(data["energy"], data["sci"])}

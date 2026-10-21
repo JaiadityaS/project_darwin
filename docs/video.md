@@ -32,7 +32,7 @@ All links are under `https://gitlab.com/gitlab-ai-hackathon/transcend-october-20
 1. `/-/jobs/17330199448`: the SandyBridge probe of the upstream recipe.
 2. `https://showcase-9a1941.gitlab.io/`: the Rieux page (the timeline, the language table, SCI, ΔM).
 3. `/-/pipelines/2969385744`: the main pipeline with the red judge.
-4. `/-/merge_requests/10`: the fix MR. Show the time and the commit author "Rieux floor repair" (the flow). The MR author is the owner's account, because the flow acts for the person whose action started it.
+4. `/-/merge_requests/10`: the fix MR. Show the time, the commit author and the MR pipeline user: both are "Rieux floor repair", the flow's service account. The MR author is the owner's account, because the flow acts for the person whose action started it.
 5. `/-/pipelines/2969425658`: the MR pipeline, every job green.
 6. Later: the notice MR, the test issue, the release page with "Who this release serves", the Cloud Run URL.
 
