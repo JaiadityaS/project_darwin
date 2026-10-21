@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-20 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync, T-61 issue #2, T-63 negative check, D-034 public decisions file)
+Last update: 2026-10-21 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync, T-61 issue #2, T-63 negative check, D-034 public decisions file, D-035 ΔM scenarios)
 
 ## Where we are
 
@@ -36,11 +36,12 @@ Last update: 2026-10-20 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync,
    - after the next release (a merged fix MR of a tag, D-024), check the note: at most 8 lines, the same text as the herald log, and the tag line. Check also that the trigger fires for a pipeline that an auto-merge started.
 3. T-63 (F11, D-033): a draft only, `.floor/flows/field-triage.yml` and its test. Not in the catalog. Saved on 2026-10-19 as private catalog flow 1018718 (the stored definition equals the file) and enabled with the trigger "Work item (Created)", on (D-033). Negative check passed (2026-10-20): issue #2 started session 9777724, the gate answered "skip" and no reply was posted. The platform adds its own "has started" note to each new work item. Open: AC-F11 (a test issue about a crash on a Sandy Bridge desktop; an answer in under 15 min). The owner said yes: ONE issue, at the end of the project, with real data (the measured crash of the upstream image under QEMU SandyBridge). Make no canary issues before that. Run it after the first `-floor` release, because the reply points to the latest release. Draft (internal, post only then): title "Field test: whisper.cpp crashes with Illegal instruction on a Sandy Bridge desktop"; body: a field test of the triage flow (AC-F11) with measured data; the upstream recipe image of whisper.cpp 0c7be696 crashes with SIGILL (exit -4) on the QEMU model SandyBridge (x86-64-v2, AVX, no AVX2), probe job 17329574751 of pipeline 2969295146 (controls +v2 pass, -v3 fail); the same kind of report upstream: ggml-org/whisper.cpp#3510. Say in the body that it is a test. Do not name a CPU model that was not measured.
 4. GitLab sync: done twice in session 10. Pipeline 2969163382 (dev f99e097) failed at the judge as planned, and the flow opened MR !7. The next sync carries D-034 and `FLOOR_SUMMARY_ISSUE`. Only a local session syncs (standing yes, after a dry run and a residue check). Batch changes: each sync starts a fix MR.
-5. MRs !1 to !7 are open. MR !6 (pipeline 2961810145, the canned image) passed every job (EPYC-Milan 1449 s, attest, herald). The user decides whether to close or merge them.
+5. MRs !1 to !10 are open. MR !10 (pipeline 2969425658, from main 2969385744) passed every job. MRs !8 and !9 failed `check` only, because their branches came from main before the D-034 fix (`test_no_internal_ids`, `TOOLS_TAG`); their other jobs passed. MR !6 (pipeline 2961810145, the canned image) passed every job (EPYC-Milan 1449 s, attest, herald). The user decides whether to close or merge them.
 6. T-90 README: the numbers are in (session 10). Each one names a file, a run or a pipeline. Do the last pass before submission. Do not use the unchecked keyword counts of PRD §3.2 (D-030).
 7. T-99 check (session 10, nothing deleted). T-99 deletes `AGENTS.md` and `.agents/` (STATE, TASKS, DECISIONS, log/) in this repo. They never go to GitLab: `scripts/assemble-gitlab.sh` copies only `.floor`, `.gitlab`, `.gitlab-ci.yml`, `deploy`, `infra` and `README.md`. `bash scripts/guard.sh tree` passes, and no tracked file is in `__pycache__`. `scripts/guard.sh` needs no change: its allowlists only permit those names. The owner chose (a), done (D-034): `.floor/DECISIONS.md` defines every cited ID, and `.floor/tests/test_ids.py` checks it. A new D-ID in a product file needs its public entry in the same commit. The catalog copies of the four flows were updated on 2026-10-20 and equal the files (D-034).
 
 8. T-92 draft: `docs/devpost.md`. Risk: for Path B, a public deployed URL that is live until about 2026-11-16 is mandatory (planning/RESEARCH.md §1, the rules). Now the only deployed URL is the GitLab Pages page. The Cloud Run service needs T-06 (GCP, the user).
+9. T-56 ΔM (D-035): sourced CPU scenarios `cpu-v3.yml` and `cpu-v4.yml`, the page section and the README text are in dev. They go to GitLab with the next sync. A memory scenario is open (no sourced N).
 
 ## Needs a human (agents cannot do these)
 

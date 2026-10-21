@@ -74,7 +74,7 @@ Measured on GitLab:
 
 - SCI (ISO/IEC 21031, Impact Framework 1.1.1): 0.00196 g CO2e per audio-minute for the all-variants build in Google Cloud northamerica-northeast1. Embodied carbon is 84.6% of it. The same work in us-central1 gives 0.0131 g, 6.7 times more.
 - One release check of Rieux itself gives 0.36 g CO2e on the GitLab runners: 486 vCPU-seconds, metered in the cgroup of each job. This is a lower bound.
-- The real lever is the hardware that a release forces people to replace. ΔM is the embodied carbon of the devices that a floor raise could make obsolete. It is a scenario with a range, and it is never added into SCI. OPEN: give the ΔM range as one number, with its file in `.floor/scenarios/`.
+- The real lever is the hardware that a release forces people to replace. ΔM is the embodied carbon of the devices that a floor raise could make obsolete. It is a scenario with a range, and it is never added into SCI. Per 10,000 x86 users: a raise from x86-64-v1 to x86-64-v3 (the folk fix) gives 30 to 1,651 kg CO2e; a raise to x86-64-v4 (upstream's recipe on an AVX-512 build machine) gives 889 to 87,338 kg CO2e. Inputs: the Steam Hardware Survey (September 2026), two Dell product carbon footprints, and 1% to 5% of affected people who replace their device. The files are in `.floor/scenarios/`, and the Rieux page shows them.
 
 ### How we built it
 

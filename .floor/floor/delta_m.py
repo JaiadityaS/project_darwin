@@ -53,6 +53,16 @@ def validate(doc: dict) -> None:
         raise ScenarioError("; ".join(problems))
 
 
+def fits(doc: dict, floor: dict | None) -> bool:
+    """A cpu scenario fits a raise only when its change ends at the measured level ("x86-64-v1 -> x86-64-v4"),
+    so a notice does not show the ΔM of another level. Other dimensions, and a change or a floor with no
+    level, always fit."""
+    if doc.get("dimension") != "cpu" or not (floor or {}).get("x86_64"):
+        return True
+    _, arrow, to = str(doc.get("change") or "").rpartition("->")
+    return not arrow or to.strip() == floor["x86_64"]
+
+
 def _bounds(doc: dict, p_low: float, p_high: float) -> tuple[float, float]:
     n, e, d, life = (doc[name] for name in RANGES)
     low = n["low"] * e["low"] * p_low * min(d["low"] / life["high"], 1.0)

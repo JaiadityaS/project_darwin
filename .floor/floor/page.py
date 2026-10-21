@@ -1,8 +1,8 @@
 """The Floor page (F12.2): one static HTML file built only from evidence files.
 
 Sections: the H-1 verdict, the backtest timeline, same-commit pairs, the CPU proof under QEMU,
-the latest manifest diff, the languages, the energy per audio-minute of each build, SCI, and the
-notices. A section with no evidence says "not measured yet".
+the latest manifest diff, the languages, the energy per audio-minute of each build, SCI, the ΔM
+scenarios and the notices. A section with no evidence says "not measured yet".
 No scripts, no external requests: the page works offline, like the product it describes.
 """
 
@@ -12,6 +12,8 @@ import json
 from datetime import datetime
 from html import escape
 from pathlib import Path
+
+from . import delta_m
 
 LEVELS = ("x86-64-v1", "x86-64-v2", "x86-64-v3", "x86-64-v4")
 SERIES = (("main", "main-", "var(--a)"), ("main-cuda", "main-cuda-", "var(--b)"))
@@ -306,6 +308,31 @@ def _section_sci(sci: dict | None) -> str:
             'are for one measured run. SCI divides them by the units of that run.</p></div>')
 
 
+def _section_delta_m(scenarios: dict[str, dict] | None) -> str:
+    """§13.3: each scenario with its range and its sensitivity across p. Beside SCI, never inside it."""
+    if not scenarios:
+        return '<div class="card">No ΔM scenario yet.</div>'
+    shares = sorted({row["p"] for result in scenarios.values() for row in result["sensitivity"]})
+    head = "".join(f"<th>p = {p:.0%}</th>" for p in shares)
+    rows = ""
+    for name, result in sorted(scenarios.items()):
+        by_p = {row["p"]: row for row in result["sensitivity"]}
+        cells = "".join(f'<td>{_kg(by_p[p]["low_kgco2e"])}–{_kg(by_p[p]["high_kgco2e"])}</td>' if p in by_p
+                        else "<td>-</td>" for p in shares)
+        rows += (f'<tr><td>{escape(str(result["change"]))}</td><td><b>{_kg(result["low_kgco2e"])}–'
+                 f'{_kg(result["high_kgco2e"])}</b></td>{cells}<td><code>.floor/scenarios/{escape(name)}</code></td></tr>')
+    return (f'<div class="card"><table><tr><th>Floor change</th><th>ΔM (kg CO2e)</th>{head}<th>Inputs and sources</th>'
+            f'</tr>{rows}</table><p class="mute">ΔM = N × e × p × (Δ / L): the embodied carbon of the devices that a '
+            'floor raise could force people to replace. N: devices below the new floor, as each file states it (the '
+            'CPU files count per 10,000 x86 users, a unit, not a count of real users). e: the embodied carbon of a '
+            'replacement device. p: the share of affected people who replace their device. Δ / L: the part of the '
+            'device life that is cut short. A scenario, not a measurement. It is never added into SCI.</p></div>')
+
+
+def _kg(value: float) -> str:
+    return f"{value:,.0f}"
+
+
 def _section_notices(notices: dict[str, str]) -> str:
     if not notices:
         return '<div class="card">No Leave-Behind Notices. No release has left anyone behind.</div>'
@@ -313,7 +340,7 @@ def _section_notices(notices: dict[str, str]) -> str:
                    for name, text in sorted(notices.items()))
 
 
-def collect(evidence: Path, notices_dir: Path | None = None) -> dict:
+def collect(evidence: Path, notices_dir: Path | None = None, scenarios_dir: Path | None = None) -> dict:
     backtest = evidence / "backtest"
     timelines, h1, h1_cuda = {}, None, None
     for path in sorted(backtest.glob("*.json")):
@@ -340,11 +367,19 @@ def collect(evidence: Path, notices_dir: Path | None = None) -> dict:
     notices = {}
     if notices_dir and notices_dir.is_dir():
         notices = {p.name: p.read_text(encoding="utf-8") for p in sorted(notices_dir.glob("[0-9]*.md"))}
+    scenarios = {}
+    for path in sorted(scenarios_dir.glob("*.yml")) if scenarios_dir and scenarios_dir.is_dir() else []:
+        if path.name != "TEMPLATE.yml":
+            try:
+                scenarios[path.name] = delta_m.compute(delta_m.load(path))
+            except (OSError, delta_m.ScenarioError):
+                continue
     costs = sorted((evidence / "backtest").glob("footprint-*.json")) if (evidence / "backtest").is_dir() else []
     return {"timelines": timelines, "h1": h1, "h1_cuda": h1_cuda, "proofs": proofs, "diff": diff, "notices": notices,
             "backtest_cost": _load(costs[-1]) if costs else None,
             "language": _load(evidence / "language" / "language.json"),
-            "energy": _load(evidence / "energy" / "energy.json"), "sci": _load(evidence / "footprint" / "sci.json")}
+            "energy": _load(evidence / "energy" / "energy.json"), "sci": _load(evidence / "footprint" / "sci.json"),
+            "delta_m": scenarios}
 
 
 def render(data: dict, generated: str) -> str:
@@ -362,6 +397,7 @@ people behind, the gate stops it, an agent repairs it, and only a human can acce
 <h2>Languages</h2>{_section_languages(data.get("language"))}
 <h2>Energy per audio-minute: the cost of inclusion</h2>{_section_energy(data["energy"], data["sci"])}
 <h2>Footprint (SCI)</h2>{_section_sci(data["sci"])}
+<h2>ΔM: the devices that a floor raise could throw away</h2>{_section_delta_m(data.get("delta_m"))}
 <h2>Leave-Behind Notices</h2>{_section_notices(data["notices"])}
 <footer>Built from the evidence files in <code>.floor/evidence/</code> on {escape(generated)}.
 <code>.floor/evidence/backtest/README.md</code> gives the job of each file and the commands to make it again.</footer>
@@ -370,8 +406,9 @@ people behind, the gate stops it, an agent repairs it, and only a human can acce
 
 
 def build(evidence: str | Path, out: str | Path, notices_dir: str | Path | None = None,
-          generated: str | None = None) -> Path:
-    data = collect(Path(evidence), Path(notices_dir) if notices_dir else None)
+          generated: str | None = None, scenarios_dir: str | Path | None = None) -> Path:
+    data = collect(Path(evidence), Path(notices_dir) if notices_dir else None,
+                   Path(scenarios_dir) if scenarios_dir else None)
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     target = out / "index.html"

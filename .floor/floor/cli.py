@@ -329,7 +329,8 @@ def _cmd_notice_draft(args: argparse.Namespace) -> int:
         except (OSError, delta_m.ScenarioError) as exc:
             print(f"{path.as_posix()}: not used: {exc}")
             continue
-        if scenario.get("dimension") in dimensions:
+        floor = verdict.get("floors", {}).get(scenario.get("dimension"))
+        if scenario.get("dimension") in dimensions and delta_m.fits(scenario, floor):
             scenarios[path.as_posix()] = delta_m.compute(scenario)
     text = notice.draft(verdict, doc, diagnosis=diagnosis, truncated=args.truncated, mr=args.mr,
                         evidence=args.evidence, flags=flags, scenarios=scenarios)
@@ -399,7 +400,7 @@ def _cmd_fallback(args: argparse.Namespace) -> int:
 
 
 def _cmd_page(args: argparse.Namespace) -> int:
-    print(f"wrote {page.build(args.evidence, args.out, args.notices)}")
+    print(f"wrote {page.build(args.evidence, args.out, args.notices, scenarios_dir=args.scenarios)}")
     return 0
 
 
@@ -1042,6 +1043,7 @@ def main(argv: list[str] | None = None) -> int:
     pg = sub.add_parser("page", help="build the Floor page from the evidence files (F12.2)")
     pg.add_argument("--evidence", default=".floor/evidence", help="evidence folder")
     pg.add_argument("--notices", default=".floor/notices", help="notices folder")
+    pg.add_argument("--scenarios", default=".floor/scenarios", help="ΔM scenarios folder")
     pg.add_argument("--out", default="site", help="output folder (index.html)")
     pg.set_defaults(func=_cmd_page)
 

@@ -105,3 +105,18 @@ def test_cli_on_a_console_without_utf8(tmp_path, monkeypatch):
     assert main(["delta-m", str(path)]) == 0
     console.flush()
     assert console.buffer.getvalue().decode("cp1252").startswith("?M (scenario): 400.0–40000.0 kgCO?e")
+
+
+def test_the_scenario_files():
+    """Every scenario file loads. The two CPU scenarios give these ranges (kg CO2e per 10,000 x86 users)."""
+    found = {path.stem: delta_m.compute(delta_m.load(path))
+             for path in sorted((policy.PACKAGE_ROOT / "scenarios").glob("*.yml")) if path.name != "TEMPLATE.yml"}
+    assert (found["cpu-v3"]["low_kgco2e"], found["cpu-v3"]["high_kgco2e"]) == (30.2, 1650.9)
+    assert (found["cpu-v4"]["low_kgco2e"], found["cpu-v4"]["high_kgco2e"]) == (889.3, 87337.9)
+
+
+def test_fits():
+    v4 = {"x86_64": "x86-64-v4"}
+    assert delta_m.fits(SCENARIO, {"x86_64": "x86-64-v3"}) and not delta_m.fits(SCENARIO, v4)
+    assert delta_m.fits(SCENARIO, None) and delta_m.fits({**SCENARIO, "change": "a rise"}, v4)
+    assert delta_m.fits({**SCENARIO, "dimension": "memory"}, v4)

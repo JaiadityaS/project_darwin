@@ -130,6 +130,16 @@ def test_timeline_svg_tooltip():
     assert svg.count("<circle") == 2 and "AVX512_VNNI" in svg
 
 
+def test_page_delta_m(tmp_path):
+    """The ΔM scenarios of the repo: each range and its sensitivity across p, beside SCI."""
+    from floor import policy
+    html = page.build(tmp_path / "none", tmp_path / "out", generated="x",
+                      scenarios_dir=policy.PACKAGE_ROOT / "scenarios").read_text(encoding="utf-8")
+    assert "<td>x86-64-v1 -&gt; x86-64-v4</td><td><b>889–87,338</b></td>" in html
+    assert "<td>30–330</td>" in html and "never added into SCI" in html
+    assert "No ΔM scenario yet" in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
+
+
 def test_cli(tmp_path):
     assert main(["page", "--evidence", str(tmp_path), "--out", str(tmp_path / "site")]) == 0
     assert (tmp_path / "site" / "index.html").exists()

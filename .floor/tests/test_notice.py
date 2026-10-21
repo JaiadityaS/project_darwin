@@ -162,6 +162,8 @@ def test_notice_draft_cli(tmp_path, capsys):
     (scenarios / "TEMPLATE.yml").write_text("dimension: <cpu>\n", encoding="utf-8")
     (scenarios / "bad.yml").write_text("n_affected: [\n", encoding="utf-8")
     (scenarios / "0002-cpu.yml").write_text(yaml.safe_dump(SCENARIO), encoding="utf-8")
+    # Another level: not used for this raise to x86-64-v4.
+    (scenarios / "cpu-v3.yml").write_text(yaml.safe_dump({**SCENARIO, "change": "x86-64-v1 -> x86-64-v3"}), encoding="utf-8")
     (tmp_path / "judge.json").write_text(json.dumps(CPU_RAISED), encoding="utf-8")
     (tmp_path / "mr.md").write_text(DIAGNOSIS, encoding="utf-8")
     args = ["notice-draft", "--judge", str(tmp_path / "judge.json"), "--root", str(root),
@@ -178,6 +180,7 @@ def test_notice_draft_cli(tmp_path, capsys):
     text = (out / "0002-cpu.md").read_text(encoding="utf-8")
     assert notice.problems(text, draft=True) == ["Guidance: still has a placeholder"]
     assert notice.parse(text)["Who is affected"].startswith("1000–4000 (N_affected in ")
+    assert "0002-cpu.yml" in text and "cpu-v3.yml" not in text
     assert "bad.yml: not used" in printed and "A code owner fills: Guidance, Approved by." in printed
 
     # With `fallback: none` in the policy, the draft does not wait for the canned config.
