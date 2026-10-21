@@ -137,6 +137,7 @@ def test_page_delta_m(tmp_path):
                       scenarios_dir=policy.PACKAGE_ROOT / "scenarios").read_text(encoding="utf-8")
     assert "<td>x86-64-v1 -&gt; x86-64-v4</td><td><b>889–87,338</b></td>" in html
     assert "<td>30–330</td>" in html and "never added into SCI" in html
+    assert "<td>x86-64-v1 -&gt; x86-64-v2</td><td><b>0.7–35</b></td>" in html  # one decimal below 10 kg
     assert "No ΔM scenario yet" in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
 
 

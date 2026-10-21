@@ -361,7 +361,8 @@ def _section_delta_m(scenarios: dict[str, dict] | None) -> str:
 
 
 def _kg(value: float) -> str:
-    return f"{value:,.0f}"
+    """Whole kilograms; one decimal below 10 kg, so that a small scenario does not round to 0 or 1."""
+    return f"{value:,.1f}" if value < 10 else f"{value:,.0f}"
 
 
 def _section_notices(notices: dict[str, str]) -> str:
