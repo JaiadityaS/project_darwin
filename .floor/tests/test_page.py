@@ -160,6 +160,22 @@ def test_page_repairs(tmp_path):
     assert "Repair loop: no fix MR yet." in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
 
 
+def test_page_notice_drafts(tmp_path):
+    """F4.5 and F6: a draft that a code owner refused is on the page, and no accepted notice."""
+    (tmp_path / "ev" / "notice").mkdir(parents=True)
+    (tmp_path / "ev" / "notice" / "drafts.json").write_text(json.dumps({"drafts": [
+        {"mr": 13, "mr_url": "https://gitlab.example/p/-/merge_requests/13", "change": "cpu: x86-64-v1 → x86-64-v2",
+         "delta_m_kgco2e": [0.679, 34.6], "pipeline": 7, "job_url": "https://gitlab.example/p/-/jobs/9",
+         "decision": "refused", "decided_at": "2026-10-21T06:00:00Z", "note": "<b>"}]}), encoding="utf-8")
+    html = page.build(tmp_path / "ev", tmp_path / "out", generated="x").read_text(encoding="utf-8")
+    notices = html.split("<h2>Leave-Behind Notices</h2>")[1]
+    assert "No release has left anyone behind." in notices
+    assert ('<td><a href="https://gitlab.example/p/-/merge_requests/13">!13</a></td><td>cpu: x86-64-v1 → x86-64-v2</td>'
+            '<td>0.7–35</td><td><a href="https://gitlab.example/p/-/jobs/9">7</a></td><td><b>refused</b></td>'
+            '<td>2026-10-21</td><td class="mute">&lt;b&gt;</td>') in notices
+    assert "Draft (pipeline)" not in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
+
+
 def test_cli(tmp_path):
     assert main(["page", "--evidence", str(tmp_path), "--out", str(tmp_path / "site")]) == 0
     assert (tmp_path / "site" / "index.html").exists()

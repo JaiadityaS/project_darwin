@@ -365,11 +365,29 @@ def _kg(value: float) -> str:
     return f"{value:,.1f}" if value < 10 else f"{value:,.0f}"
 
 
-def _section_notices(notices: dict[str, str]) -> str:
-    if not notices:
-        return '<div class="card">No Leave-Behind Notices. No release has left anyone behind.</div>'
-    return "".join(f'<div class="card"><b>{escape(name)}</b><pre>{escape(text)}</pre></div>'
-                   for name, text in sorted(notices.items()))
+def _section_notices(notices: dict[str, str], drafts: dict | None = None) -> str:
+    """F6: the accepted notices, then each draft of the notice-draft job (F4.5) and what a code owner did with it."""
+    html = "".join(f'<div class="card"><b>{escape(name)}</b><pre>{escape(text)}</pre></div>'
+                   for name, text in sorted(notices.items())) if notices else (
+        '<div class="card">No Leave-Behind Notices. No release has left anyone behind.</div>')
+    rows = (drafts or {}).get("drafts") or []
+    if not rows:
+        return html
+    body = "".join(
+        f'<tr><td>{_link(d.get("mr_url"), "!" + str(d["mr"]))}</td><td>{escape(d.get("change") or "-")}</td>'
+        f'<td>{_kg_range(d.get("delta_m_kgco2e"))}</td><td>{_link(d.get("job_url"), str(d.get("pipeline") or "-"))}</td>'
+        f'<td><b>{escape(d.get("decision") or "open")}</b></td><td>{escape((d.get("decided_at") or "-")[:10])}</td>'
+        f'<td class="mute">{escape(d.get("note") or "")}</td></tr>' for d in rows)
+    return html + ('<div class="card"><table><tr><th>MR</th><th>Floor change</th><th>ΔM (kg CO2e)</th>'
+                   '<th>Draft (pipeline)</th><th>Decision</th><th>Date</th><th>Note</th></tr>'
+                   f'{body}</table><p class="mute">The notice-draft job writes a draft only when the fix and the canned '
+                   'config did not hold a floor. Only a code owner decides. To accept the raise, the owner adds the '
+                   'notice in a new MR and approves it. To refuse it, the owner closes the MR, and the raise does not '
+                   'ship. Agents and the merge-bot cannot approve a notice.</p></div>')
+
+
+def _kg_range(pair: list | None) -> str:
+    return f"{_kg(pair[0])}–{_kg(pair[1])}" if pair and len(pair) == 2 else "-"
 
 
 def collect(evidence: Path, notices_dir: Path | None = None, scenarios_dir: Path | None = None) -> dict:
@@ -412,7 +430,8 @@ def collect(evidence: Path, notices_dir: Path | None = None, scenarios_dir: Path
             "language": _load(evidence / "language" / "language.json"),
             "energy": _load(evidence / "energy" / "energy.json"), "sci": _load(evidence / "footprint" / "sci.json"),
             "delta_m": scenarios, "repairs": _load(evidence / "repair" / "repairs.json"),
-            "repair_notes": _load(evidence / "repair" / "notes.json")}
+            "repair_notes": _load(evidence / "repair" / "notes.json"),
+            "notice_drafts": _load(evidence / "notice" / "drafts.json")}
 
 
 def render(data: dict, generated: str) -> str:
@@ -432,7 +451,7 @@ people behind, the gate stops it, an agent repairs it, and only a human can acce
 <h2>Energy per audio-minute: the cost of inclusion</h2>{_section_energy(data["energy"], data["sci"])}
 <h2>Footprint (SCI)</h2>{_section_sci(data["sci"])}
 <h2>ΔM: the devices that a floor raise could throw away</h2>{_section_delta_m(data.get("delta_m"))}
-<h2>Leave-Behind Notices</h2>{_section_notices(data["notices"])}
+<h2>Leave-Behind Notices</h2>{_section_notices(data["notices"], data.get("notice_drafts"))}
 <footer>Built from the evidence files in <code>.floor/evidence/</code> on {escape(generated)}.
 <code>.floor/evidence/backtest/README.md</code> gives the job of each file and the commands to make it again.</footer>
 </main></body></html>
