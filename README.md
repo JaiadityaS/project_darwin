@@ -130,8 +130,8 @@ Status on 2026-10-21. "Runs" means that it runs in this project's GitLab pipelin
 | Stage | What Rieux does | GitLab feature | Status |
 |---|---|---|---|
 | Plan | Leave-Behind Notices are planned, reviewed decisions. The field triage flow answers each new floor issue | MR templates, labels, issues, flow triggers | Runs (`floor notice` in the check job). The field triage flow is saved and on, with the trigger "Work item: Created". It has not answered an issue yet |
-| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: from 10 failed `main` pipelines, the flow opened 10 fix MRs (!1 to !10). 8 of them came 1.6 to 2.9 min after the failed pipeline ended, and the other two after 4.3 and 8.9 min (the MR time minus the pipeline end time, from the GitLab API) |
-| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5, !6, !7 and !10 held every floor (pipelines 2961110649, 2961210282, 2961810145, 2969259993 and 2969425658) |
+| Create | After a failed Judge, a script makes the canned build-config patch (`fallback` job), then the notice draft (`notice-draft` job). CI cannot push, so the floor-repair flow commits the patch and opens the fix MR | Merge requests, MR widget artifacts, flows | Runs: on 2026-10-21, the flow had opened 11 fix MRs (!1 to !11) for 11 failed `main` pipelines. 9 came 1.6 to 2.9 min after the failed pipeline ended, and the other two after 4.3 and 8.9 min ([`repairs.json`](.floor/evidence/repair/repairs.json), from the GitLab API) |
+| Verify | Static CPU gate, QEMU on 4 CPU models, memory limits, offline tripwire, the Judge | CI/CD, cache, artifacts | Runs. The gates of fix MRs !3, !5, !6, !7, !10 and !11 held every floor (pipelines 2961110649, 2961210282, 2961810145, 2969259993, 2969425658 and 2970335928) |
 | Secure | Offline tripwire, pinned model hash, the image by digest; the Floor Manifest signed as an attestation | Container registry, keyless signing (GitLab ID token, Sigstore) | Runs: the attest job signed and verified the manifest (pipeline 2961110649, job 17270217868) |
 | Package | The image of the release, checked by its digest | Container registry | Runs |
 | Release | `-floor.N` tags and "Who this release serves" notes | Releases, protected tags | Partly: the herald job wrote the "Who this release serves" text from the signed manifest (pipeline 2961210282, job 17270780571). The tag and the release have not run yet. The release summary goes to issue [#2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/issues/2) after the first release; it has not run yet |
@@ -165,9 +165,10 @@ python -m floor scan build/bin
 python -m floor probe --cpu Nehalem -- build/bin/whisper-cli -m models/ggml-tiny.en.bin -f samples/jfk.wav
 ```
 
-Make the Rieux page from the evidence:
+Read the repair loop of a GitLab project from its public API (no token), then make the Rieux page from the evidence:
 
 ```bash
+python -m floor repairs --api https://gitlab.com/api/v4 --project 87296266 --out .floor/evidence/repair/repairs.json
 python -m floor page --out site
 ```
 

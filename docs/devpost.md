@@ -57,8 +57,8 @@ When a floor rises, the floor-repair flow of the GitLab Duo Agent Platform start
 Measured on GitLab:
 
 - The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4, AVX-512). The policy asks for x86-64-v1.
-- The flow worked every time: from 10 failed `main` pipelines, the flow opened 10 fix MRs (!1 to !10). 8 of them came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (the MR time minutesus the pipeline end time, from the GitLab API).
-- The gates of fix MRs !3, !5, !6, !7 and !10 passed every floor. For MR !10 (pipeline 2969425658) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
+- The flow answered every failed pipeline: on 2026-10-21, it had opened 11 fix MRs (!1 to !11) for 11 failed `main` pipelines. 9 came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (`.floor/evidence/repair/repairs.json`, from the GitLab API; the Rieux page shows the table).
+- The gates of fix MRs !3, !5, !6, !7, !10 and !11 passed every floor. For MR !11 (pipeline 2970335928) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
 - The attest job signed and verified the manifest (pipeline 2961110649, job 17270217868).
 - OPEN: the release loop. PRD §16.2 asks for 3 complete loops: a repair of the default flags, a repair of the folk fix, and one notice. Each needs a merged fix MR and a `-floor.N` tag (T-05, T-42).
 
