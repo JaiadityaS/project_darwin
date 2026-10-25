@@ -11,10 +11,10 @@ Rules that still hold: AGENTS.md §2 (no AI attribution, human identity, no `--n
 
 | # | Item | Who | Needed for | State |
 |---|---|---|---|---|
-| 1 | GitLab sync of the new page (dev `c188b55`) and the evidence commit `2c4e51e` | agent | the live page | ready |
-| 2 | Release loop 1: tag `v1.9.5-rieux.1`, merge its fix MR, get `-floor.1` | owner + agent | PRD §16.2, video, AC-F11 | ready |
+| 1 | GitLab sync of the new page (dev `c188b55`) and the evidence commit `2c4e51e` | agent | the live page | done (4bebbbac, pages job 17451675267) |
+| 2 | Release loop 1: tag `v1.9.5-rieux.1`, merge its fix MR, get `-floor.1` | owner + agent | PRD §16.2, video, AC-F11 | done (MR !18, pipeline 2987186947, `v1.9.5-rieux.1-floor.1`). Open: `floor runners` refresh (needs the artifacts CDN; run it locally), then a sync |
 | 3 | AC-F11: one field-test issue with real data | owner yes + agent | F11 | after 2 |
-| 4 | T-61 check: the release summary note on issue #2 | agent | F12.3 | after 2 |
+| 4 | T-61 check: the release summary note on issue #2 | agent | F12.3 | flow ran, note posted 21:53:43; owner to read it |
 | 5 | Cloud Run deployed URL (T-06, T-50, T-51) | owner + agent | Path B rule: a live deployed URL | not started |
 | 6 | Video under 3:00 (T-91, `docs/video.md`) | owner | submission | after 2 |
 | 7 | Release loop 2: the folk fix (optional) | owner + agent | PRD §16.2 (3 loops) | after 2, if time |

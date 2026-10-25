@@ -1,7 +1,7 @@
 {
   "tool": "floor 0.1.0",
   "project": "87296266",
-  "as_of": "2026-10-21T21:02:46+00:00",
+  "as_of": "2026-10-25T22:24:29+00:00",
   "rows": [
     {
       "mr": 1,
@@ -242,14 +242,46 @@
       "gate_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2973807759",
       "gate_status": "success",
       "gate_judge": "success"
+    },
+    {
+      "mr": 17,
+      "mr_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/merge_requests/17",
+      "state": "opened",
+      "opened_at": "2026-10-25T20:22:58.835Z",
+      "failed_pipeline": 2987099530,
+      "failed_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2987099530",
+      "failed_ref": "main",
+      "failed_at": "2026-10-25T20:21:18.495Z",
+      "failed_judge": "failed",
+      "minutes": 1.7,
+      "gate_pipeline": 2987111283,
+      "gate_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2987111283",
+      "gate_status": "success",
+      "gate_judge": "success"
+    },
+    {
+      "mr": 18,
+      "mr_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/merge_requests/18",
+      "state": "merged",
+      "opened_at": "2026-10-25T20:29:20.702Z",
+      "failed_pipeline": 2987108367,
+      "failed_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2987108367",
+      "failed_ref": "v1.9.5-rieux.1",
+      "failed_at": "2026-10-25T20:27:29.753Z",
+      "failed_judge": "failed",
+      "minutes": 1.8,
+      "gate_pipeline": 2987119941,
+      "gate_url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2987119941",
+      "gate_status": "success",
+      "gate_judge": "success"
     }
   ],
   "summary": {
-    "fix_mrs": 15,
-    "under_3_min": 13,
-    "median_minutes": 1.9,
+    "fix_mrs": 17,
+    "under_3_min": 15,
+    "median_minutes": 1.8,
     "max_minutes": 8.9,
-    "gate_judge_passed": 12,
-    "merged": 0
+    "gate_judge_passed": 14,
+    "merged": 1
   }
 }

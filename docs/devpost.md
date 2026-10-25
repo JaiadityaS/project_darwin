@@ -57,11 +57,12 @@ When a floor rises, the floor-repair flow of the GitLab Duo Agent Platform start
 Measured on GitLab:
 
 - The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4 on an Intel Xeon Platinum 8581C, x86-64-v3 on an AMD EPYC 7B13). The policy asks for x86-64-v1.
-- The flow answered every failed pipeline: on 2026-10-21, it had opened 15 fix MRs (!1 to !12 and !14 to !16) for 15 failed `main` pipelines. 13 came 1.6 to 2.9 minutes after the failed pipeline ended, and the other two after 4.3 and 8.9 minutes (`.floor/evidence/repair/repairs.json`, from the GitLab API; the Rieux page shows the table).
-- The gates of fix MRs !3, !5, !6, !7, !10, !11, !12, !14, !15 and !16 passed every floor. For MRs !15 and !16 (pipelines 2970973362 and 2973807759) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
+- The flow answered every failed pipeline: on 2026-10-25, it had opened 17 fix MRs (!1 to !12 and !14 to !18) for 17 failed pipelines. 15 came 1.6 to 2.9 minutes after the failed pipeline ended (median 1.8), and the other two after 4.3 and 8.9 minutes (`.floor/evidence/repair/repairs.json`, from the GitLab API; the Rieux page shows the table).
+- The gates of fix MRs !3, !5, !6, !7, !10, !11, !12, !14, !15, !16, !17 and !18 passed every floor. For MRs !15 and !16 (pipelines 2970973362 and 2973807759) every job passed: the four QEMU probes, memory, offline, the Judge, attest and herald.
 - The attest job signed and verified the manifest (pipeline 2961110649, job 17270217868).
 - The notice path ran once, on a real trade-off. MR !13, a proposal by the owner, removed the baseline CPU variant of ggml (about 1 MB) from the image. The gate raised the CPU floor to x86-64-v2 (on qemu64 the image stopped), the fallback had no patch, and the `notice-draft` job wrote the Leave-Behind Notice draft: 11 to 12 of each 10,000 x86 users affected, ΔM 0.7 to 35 kg CO2e. The owner refused it and closed the MR. The Rieux page shows the decision.
-- OPEN: the release loop. PRD §16.2 asks for 3 complete loops: a repair of the default flags, a repair of the folk fix, and one notice. The notice path ran on MR !13; the owner refused it, so it made no release. Each repair loop needs a merged fix MR and a `-floor.N` tag (T-05, T-42).
+- One complete release loop ran on 2026-10-25. The owner tagged `v1.9.5-rieux.1`. Its gate failed (pipeline 2987108367), and the flow opened fix MR !18 1.8 minutes later. The gate of !18 held every floor (pipeline 2987119941), and the owner merged it. The `main` pipeline of the merge (2987186947) signed the manifest, wrote the notes and cut the release `v1.9.5-rieux.1-floor.1`.
+- OPEN: PRD §16.2 asks for 3 complete loops: a repair of the default flags (done, above), a repair of the folk fix, and one notice. The notice path ran on MR !13; the owner refused it, so it made no release.
 
 ### What we measured
 
