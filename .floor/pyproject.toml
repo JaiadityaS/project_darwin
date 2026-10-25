@@ -27,7 +27,7 @@ floor = "floor.cli:main"
 include = ["floor*"]
 
 [tool.setuptools.package-data]
-floor = ["gateway.html"]
+floor = ["gateway.html", "page_assets/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -42,9 +42,13 @@ def test_page_from_repo_evidence(tmp_path):
     html = target.read_text(encoding="utf-8")
     assert html.startswith("<!doctype html>")
     assert "<title>Rieux</title>" in html and "<h1>Rieux</h1>" in html  # the product name (D-013)
-    assert "<script" not in html and "http://" not in html
+    # One inline script (Mochi and the language filter); no external script, no external request.
+    assert html.count("<script") == 1 and "<script src" not in html and "http://" not in html
+    assert "https://" not in html.split("<main>")[0]  # the head loads nothing from the network
+    assert (tmp_path / "assets" / "UbuntuMono-Regular.woff2").exists() and (tmp_path / "assets" / "mochi-tail.svg").exists()
     assert html.count("<circle") >= 100
-    assert "H-1: the build machine sets the floor." in html
+    assert '<strong class="hl">Supported.</strong> 11 of 38 shared commits' in html  # H-1
+    assert "Every x86-64 machine back to" in html  # the hero, from release/diff.md
     assert "SIGILL" in html and "sandybridge" in html
     assert "**" not in html
     # F14.4: the one-off footprint of the backtest (floor backtest-footprint).
@@ -62,7 +66,7 @@ def test_page_energy_and_sci(tmp_path):
         (tmp_path / path).parent.mkdir()
         (tmp_path / path).write_text(json.dumps(doc))
     html = page.build(tmp_path, tmp_path / "out", generated="x").read_text(encoding="utf-8")
-    assert "<script" not in html and html.count("not measured yet") == 4  # H-1, backtest, CPU proof, languages
+    assert html.count("not measured yet") == 4  # H-1, backtest, CPU proof, languages
     energy = html.split("the cost of inclusion</h2>")[1].split("<h2>")[0]
     # The builds in the order of F14.2. native has a failed run, so it has no medians and no ratio.
     assert [energy.index(f"<b>{n}</b>") for n in page.BUILDS] == sorted(energy.index(f"<b>{n}</b>") for n in page.BUILDS)
@@ -77,8 +81,8 @@ def test_page_energy_and_sci(tmp_path):
     assert "needs 2.0× the CPU time of all-variants" in energy  # 300 / 150
     assert "AMD EPYC 7763" in energy and "Median of 2 runs" in energy
     sci = html.split("Footprint (SCI)</h2>")[1].split("<h2>")[0]
-    assert "<b>0.0512</b>g CO2e per audio-minute (us-central1)" in sci
-    assert "<b>3.25</b>g CO2e per release check" in sci
+    assert '<span class="stat">0.0512</span><span>g CO2e per audio-minute (us-central1)' in sci
+    assert '<span class="stat">3.25</span><span>g CO2e per release check' in sci
     assert "all-variants (headline)" in sci and "folk-fix (headline)" not in sci
     assert "<td>7.8</td>" in sci  # 0.0078 kWh as Wh
     assert "GSF Impact Framework (test)" in sci
@@ -115,7 +119,8 @@ def test_page_language_table(tmp_path):
     html = page.build(tmp_path, tmp_path / "out", generated="x").read_text(encoding="utf-8")
     lang = html.split("<h2>Languages</h2>")[1].split("<h2>")[0]
     assert "not measured yet" not in lang
-    assert "<b>Served</b> (f16 WER at most 30%): swahili." in lang
+    assert 'Served (f16 WER at most 30%): <strong class="hl">swahili</strong>.' in lang
+    assert '<tr data-model="small" data-served="yes">' in lang and 'data-k="model" data-v="tiny"' in lang
     assert ('<td>28.0%</td><td>9.0%</td><td>31.2%</td><td>+3.2 <span class="mute">[+1.1, +5.4]</span></td>'
             '<td><span class="pass">yes</span> <span class="inc">(no at q5_1)</span></td>') in lang
     assert "50 sentences per language" in lang and "<code>0c7be696</code>" in lang
@@ -156,7 +161,7 @@ def test_page_repairs(tmp_path):
     html = page.build(tmp_path / "ev", tmp_path / "out", generated="x").read_text(encoding="utf-8")
     assert '<a href="https://gitlab.example/p/-/merge_requests/10">!10</a></td><td>2.1</td>' in html
     assert "2 fix MRs." in html and "From the GitLab API on 2026-10-21" in html
-    assert '<td class="mute">a &lt;note&gt;</td>' in html
+    assert '<td class="note">a &lt;note&gt;</td>' in html
     assert "Repair loop: no fix MR yet." in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
 
 
@@ -169,13 +174,13 @@ def test_page_runners(tmp_path):
     (tmp_path / "ev" / "runners" / "runners.json").write_text(json.dumps(doc), encoding="utf-8")
     html = page.build(tmp_path / "ev", tmp_path / "out", generated="x").read_text(encoding="utf-8")
     h1 = html.split("<h2>Does the build machine set the floor?</h2>")[1].split("<h2>")[0]
-    assert '<div class="card verdict ok"><b>On GitLab too.</b><p>3 main pipelines: 2 on AMD EPYC 7B13 (x86-64-v3)' in h1
+    assert '<h3>On GitLab too: 3 <code>main</code> pipelines</h3><p>3 main pipelines: 2 on AMD EPYC 7B13 (x86-64-v3)' in h1
     assert "<tr><td>AMD EPYC 7B13</td><td>x86-64-v3</td><td>2</td></tr>" in h1
-    assert ('<td><a href="https://gitlab.example/p/-/pipelines/20">20</a> <code>bbbbbbbb</code> x86-64-v4</td>'
-            '<td><a href="https://gitlab.example/p/-/pipelines/30">30</a> <code>cccccccc</code> x86-64-v3</td>'
-            '<td>1</td><td>2</td><td><b>none</b></td>') in h1
-    assert "<td><code>.gitlab-ci.yml</code></td>" in h1 and "job logs on 2026-10-21" in h1
-    assert "On GitLab too." not in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
+    assert ('<td><a href="https://gitlab.example/p/-/pipelines/20">20</a> bbbbbbbb x86-64-v4</td>'
+            '<td><a href="https://gitlab.example/p/-/pipelines/30">30</a> cccccccc x86-64-v3</td>'
+            '<td>1</td><td>2</td><td><span class="fail">none</span></td>') in h1
+    assert "<td>.gitlab-ci.yml</td>" in h1 and "job logs on 2026-10-21" in h1
+    assert "On GitLab too" not in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
 
 
 def test_page_notice_drafts(tmp_path):
@@ -190,7 +195,8 @@ def test_page_notice_drafts(tmp_path):
     assert "No release has left anyone behind." in notices
     assert ('<td><a href="https://gitlab.example/p/-/merge_requests/13">!13</a></td><td>cpu: x86-64-v1 → x86-64-v2</td>'
             '<td>0.7–35</td><td><a href="https://gitlab.example/p/-/jobs/9">7</a></td><td><b>refused</b></td>'
-            '<td>2026-10-21</td><td class="mute">&lt;b&gt;</td>') in notices
+            '<td>2026-10-21</td><td class="note">&lt;b&gt;</td>') in notices
+    assert "1 draft(s) written, 1 refused." in notices
     assert "Draft (pipeline)" not in page.build(tmp_path / "none", tmp_path / "o2", generated="x").read_text("utf-8")
 
 
