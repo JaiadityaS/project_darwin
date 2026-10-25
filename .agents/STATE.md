@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-21 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync, T-61 issue #2, T-63 negative check, D-034 public decisions file, D-035 ΔM scenarios)
+Last update: 2026-10-25 · @JaiadityaS · session 11 (page redesign c188b55; the work that is left is in `.agents/remaining-work.md`)
 
 ## Where we are
 
@@ -29,6 +29,7 @@ Last update: 2026-10-21 · @JaiadityaS · session 10 (T-90 numbers, GitLab sync,
 
 ## Next agent: start here
 
+0. **Read `.agents/remaining-work.md` first.** It lists the work that is left (2026-10-25 19:45 UTC, about 41 hours to the deadline), in order, with who does each item and how. The items below are the history.
 1. T-62 is done (D-031): run 39233922646, `.floor/evidence/language/language.json`. Served: English and Spanish. Not served: the other six languages. The page shows it after the next GitLab sync. Open, not urgent: the cause of the transcripts with bytes that are not UTF-8 (57 of 100 Bengali small, 60 of 100 Yoruba small). The segment break was not the main cause. Read some of them in the run artifacts (a download needs the owner's yes).
 2. T-61 (PRD F12.3, D-032): the code is done in session 8 (cloud). `floor summary` makes at most 7 lines from the signed manifest and `who.md`. The `herald` job prints `summary issue: $FLOOR_SUMMARY_ISSUE` and the summary between `--- BEGIN summary ---` and `--- END summary ---`. The flow is `.floor/flows/release-summary.yml`. A local session must:
    - done (2026-10-20): issue #2 "Rieux release summaries". GitLab has no pin action, so the README links it. `FLOOR_SUMMARY_ISSUE: "2"`.
