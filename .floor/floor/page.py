@@ -301,7 +301,7 @@ def _h1_gitlab(doc: dict | None) -> tuple[str, str]:
                         f'<td>{changed}</td></tr>')
         html.append(_table(["From", "To", "Commits", "Files", "Build inputs changed"], "".join(rows)))
     src = ('<p class="src">Each <code>main</code> pipeline builds the upstream recipe <code>.devops/main.Dockerfile</code> '
-           'on a shared runner. The build job prints the build machine; the judge finds the CPU floor in the image. '
+           'on a shared runner, until a merged fix MR changes <code>.devops/</code>; the counts stop there. The build job prints the build machine; the judge finds the CPU floor in the image. '
            'Build inputs: the Dockerfiles, the CMake files, the ggml CPU code and <code>.gitlab-ci.yml</code>. From the '
            f'GitLab API and the job logs on {escape(str(doc.get("as_of") or "-")[:10])}.</p>')
     return src, "".join(html)

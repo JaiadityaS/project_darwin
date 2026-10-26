@@ -34,7 +34,7 @@ Every number here comes from a script in this project. The outputs are in [`.flo
 
 - The #3510 pair: `main-a1867e0` is x86-64-v4 + AVX512_VNNI (its `libggml-cpu.so` has EVEX code). `main-c62adfbd` is x86-64-v3.
 - The same recipe gave x86-64-v3 on a GitHub runner (AMD EPYC, no AVX-512 visible) and x86-64-v4 on a GitLab runner (Intel Xeon Platinum 8581C, AVX-512). So the image that you download depends on which cloud machine built it.
-- It happens on GitLab too. Of the 22 `main` pipelines of this project, 19 built the image on an Intel Xeon Platinum 8581C (x86-64-v4) and 3 on an AMD EPYC 7B13 (x86-64-v3). In each one, the judge found the level of the build machine. `main-0f7d064e` (pipeline 2970462438) is x86-64-v4. The next commit changed 7 files, all in `.floor/` and `README.md`, and `main-86e5dc5d` (pipeline 2970859268) is x86-64-v3 ([`runners/`](.floor/evidence/runners/runners.json)).
+- It happens on GitLab too. Of the 23 `main` pipelines of this project that built upstream's recipe, 20 built the image on an Intel Xeon Platinum 8581C (x86-64-v4) and 3 on an AMD EPYC 7B13 (x86-64-v3). In each one, the judge found the level of the build machine. (The 24th built the merged fix MR !18 on the Intel runner and got x86-64-v1.) `main-0f7d064e` (pipeline 2970462438) is x86-64-v4. The next commit changed 7 files, all in `.floor/` and `README.md`, and `main-86e5dc5d` (pipeline 2970859268) is x86-64-v3 ([`runners/`](.floor/evidence/runners/runners.json)).
 
 **The folk fix does not fix it.** We built whisper.cpp three ways and ran each `whisper-cli` under QEMU on four CPU models, with positive and negative controls:
 
@@ -140,7 +140,7 @@ Status on 2026-10-25. "Runs" means that it runs in this project's GitLab pipelin
 | Monitor | The Rieux page with the backtest, the floors, the languages, SCI, ΔM and the repair loop | Pages | Runs |
 | Govern | The ratchet, code owners, the agent path allowlist, the human-only notice | CODEOWNERS, approval rules | Runs (`floor ratchet`, `floor paths`) |
 
-The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4 in 19 of 22 `main` pipelines, x86-64-v3 in 3), and the policy asks for x86-64-v1. The repair loop must make it green.
+The first `main` pipelines are red on purpose. Upstream's recipe gives the CPU floor of the GitLab runner (x86-64-v4 in 20 of the 23 `main` pipelines before the first fix, x86-64-v3 in 3), and the policy asks for x86-64-v1. The repair loop must make it green.
 
 ## How to run
 

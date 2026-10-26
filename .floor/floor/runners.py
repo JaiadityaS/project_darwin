@@ -20,6 +20,8 @@ from .h1 import FLOOR_PATHS
 
 # The build inputs on GitLab: upstream's floor paths and the CI file that runs `docker build`.
 BUILD_PATHS = FLOOR_PATHS + (".gitlab-ci.yml",)
+# Upstream's recipe. A change here (the canned config of a fix MR) ends the rows that test H-1.
+RECIPE = ".devops/"
 _ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 _MACHINE = re.compile(r"build machine: (.+) \((x86-64-v[1-4])\)\s*$", re.M)
 _FLOOR = re.compile(r"(?:^|\s)cpu\s+[a-z]+\s+(x86-64-v[1-4])\s", re.M)
@@ -87,15 +89,23 @@ def flips(found: list[dict], get: Callable[[str], list | dict]) -> list[dict]:
 
 
 def summary(found: list[dict], changes: list[dict]) -> dict:
-    """The counts that the page and the CLI print."""
+    """The counts that the page and the CLI print. H-1 is a claim about upstream's recipe, so the counts stop at
+    the first flip that changed a file in `.devops/` (a merged fix MR). The pipelines from there on are "repaired"
+    and do not count."""
     known = [r for r in found if r["floor"] and r["machine"]]
+    cut = next((f["to"]["pipeline"] for f in changes if any(p.startswith(RECIPE) for p in f["build_changes"])), None)
+    recipe = [r for r in known if cut is None or r["pipeline"] < cut]
+    repaired = [r for r in known if cut is not None and r["pipeline"] >= cut]
+    changes = [f for f in changes if cut is None or f["to"]["pipeline"] < cut]
     machines: dict[str, dict] = {}
-    for r in known:
+    for r in recipe:
         m = machines.setdefault(r["machine"], {"level": r["machine_level"], "pipelines": 0})
         m["pipelines"] += 1
-    return {"pipelines": len(known), "machines": machines,
-            "floor_is_machine_level": sum(r["floor"] == r["machine_level"] for r in known),
-            "flips": len(changes), "flips_without_build_changes": sum(not f["build_changes"] for f in changes)}
+    return {"pipelines": len(recipe), "machines": machines,
+            "floor_is_machine_level": sum(r["floor"] == r["machine_level"] for r in recipe),
+            "flips": len(changes), "flips_without_build_changes": sum(not f["build_changes"] for f in changes),
+            "repaired": {"pipelines": len(repaired), "from": cut,
+                         "floors": sorted({r["floor"] for r in repaired})}}
 
 
 def verdict(s: dict) -> str:
@@ -145,4 +155,14 @@ def text(doc: dict) -> str:
              for name, m in sorted(s["machines"].items(), key=lambda kv: -kv[1]["pipelines"])]
     return (f"{s['pipelines']} main pipelines: " + ", ".join(parts) + ". "
             f"In {s['floor_is_machine_level']} of them the CPU floor is the level of the build machine. "
-            f"{s['flips']} floor changes, {s['flips_without_build_changes']} with no change to the build inputs.")
+            f"{s['flips']} floor changes, {s['flips_without_build_changes']} with no change to the build inputs."
+            + _repaired(s))
+
+
+def _repaired(s: dict) -> str:
+    r = s.get("repaired") or {}
+    if not r.get("pipelines"):
+        return ""
+    n = r["pipelines"]
+    return (f" From pipeline {r['from']}, a merged fix MR changed `.devops/`, so {n} later "
+            f"{'pipeline does' if n == 1 else 'pipelines do'} not count (CPU floor {', '.join(r['floors'])}).")

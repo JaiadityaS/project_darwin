@@ -373,3 +373,11 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Side fact: QEMU on the AMD runner ran the EPYC-Milan probe of MR !15 in 353 s (the Intel runners: 1156 to 1464 s).
 - Public entry: none needed. No product file cites D-038.
 - PRD impact: F10.3 (H-1 on the submission project itself), F12.2.
+
+## D-039 (2026-10-26) H-1 on GitLab counts only the pipelines that build upstream's recipe
+- Fact: after the owner merged fix MR !18 (release loop 1), main pipeline 2987186947 ran on the Intel runner (v4) and its floor was x86-64-v1, because the canned config was on `main`. `floor runners` then said "partly supported", because 23 of 24 floors equalled the machine level.
+- Decision (the owner chose it, 2026-10-26): H-1 is a claim about upstream's recipe. `runners.summary` stops the counts at the first floor change whose build inputs include a file in `.devops/` (a merged fix MR). The pipelines from there on are in `summary.repaired` (count, first pipeline, floors) and do not count toward the verdict. A change to `.gitlab-ci.yml` alone does not stop the counts. Limit: a `.devops/` change with no floor change is not seen; the canned config always changes the floor on these runners.
+- Measured (2026-10-26, the owner's local run): 24 main pipelines. 23 build upstream's recipe: 20 on the Intel Xeon Platinum 8581C (v4), 3 on the AMD EPYC 7B13 (v3); in all 23 the floor is the machine level. 4 floor changes, 2 with no change to the build inputs (0f7d064e to 86e5dc5d, 851a724d to 4bebbbac). Repaired: 1 (2987186947, x86-64-v1).
+- Tests: `test_repaired_pipelines_do_not_count`.
+- Public entry: none needed. No product file cites D-039.
+- PRD impact: F10.3, F12.2.

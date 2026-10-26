@@ -77,7 +77,8 @@ def test_summary_text_and_verdict():
     doc = _doc()
     assert doc["summary"] == {"pipelines": 3, "machines": {AMD: {"level": "x86-64-v3", "pipelines": 2},
                                                            INTEL: {"level": "x86-64-v4", "pipelines": 1}},
-                              "floor_is_machine_level": 3, "flips": 2, "flips_without_build_changes": 1}
+                              "floor_is_machine_level": 3, "flips": 2, "flips_without_build_changes": 1,
+                              "repaired": {"pipelines": 0, "from": None, "floors": []}}
     assert doc["verdict"].startswith("supported: in each main pipeline the CPU floor is the level of the build "
                                      "machine, and 1 floor change came")
     assert runners.text(doc) == (f"3 main pipelines: 2 on {AMD} (x86-64-v3), 1 on {INTEL} (x86-64-v4). In 3 of them "
@@ -86,6 +87,30 @@ def test_summary_text_and_verdict():
     one = runners.summary(doc["rows"][1:2], [])
     assert runners.verdict(one).startswith("not shown")
     assert runners.text({"summary": runners.summary([], [])}) == "No main pipeline with a build and a judge yet."
+
+
+def test_repaired_pipelines_do_not_count():
+    """A merged fix MR changes `.devops/`. From then on the floor is no longer the level of the build machine, and
+    H-1 (a claim about upstream's recipe) must not count those pipelines."""
+    doc = _doc()
+    fixed = {"pipeline": 50, "url": f"{BASE}/pipelines/50", "sha": "e" * 40, "created_at": "2026-10-25T21:18:00Z",
+             "build_job": 501, "machine": INTEL, "machine_level": "x86-64-v4", "judge_job": 502, "floor": "x86-64-v1"}
+    later = dict(fixed, pipeline=60, sha="f" * 40)
+    found = doc["rows"] + [fixed, later]
+    fix = {"from": {"pipeline": 30, "sha": "c" * 40, "machine": AMD, "floor": "x86-64-v3"},
+           "to": {"pipeline": 50, "sha": "e" * 40, "machine": INTEL, "floor": "x86-64-v1"},
+           "commits": 2, "changed_files": 8, "build_changes": [".devops/main.Dockerfile"]}
+    s = runners.summary(found, doc["flips"] + [fix])
+    assert s["pipelines"] == 3 and s["floor_is_machine_level"] == 3 and s["flips"] == 2
+    assert s["repaired"] == {"pipelines": 2, "from": 50, "floors": ["x86-64-v1"]}
+    assert runners.verdict(s).startswith("supported:")
+    assert runners.text({"summary": s}).endswith(
+        "From pipeline 50, a merged fix MR changed `.devops/`, so 2 later pipelines do not count (CPU floor x86-64-v1).")
+    # A flip that changed only .gitlab-ci.yml is not a recipe change: every row still counts.
+    ci = dict(fix, build_changes=[".gitlab-ci.yml"])
+    s = runners.summary(found, doc["flips"] + [ci])
+    assert s["pipelines"] == 5 and s["repaired"]["pipelines"] == 0
+    assert runners.verdict(s) == "partly supported: see the rows"
 
 
 def test_build_changes():
