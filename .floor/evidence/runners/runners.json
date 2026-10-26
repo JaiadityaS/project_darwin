@@ -1,7 +1,7 @@
 {
   "tool": "floor 0.1.0",
   "project": "87296266",
-  "as_of": "2026-10-21T20:54:44+00:00",
+  "as_of": "2026-10-26T17:53:22+00:00",
   "build_paths": [
     ".devops/",
     ".github/workflows/docker.yml",
@@ -256,6 +256,28 @@
       "machine_level": "x86-64-v3",
       "judge_job": 17362193870,
       "floor": "x86-64-v3"
+    },
+    {
+      "pipeline": 2987099530,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2987099530",
+      "sha": "4bebbbac21f8f6266908fc990af28bc21c2f1959",
+      "created_at": "2026-10-25T20:13:43.172Z",
+      "build_job": 17451675252,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17451675261,
+      "floor": "x86-64-v4"
+    },
+    {
+      "pipeline": 2987186947,
+      "url": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/pipelines/2987186947",
+      "sha": "ccd4f10dc9282742e0593b7d8909f7d6b4227e94",
+      "created_at": "2026-10-25T21:18:30.722Z",
+      "build_job": 17452197358,
+      "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+      "machine_level": "x86-64-v4",
+      "judge_job": 17452197367,
+      "floor": "x86-64-v1"
     }
   ],
   "flips": [
@@ -313,23 +335,72 @@
       "commits": 1,
       "changed_files": 7,
       "build_changes": []
+    },
+    {
+      "from": {
+        "pipeline": 2973711384,
+        "sha": "851a724d20e94d1f9afef3766024af2e21fc3f4d",
+        "machine": "AMD EPYC 7B13",
+        "floor": "x86-64-v3"
+      },
+      "to": {
+        "pipeline": 2987099530,
+        "sha": "4bebbbac21f8f6266908fc990af28bc21c2f1959",
+        "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+        "floor": "x86-64-v4"
+      },
+      "commits": 1,
+      "changed_files": 14,
+      "build_changes": []
+    },
+    {
+      "from": {
+        "pipeline": 2987099530,
+        "sha": "4bebbbac21f8f6266908fc990af28bc21c2f1959",
+        "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+        "floor": "x86-64-v4"
+      },
+      "to": {
+        "pipeline": 2987186947,
+        "sha": "ccd4f10dc9282742e0593b7d8909f7d6b4227e94",
+        "machine": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz",
+        "floor": "x86-64-v1"
+      },
+      "commits": 2,
+      "changed_files": 8,
+      "build_changes": [
+        ".devops/cublas.Dockerfile",
+        ".devops/main-cuda.Dockerfile",
+        ".devops/main-intel.Dockerfile",
+        ".devops/main-musa.Dockerfile",
+        ".devops/main-rocm.Dockerfile",
+        ".devops/main-vulkan.Dockerfile",
+        ".devops/main.Dockerfile"
+      ]
     }
   ],
   "summary": {
-    "pipelines": 22,
+    "pipelines": 23,
     "machines": {
       "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz": {
         "level": "x86-64-v4",
-        "pipelines": 19
+        "pipelines": 20
       },
       "AMD EPYC 7B13": {
         "level": "x86-64-v3",
         "pipelines": 3
       }
     },
-    "floor_is_machine_level": 22,
-    "flips": 3,
-    "flips_without_build_changes": 1
+    "floor_is_machine_level": 23,
+    "flips": 4,
+    "flips_without_build_changes": 2,
+    "repaired": {
+      "pipelines": 1,
+      "from": 2987186947,
+      "floors": [
+        "x86-64-v1"
+      ]
+    }
   },
-  "verdict": "supported: in each main pipeline the CPU floor is the level of the build machine, and 1 floor change came with no change to the build inputs"
+  "verdict": "supported: in each main pipeline the CPU floor is the level of the build machine, and 2 floor changes came with no change to the build inputs"
 }
