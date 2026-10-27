@@ -238,7 +238,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/":
             self._send(200, self.server.page, "text/html; charset=utf-8",
                        {"Content-Security-Policy": "default-src 'self'; script-src 'unsafe-inline'; "
-                        "style-src 'unsafe-inline'; media-src 'self' blob:; connect-src 'self'"})
+                        "style-src 'unsafe-inline'; font-src data:; media-src 'self' blob:; connect-src 'self'"})
         elif path == "/healthz":
             ok = self.server.healthy()
             self._send(200 if ok else 503, b"ok\n" if ok else b"starting\n", "text/plain")
