@@ -14,6 +14,8 @@ SKIP_SUFFIXES = {".json", ".wav", ".png", ".bin", ".pyc"}
 ID = re.compile(r"(?<![\w.-])(D-\d{3}|AC-F\d+[a-z]?|NFR-\d+|F\d+(?:\.\d+)?|§\d+(?:\.\d+)?|H-\d|R\d|G\d)(?![\w-])")
 # IDs of the team's working files, which are not in this project.
 INTERNAL = re.compile(r"\bT-\d{2,3}\b|\bPRD\b|\bDECISIONS D-|\bG-\d\b")
+# Inline files (the fonts of the service page) are data, not text.
+DATA_URI = re.compile(r"data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+")
 
 
 def product_files():
@@ -30,7 +32,7 @@ def product_files():
 def texts():
     for p in product_files():
         try:
-            yield p.relative_to(ROOT).as_posix(), p.read_text("utf-8")
+            yield p.relative_to(ROOT).as_posix(), DATA_URI.sub("data:", p.read_text("utf-8"))
         except UnicodeDecodeError:
             continue
 
