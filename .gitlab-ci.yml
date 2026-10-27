@@ -17,11 +17,13 @@
 #   herald  after attest: "Who this release serves" and the pinned-issue summary, from the manifest (F12.1, F12.3)
 #   release default branch, after attest: cuts <tag>-floor.N when the commit merged a fix of a tag (F4.4)
 #   pages   the Rieux page from the committed evidence (default branch only)
+#   deploy-image, deploy  default branch, after attest, only when GCP_PROJECT_ID is set: the held image
+#           on Cloud Run as a revision with no traffic, the smoke test, then all traffic (F13.1, F13.2)
 #
 # Evidence: the artifacts below out/ (the judge job keeps all of them).
 # SCI per release check (R2): each job that uses the tools image meters its own container, and
 # the judge job adds the meters into out/judge/meter.json (D-015).
-# Not here yet: the agent part of herald (D-025), deploy.
+# Not here yet: the agent part of herald (D-025).
 
 workflow:
   rules:
@@ -35,7 +37,7 @@ workflow:
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-stages: [check, build, floors, judge, repair, publish]
+stages: [check, build, floors, judge, repair, publish, deploy]
 
 variables:
   IMAGE_REPO: $CI_REGISTRY_IMAGE/main
@@ -48,6 +50,13 @@ variables:
   FLOOR_SUMMARY_ISSUE: "2"
   # Reference transcript of samples/jfk.wav.
   EXPECT: "ask not what your country can do for you"
+  # Cloud Run (F13.1, D-040): the outputs of infra/ (`tofu output gitlab_ci_variables`). None is a secret.
+  # Empty GCP_PROJECT_ID: the deploy jobs do not run.
+  GCP_PROJECT_ID: ""
+  GCP_REGION: "northamerica-northeast1"
+  GCP_WIF_PROVIDER: ""
+  GCP_WIF_AUDIENCE: ""
+  GCP_SERVICE_ACCOUNT: ""
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PIP_ROOT_USER_ACTION: "ignore"
   PIP_PROGRESS_BAR: "off"
@@ -541,3 +550,112 @@ pages:
     - floor page --out public
   artifacts:
     paths: [public]
+
+# F13.1 (D-040): the service image of the held, signed image (the pushed image plus the gateway) goes
+# to Artifact Registry. No key file: .gitlab/ci/gcp-token.sh trades the job's GitLab ID token for a
+# short-lived token of the deploy service account (Workload Identity Federation, infra/main.tf).
+deploy-image:
+  stage: deploy
+  extends: .evidence
+  image: docker:27.5.1
+  services:
+    - name: docker:27.5.1-dind
+      alias: docker
+      command: ["--registry-mirror", "https://mirror.gcr.io"]
+  needs: [build, attest]
+  interruptible: false
+  timeout: 30m
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $GCP_PROJECT_ID
+  id_tokens:
+    GCP_ID_TOKEN:
+      aud: $GCP_WIF_AUDIENCE
+  variables:
+    GIT_DEPTH: "1"
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: /certs
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: /certs/client
+  script:
+    - |
+      for i in $(seq 1 30); do docker info > /dev/null 2>&1 && break; sleep 2; done
+      apk add --no-cache curl > /dev/null
+      mkdir -p out/deploy
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+      sh .gitlab/ci/gcp-token.sh /tmp/gcp-token
+      registry="$GCP_REGION-docker.pkg.dev"
+      docker login -u oauth2accesstoken --password-stdin "https://$registry" < /tmp/gcp-token
+      rm -f /tmp/gcp-token
+      ref="$registry/$GCP_PROJECT_ID/rieux/service:$CI_COMMIT_SHA"
+      docker build --progress=plain -f deploy/service.Dockerfile --build-arg IMAGE="$IMAGE_REF" -t "$ref" . \
+        > /tmp/deploy-build.log 2>&1 || { tail -n 40 /tmp/deploy-build.log; exit 1; }
+      docker push "$ref" > /dev/null
+      digest="$(docker inspect --format '{{index .RepoDigests 0}}' "$ref")"
+      digest="${digest#*@}"
+      case "$digest" in sha256:*) ;; *) echo "no registry digest for $ref"; exit 1 ;; esac
+      {
+        echo "SERVICE_IMAGE=$registry/$GCP_PROJECT_ID/rieux/service@$digest"
+        echo "HELD_IMAGE=$IMAGE_REF"
+      } > out/deploy/image.env
+      cat out/deploy/image.env
+  artifacts:
+    paths: [out/deploy/]
+    reports:
+      dotenv: out/deploy/image.env
+
+# F13.2 (D-040): staging, smoke test, production, rollback on Cloud Run. The new revision gets no
+# traffic and the tag "candidate" (staging). The smoke test of the service job runs against its own
+# URL. Only then does it get all traffic (production). If a check fails, the job stops and the
+# traffic stays on the previous revision: that is the rollback, with no step of its own.
+deploy:
+  stage: deploy
+  extends: .evidence
+  image: google/cloud-sdk:slim
+  needs: [deploy-image]
+  interruptible: false
+  resource_group: cloud-run
+  timeout: 30m
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $GCP_PROJECT_ID
+  id_tokens:
+    GCP_ID_TOKEN:
+      aud: $GCP_WIF_AUDIENCE
+  variables:
+    GIT_DEPTH: "1"
+  script:
+    - |
+      mkdir -p out/deploy
+      echo "$CI_JOB_URL" > out/deploy/job-url.txt
+      sh .gitlab/ci/gcp-token.sh /tmp/gcp-token
+      gc() { gcloud --quiet --project "$GCP_PROJECT_ID" --access-token-file /tmp/gcp-token "$@"; }
+      gc run deploy rieux --region "$GCP_REGION" --image "$SERVICE_IMAGE" --no-traffic --tag candidate
+      url="$(gc run services describe rieux --region "$GCP_REGION" --format 'value(status.url)')"
+      candidate="https://candidate---${url#https://}"
+      echo "staging: $candidate"
+      ok=0
+      for i in $(seq 1 60); do
+        if curl -fsS -o /dev/null --max-time 20 "$candidate/healthz"; then ok=1; break; fi
+        sleep 10
+      done
+      [ "$ok" = 1 ] || { echo "the candidate revision never answered /healthz"; exit 1; }
+      code=$(curl -sS -o out/deploy/transcribe.json -w '%{http_code}' --max-time 120 -H "Content-Type: audio/wav" \
+        --data-binary @samples/jfk.wav "$candidate/transcribe")
+      cat out/deploy/transcribe.json; echo
+      [ "$code" = 200 ] || { echo "HTTP $code"; exit 1; }
+      grep -qi "$EXPECT" out/deploy/transcribe.json || { echo "the text does not match: $EXPECT"; exit 1; }
+      # F13.4 (D-028): the host level of the Cloud Run machine and the ggml CPU variant that loaded.
+      curl -sS -o out/deploy/floor.json --max-time 20 "$candidate/floor"
+      cat out/deploy/floor.json; echo
+      grep -q '"host_level": "x86-64-v' out/deploy/floor.json || { echo "GET /floor has no host level"; exit 1; }
+      head -c 500000 /dev/zero > /tmp/not-wav.bin
+      code=$(curl -sS -o /tmp/bad.json -w '%{http_code}' --max-time 60 --data-binary @/tmp/not-wav.bin "$candidate/transcribe")
+      [ "$code" = 400 ] || { echo "a body that is not WAV got HTTP $code"; exit 1; }
+      gc run services update-traffic rieux --region "$GCP_REGION" --to-tags candidate=100
+      curl -fsS -o /dev/null --max-time 60 "$url/healthz"
+      gc run services describe rieux --region "$GCP_REGION" \
+        --format 'value(status.latestReadyRevisionName,status.traffic)' | tee out/deploy/revision.txt
+      rm -f /tmp/gcp-token
+      echo "$url" | tee out/deploy/url.txt
+      echo "production: $url ($SERVICE_IMAGE, from $HELD_IMAGE)"
+  artifacts:
+    paths: [out/deploy/]

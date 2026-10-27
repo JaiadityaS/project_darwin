@@ -54,6 +54,7 @@ The product plan is a working document of the team. It is not in this project, s
 | F12.2 | A public Floor page: the floor history with the backtest and the H-1 verdict, the runs on emulated CPUs, the language table, SCI and the notices. |
 | F12.3 | A summary of at most 8 lines on a pinned issue after each release. |
 | F13.1 | whisper-server runs on Cloud Run in a low-CO₂ region from the signed, held image. OpenTofu is in the repo, and CI uses Workload Identity Federation. |
+| F13.2 | A new revision goes to staging first, passes a smoke test, and only then takes the production traffic. A failed check leaves the previous revision in production (the rollback). |
 | F13.3 | The upload page caps the audio at 30 seconds, limits the requests and the instances, and stores no audio. |
 | F13.4 | A `/floor` endpoint reports the x86-64 level of the host CPU and the ggml CPU variant that loaded, from ggml's load log. |
 | F14.1 | SCI per audio-minute for the service (R1) and per release check (R2), with Green Software Foundation Impact Framework manifests in the repo. |
@@ -246,3 +247,10 @@ The product plan is a working document of the team. It is not in this project, s
 - `.floor/flows/field-triage.yml`: `gate` (no tools) answers "cpu", "memory", "language" or "skip". `reply` (tool `create_issue_note` only) maps the reporter's CPU to a probe model by a fixed table, points to the latest `-floor` release and its "Who this release serves" part, and asks for `/lib64/ld-linux-x86-64.so.2 --help` and the CPU model when the CPU is not known. It states no floor value.
 - Deviation: no new reproduction per issue. The proof is the probe run of the release.
 - The trigger is "Work item: Created".
+
+### D-040 F13.1, F13.2: Cloud Run from the signed image, with Workload Identity Federation
+- `infra/main.tf` (OpenTofu; Terraform reads it too) makes the APIs, an Artifact Registry repository, a Workload Identity pool for gitlab.com, a deploy service account, a runtime service account with no roles, and the Cloud Run service `rieux` in northamerica-northeast1: 0 to 1 instances, 1 vCPU, 2 GiB, public. A project owner applies it once.
+- Only pipelines of this project on `main` can deploy: the provider condition checks `project_id`, `ref_type` and `ref` of the GitLab ID token. `.gitlab/ci/gcp-token.sh` trades the ID token for a short-lived token of the deploy service account. There is no key file, and the values in `.gitlab-ci.yml` (`GCP_*`) are not secrets.
+- `deploy-image` and `deploy` run on the default branch after `attest`, so only for a held and signed image. `deploy-image` pushes the service image (`deploy/service.Dockerfile` on the held image) to Artifact Registry. `deploy` makes a revision with no traffic and the tag `candidate`, runs the smoke test of the service job against it (the reference text, `GET /floor`, 400 for a body that is not WAV), and then moves all traffic to it. A failed check leaves the traffic on the previous revision.
+- Deviation: OpenTofu makes the service once; the deploy jobs own the image and the traffic (`ignore_changes`).
+- Empty `GCP_PROJECT_ID`: the jobs do not run.

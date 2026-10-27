@@ -13,3 +13,4 @@
 /.gitlab/CODEOWNERS @jaiadityasinghr
 /.gitlab-ci.yml @jaiadityasinghr
 /.gitlab/ci/ @jaiadityasinghr
+/infra/ @jaiadityasinghr

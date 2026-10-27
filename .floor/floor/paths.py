@@ -25,6 +25,7 @@ CODE_OWNED = (
     ".gitlab/CODEOWNERS",
     ".gitlab-ci.yml",
     ".gitlab/ci/**",
+    "infra/**",                 # Cloud Run and Workload Identity Federation (D-040)
 )
 
 
