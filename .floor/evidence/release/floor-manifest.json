@@ -2,19 +2,20 @@
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
-      "name": "github.com/JaiadityaS/project_darwin/whisper-cli",
+      "name": "registry.gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/main",
       "digest": {
-        "sha256": "9023193a1b3aa22458899b221c8dd5781a4bffbe21255e03f422d2586d162039"
+        "sha256": "5ff92d99a96e9d752b14619e216fcfc522d0cdf9533d64108e915774517ad3af"
       }
     }
   ],
-  "predicateType": "https://github.com/JaiadityaS/project_darwin/floor-manifest/v0.3",
+  "predicateType": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/floor-manifest/v0.3",
   "predicate": {
-    "release": "dry-run-38704136185",
-    "commit": "0c7be696371069e0baa2515ed7aa08d5a5473aa6",
+    "release": "main-ccd4f10d",
+    "commit": "ccd4f10dc9282742e0593b7d8909f7d6b4227e94",
     "build": {
-      "cmake_flags": "-DGGML_NATIVE=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DBUILD_SHARED_LIBS=ON",
-      "base_image": null,
+      "cmake_flags": "-DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DGGML_AVX=ON -DGGML_AVX2=ON -DGGML_AVX512=OFF -DGGML_AVX512_BF16=OFF -DGGML_AVX512_VBMI=OFF -DGGML_AVX512_VNNI=OFF -DGGML_AVX_VNNI=OFF -DGGML_BACKEND_DL=ON -DGGML_BMI2=ON -DGGML_CPU_ALL_VARIANTS=ON -DGGML_F16C=ON -DGGML_FMA=ON -DGGML_NATIVE=OFF -DGGML_SSE42=ON",
+      "base_image": "docker.io/library/ubuntu:22.04@sha256:0a9887931b0e38af2e3487ed39e29436b0535c4f3f52e57745baaf79d1898956",
+      "host_cpu": "INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz (x86-64-v4)",
       "source_date_epoch": false,
       "highest_level_found": "x86-64-v4",
       "baseline_variant": "x64"
@@ -27,9 +28,14 @@
         "coverage_limited": false,
         "meets_policy": true,
         "policy": "x86-64-v1",
-        "dispatch": {},
+        "dispatch": {
+          "EPYC-Milan": "haswell",
+          "Nehalem": "sse42",
+          "SandyBridge": "sandybridge",
+          "qemu64": "x64"
+        },
         "notes": [],
-        "evidence": "https://github.com/JaiadityaS/project_darwin/actions/runs/38704136185"
+        "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17452197360"
       },
       "memory": {
         "status": "held",
@@ -38,17 +44,50 @@
           "small": 768,
           "tiny": 512
         },
+        "peak_rss_mb": {
+          "base": 284,
+          "small": 751,
+          "tiny": 176
+        },
+        "download_mb": {
+          "base": 168.7,
+          "small": 508.3,
+          "tiny": 98.4
+        },
         "meets_policy": true,
         "notes": [],
-        "evidence": "https://github.com/JaiadityaS/project_darwin/actions/runs/38704136185"
+        "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17452197365"
       },
       "connectivity": {
         "status": "held",
         "offline": "proven",
         "network_attempts": 0,
+        "download_mb": 98.4,
+        "download_bytes": {
+          "ggml-tiny.en.bin": 77704715,
+          "whisper-cli": 976312,
+          "libggml-cpu-sandybridge.so": 1217200,
+          "libggml-cpu-icelake.so": 1374344,
+          "libggml-cpu-cooperlake.so": 1374344,
+          "libggml-cpu-cascadelake.so": 1374344,
+          "libwhisper.so.1.9.5": 615800,
+          "libggml-cpu-sapphirerapids.so": 1636576,
+          "libparakeet.so.1.9.5": 188848,
+          "libggml-cpu-x64.so": 942168,
+          "libggml-cpu-ivybridge.so": 1213104,
+          "libggml-cpu-alderlake.so": 1280320,
+          "libggml-cpu-piledriver.so": 1209008,
+          "libggml-base.so.0.26.0": 931232,
+          "libggml.so.0.26.0": 55184,
+          "libggml-cpu-cannonlake.so": 1362352,
+          "libggml-cpu-haswell.so": 1284416,
+          "libggml-cpu-sse42.so": 946088,
+          "libggml-cpu-zen4.so": 1374344,
+          "libggml-cpu-skylakex.so": 1362352
+        },
         "meets_policy": true,
         "notes": [],
-        "evidence": "https://github.com/JaiadityaS/project_darwin/actions/runs/38704136185"
+        "evidence": "https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase/-/jobs/17452197366"
       }
     },
     "decision": "pass",
@@ -62,9 +101,9 @@
     "changes": [],
     "leave_behind_notices": [],
     "footprint": {
-      "sci_gco2e_per_audio_minute": null,
-      "sci_gco2e_per_release_check": null,
-      "method": "GSF Impact Framework"
+      "sci_gco2e_per_audio_minute": 0.0019596936511420246,
+      "sci_gco2e_per_release_check": 0.36160130564626297,
+      "method": "GSF Impact Framework (@grnsft/if@1.1.1, if-run) with Cloud Carbon Footprint coefficients"
     },
     "delta_m_kgco2e": {
       "low": 0,

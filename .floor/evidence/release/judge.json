@@ -8,7 +8,12 @@
       "coverage_limited": false,
       "meets_policy": true,
       "policy": "x86-64-v1",
-      "dispatch": {},
+      "dispatch": {
+        "EPYC-Milan": "haswell",
+        "Nehalem": "sse42",
+        "SandyBridge": "sandybridge",
+        "qemu64": "x64"
+      },
       "notes": []
     },
     "memory": {
@@ -18,6 +23,16 @@
         "small": 768,
         "tiny": 512
       },
+      "peak_rss_mb": {
+        "base": 284,
+        "small": 751,
+        "tiny": 176
+      },
+      "download_mb": {
+        "base": 168.7,
+        "small": 508.3,
+        "tiny": 98.4
+      },
       "meets_policy": true,
       "notes": []
     },
@@ -25,6 +40,29 @@
       "status": "held",
       "offline": "proven",
       "network_attempts": 0,
+      "download_mb": 98.4,
+      "download_bytes": {
+        "ggml-tiny.en.bin": 77704715,
+        "whisper-cli": 976312,
+        "libggml-cpu-sandybridge.so": 1217200,
+        "libggml-cpu-icelake.so": 1374344,
+        "libggml-cpu-cooperlake.so": 1374344,
+        "libggml-cpu-cascadelake.so": 1374344,
+        "libwhisper.so.1.9.5": 615800,
+        "libggml-cpu-sapphirerapids.so": 1636576,
+        "libparakeet.so.1.9.5": 188848,
+        "libggml-cpu-x64.so": 942168,
+        "libggml-cpu-ivybridge.so": 1213104,
+        "libggml-cpu-alderlake.so": 1280320,
+        "libggml-cpu-piledriver.so": 1209008,
+        "libggml-base.so.0.26.0": 931232,
+        "libggml.so.0.26.0": 55184,
+        "libggml-cpu-cannonlake.so": 1362352,
+        "libggml-cpu-haswell.so": 1284416,
+        "libggml-cpu-sse42.so": 946088,
+        "libggml-cpu-zen4.so": 1374344,
+        "libggml-cpu-skylakex.so": 1362352
+      },
       "meets_policy": true,
       "notes": []
     }

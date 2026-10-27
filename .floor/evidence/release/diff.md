@@ -1,4 +1,4 @@
-## Floor diff: no previous release → dry-run-38704136185
+## Floor diff: no previous release → main-ccd4f10d
 
 | Floor | Previous | This release | Status |
 |---|---|---|---|
@@ -8,6 +8,6 @@
 
 Pareto: **held**. Gate decision: **pass**.
 
-No floor moved.
+No previous release, so the Judge compares each floor with the policy.
 
 Not measured: arm64, gpu-backends, language.

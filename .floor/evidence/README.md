@@ -6,7 +6,8 @@ Measured results that the Floor page (`python -m floor page`) and the README use
 |---|---|---|
 | `backtest/` | `sweep.yml`, `floor h1` | Timelines of published images and the H-1 verdict. See `backtest/README.md` |
 | `cpu-proof/<build>/` | `cpu-proof.yml` run 38702242235 (whisper.cpp 0c7be696) | Static scan and QEMU runs with controls for the native, folk-fix and all-variants builds (AC-F2, AC-F3) |
-| `release/` | `floors.yml` run 38704136185 (all-variants build) | Memory floor, offline proof, Judge output, manifest and diff of a dry-run release |
+| `release/floor-manifest.json`, `release/diff.md`, `release/judge.json` | GitLab main pipeline 2987186947, judge job 17452197367 (the release `v1.9.5-rieux.1-floor.1`, merge commit `ccd4f10d`) | The signed Floor Manifest, its diff and the Judge output of the first real release |
+| `release/` (the other files) | `floors.yml` run 38704136185 (all-variants build) | Memory floor, offline proof and the Judge text of a dry-run release |
 | `release/meter.json` | GitLab pipeline 2960804030 (`main` `64329927`), the judge job's `out/judge/meter.json` | CPU time and memory of one release check, R2 (D-015) |
 | `energy/` | `energy.yml` run 39033747472 (whisper.cpp 0c7be696, `base.en`, 5 runs per build) | CPU time, wall time and peak memory of the native, folk-fix, all-variants and x64-only builds on the same audio (F14.2), with the CMake logs and the runner CPU |
 | `language/` | `language.yml` run 39233922646 (whisper.cpp 0c7be696, FLEURS test, 50 sentences per language) | The served / not-served language table (F9.1, D-031): WER and CER of tiny, base and small at f16 and q5_1, the drift with a paired-bootstrap 95% interval, and the pinned decoding (F9.2) |
