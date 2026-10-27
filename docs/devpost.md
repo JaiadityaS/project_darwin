@@ -5,7 +5,7 @@ The text for the submission form. Every number comes from `README.md` or from a 
 Before you submit (owner):
 
 1. Video: put the YouTube URL (public, under 3:00) in the table below.
-2. Deployed URL: if the `deploy` job of a `main` pipeline passed, use its URL (`out/deploy/url.txt`), and keep `opentofu` and `google-cloud-run` in "Built with". If not, keep the Pages URL and remove those two names.
+2. Deployed URL: done. The Cloud Run service is live at https://rieux-tv4gzmv7kq-nn.a.run.app (2026-10-27, `infra/quick-deploy.sh`).
 3. Count the pitch again if you change it.
 
 ## Form fields
@@ -18,9 +18,9 @@ Before you submit (owner):
 | Special prize | Most Environmentally Impactful (opt in; SCI below) |
 | Original MIT project | https://github.com/ggml-org/whisper.cpp |
 | GitLab project | https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase |
-| Deployed URL | https://showcase-9a1941.gitlab.io/ (the Rieux page, GitLab Pages). Replace it with the Cloud Run URL when the `deploy` job has passed. It must stay live until 2026-11-16 |
+| Deployed URL | https://rieux-tv4gzmv7kq-nn.a.run.app (the Rieux service on Cloud Run). The project page is https://showcase-9a1941.gitlab.io/. It must stay live until 2026-11-16 |
 | Video | (the YouTube URL) |
-| Built with | python, gitlab-ci, gitlab-duo-agent-platform, qemu, docker, sigstore, in-toto, impact-framework, gitlab-pages, opentofu, google-cloud-run (the last two only if the Cloud Run service is live) |
+| Built with | python, gitlab-ci, gitlab-duo-agent-platform, qemu, docker, sigstore, in-toto, impact-framework, gitlab-pages, opentofu, google-cloud-run |
 
 The pitch is 191 characters. Count it again after each change.
 
