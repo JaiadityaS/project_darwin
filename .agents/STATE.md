@@ -1,6 +1,6 @@
 # STATE: the baton
 
-Last update: 2026-10-25 · @JaiadityaS · session 12 (GitLab sync 4bebbbac; release loop 1 done: `v1.9.5-rieux.1-floor.1`; the work that is left is in `.agents/remaining-work.md`)
+Last update: 2026-10-27 · @JaiadityaS · session 13 (Cloud Run code, D-040; devpost last pass). Before: session 12 (GitLab sync 4bebbbac; release loop 1 done: `v1.9.5-rieux.1-floor.1`; the work that is left is in `.agents/remaining-work.md`)
 
 ## Where we are
 
@@ -29,6 +29,7 @@ Last update: 2026-10-25 · @JaiadityaS · session 12 (GitLab sync 4bebbbac; rele
 
 ## Next agent: start here
 
+00. Session 13 (2026-10-27, cloud): the agent part of remaining-work item 5 and item 10 are done. Cloud Run (D-040): `infra/main.tf` (OpenTofu), `infra/README.md` (the owner steps), `.gitlab/ci/gcp-token.sh`, the jobs `deploy-image` and `deploy`, `test_deploy.py`. The jobs stay off while `GCP_PROJECT_ID` is empty. Next: (1) the owner does `infra/README.md` steps 1 to 3 in Cloud Shell and gives the 5 output values; (2) an agent puts them into the `GCP_*` variables of `.gitlab-ci.yml`, commits, and a local session syncs; (3) check the `deploy` job of that `main` pipeline (`out/deploy/url.txt`, `transcribe.json`, `floor.json`), then put the URL into README (Configure row) and `docs/devpost.md`, and sync again. devpost.md has 0 OPEN; the owner adds the video URL. T-99 comes after the deploy, as the last commit. The cloud session 10 work of 2026-10-19 was dropped: a local session had done it on 2026-10-20.
 0. Session 12 (2026-10-25, cloud): items 1 and 2 of `.agents/remaining-work.md` are done. GitLab `main` = `4bebbbac` (sync of dev 8182734; pages job 17451675267 passed). The owner tagged `v1.9.5-rieux.1` (pipeline 2987108367, judge failed as planned). The flow opened fix MR !18 (`floor-fix/2987108367`) 1.8 min later; its gate 2987119941 passed every job and the judge held cpu v1, memory and connectivity. The owner merged !18 (merge commit `ccd4f10d`). Main pipeline 2987186947 passed: attest 17452197370, herald 17452197371, release 17452197372 cut `v1.9.5-rieux.1-floor.1` (21:52:54 UTC; assets: Floor Manifest, Signature check). The job token could make the tag (the D-024 risk did not happen). The release summary flow ran (pipeline 2987226449, success); issue #2 changed at 21:53:43 and has 2 notes. Not checked: the note text (the notes API needs a sign-in). MR !17 (from the main sync) is open; do not merge it. Next: item 3 (AC-F11, the owner's yes first), then 5 (GCP).
 0b. **Read `.agents/remaining-work.md` first.** It lists the work that is left (2026-10-25 19:45 UTC, about 41 hours to the deadline), in order, with who does each item and how. The items below are the history.
 1. T-62 is done (D-031): run 39233922646, `.floor/evidence/language/language.json`. Served: English and Spanish. Not served: the other six languages. The page shows it after the next GitLab sync. Open, not urgent: the cause of the transcripts with bytes that are not UTF-8 (57 of 100 Bengali small, 60 of 100 Yoruba small). The segment break was not the main cause. Read some of them in the run artifacts (a download needs the owner's yes).

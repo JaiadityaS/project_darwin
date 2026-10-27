@@ -381,3 +381,14 @@ Short records, newest last. Each record: the decision, why, and the PRD impact.
 - Tests: `test_repaired_pipelines_do_not_count`.
 - Public entry: none needed. No product file cites D-039.
 - PRD impact: F10.3, F12.2.
+
+## D-040 (2026-10-27) T-50, T-51: Cloud Run from the signed image, with Workload Identity Federation
+- PRD F13.1: whisper-server on Cloud Run in a low-CO2 region from the signed, held image; OpenTofu in the repo; CI uses WIF. F13.2: staging, smoke test, production, rollback.
+- Decision (`infra/main.tf`, `.gitlab/ci/gcp-token.sh`, jobs `deploy-image` and `deploy`, tested in `test_deploy.py`; public entry D-040 in `.floor/DECISIONS.md`):
+  - OpenTofu (Terraform reads it too, so Cloud Shell can apply it) makes the APIs, the Artifact Registry repository `rieux`, the pool `rieux-gitlab` with provider `gitlab-com` (condition: project 87296266, `ref_type` branch, `ref` main), the deploy service account `rieux-deploy` (run.developer, registry writer, acts as the runtime account) and the runtime account `rieux-run` (no roles), and the service `rieux` in northamerica-northeast1 (0 to 1 instances, 1 vCPU, 2 GiB, public). The service starts with Google's placeholder image.
+  - The token script does the STS exchange and `generateAccessToken` with curl. No key file; it never prints a token (a test with a fake curl checks it). The `GCP_*` values are not secrets, so they are in `.gitlab-ci.yml`. A Maintainer setting is not needed (our role is Developer, D-010).
+  - `deploy-image` (dind, after `build` and `attest`) pushes the service image. `deploy` (`google/cloud-sdk:slim`, `resource_group: cloud-run`) deploys a revision with `--no-traffic --tag candidate`, runs the smoke test on the tag URL, then `update-traffic --to-tags candidate=100`. A failed check leaves the traffic on the old revision (the rollback).
+  - `infra/` is code-owned (CODEOWNERS, `paths.CODE_OWNED`).
+- Deviations: OpenTofu makes the service once; the jobs own the image and the traffic (`ignore_changes`). The cloud-sdk image tag is not pinned to a version (no registry access from the cloud container to choose one).
+- Not checked: `tofu validate` (the container cannot download the provider; python-hcl2 parsed the file), the id_tokens `aud` from a variable, and the whole deploy. The first `main` pipeline after the apply is the check.
+- PRD impact: F13.1 (OpenTofu makes the service; CI rolls the revisions).

@@ -1,22 +1,28 @@
-# Devpost text: draft (T-92)
+# Devpost text
 
-Draft for the submission form. Every number comes from `README.md` or from a pipeline or MR on GitLab. Each "OPEN" item must be done, or removed from the text, before submission. Do the last pass with the README (T-90), because the two texts must agree.
+The text for the submission form. Every number comes from `README.md` or from a pipeline or MR on GitLab. The two texts agree (last pass 2026-10-27).
+
+Before you submit (owner):
+
+1. Video: put the YouTube URL (public, under 3:00) in the table below.
+2. Deployed URL: if the `deploy` job of a `main` pipeline passed, use its URL (`out/deploy/url.txt`), and keep `opentofu` and `google-cloud-run` in "Built with". If not, keep the Pages URL and remove those two names.
+3. Count the pitch again if you change it.
 
 ## Form fields
 
 | Field | Value |
 |---|---|
 | Project name | Rieux |
-| Elevator pitch (200 characters) | A release gate for whisper.cpp. It proves, for every release, who can still use it: the oldest CPU, the smallest memory, no network. Agents repair, a script judges, only a human can exclude. |
+| Elevator pitch (200 characters) | Which machines does this release still run on? Rieux proves it for each whisper.cpp release: the oldest CPU, the smallest memory, no network. Agents repair, a script judges, a human excludes. |
 | Path and category | Path B (Bring Your Own), Hands-off |
 | Special prize | Most Environmentally Impactful (opt in; SCI below) |
 | Original MIT project | https://github.com/ggml-org/whisper.cpp |
 | GitLab project | https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43085222/showcase |
-| Deployed URL | OPEN: the Cloud Run URL (T-06, T-50, T-51). It must be live until 2026-11-16. Now: the Rieux page, https://showcase-9a1941.gitlab.io/ |
-| Video | OPEN: the YouTube URL (T-91), public, under 3:00 |
-| Built with | python, gitlab-ci, gitlab-duo-agent-platform, qemu, docker, sigstore, in-toto, impact-framework, gitlab-pages, opentofu, google-cloud-run (OPEN: keep opentofu and google-cloud-run only if the Cloud Run service is live) |
+| Deployed URL | https://showcase-9a1941.gitlab.io/ (the Rieux page, GitLab Pages). Replace it with the Cloud Run URL when the `deploy` job has passed. It must stay live until 2026-11-16 |
+| Video | (the YouTube URL) |
+| Built with | python, gitlab-ci, gitlab-duo-agent-platform, qemu, docker, sigstore, in-toto, impact-framework, gitlab-pages, opentofu, google-cloud-run (the last two only if the Cloud Run service is live) |
 
-The pitch is 190 characters. Count it again after each change.
+The pitch is 191 characters. Count it again after each change.
 
 ## About the project
 
@@ -40,7 +46,7 @@ The cause is in the build. All 7 upstream Dockerfiles use ggml's default `GGML_N
 | A floor rises | Users find out when the image crashes. A stale bot closes the issue | The pipeline fails. A flow opens a fix MR in minutes, and the gate checks the fix again |
 | The fix does not hold | No process | A script applies upstream's own inclusive config. If that fails too, a Leave-Behind Notice draft. Only a human approves it |
 | Release notes | Changes to code | "Who this release serves", from the signed manifest |
-| A user reports a crash | Wait for a maintainer | The field triage flow answers with the CPU model of the gate that matches the user's CPU (OPEN: AC-F11, one test issue at the end) |
+| A user reports a crash | Wait for a maintainer | The field triage flow reads each new issue. For a floor report, it names the gate's CPU model that matches the user's CPU and the latest release. Tested so far: it skips an issue that is not about a floor (issue #2) |
 
 ### What it does
 
@@ -62,7 +68,7 @@ Measured on GitLab:
 - The attest job signed and verified the manifest (pipeline 2961110649, job 17270217868).
 - The notice path ran once, on a real trade-off. MR !13, a proposal by the owner, removed the baseline CPU variant of ggml (about 1 MB) from the image. The gate raised the CPU floor to x86-64-v2 (on qemu64 the image stopped), the fallback had no patch, and the `notice-draft` job wrote the Leave-Behind Notice draft: 11 to 12 of each 10,000 x86 users affected, ΔM 0.7 to 35 kg CO2e. The owner refused it and closed the MR. The Rieux page shows the decision.
 - One complete release loop ran on 2026-10-25. The owner tagged `v1.9.5-rieux.1`. Its gate failed (pipeline 2987108367), and the flow opened fix MR !18 1.8 minutes later. The gate of !18 held every floor (pipeline 2987119941), and the owner merged it. The `main` pipeline of the merge (2987186947) signed the manifest, wrote the notes and cut the release `v1.9.5-rieux.1-floor.1`.
-- OPEN: PRD §16.2 asks for 3 complete loops: a repair of the default flags (done, above), a repair of the folk fix, and one notice. The notice path ran on MR !13; the owner refused it, so it made no release.
+- Two of the three loops of our plan ran: the repair of the default flags (the release above) and the notice (MR !13, refused, so no release). The repair of the folk fix did not run.
 
 ### What we measured
 
@@ -81,7 +87,7 @@ Measured on GitLab:
 ### How we built it
 
 - One Python package, `floor`, with 36 modules and 27 test files. 280 tests passed in the `check` job of pipeline 2973711384.
-- `.gitlab-ci.yml`: check, build, service, scan, probe ×4, memory, offline, judge, fallback, notice-draft, attest, herald, release and pages.
+- `.gitlab-ci.yml`: check, build, service, scan, probe ×4, memory, offline, judge, fallback, notice-draft, attest, herald, release and pages. Two deploy jobs follow `attest` on `main`: a Cloud Run revision with no traffic, the smoke test, then all traffic. `infra/main.tf` (OpenTofu) makes the service and Workload Identity Federation, so CI has no key file.
 - Four flows in `.floor/flows/`, saved as private AI Catalog flows: floor repair (trigger: a failed pipeline), field triage (trigger: a new work item), release summary (trigger: a passed pipeline) and a trigger probe.
 - The Rieux page on GitLab Pages: the backtest timeline, the floors, the languages, SCI, ΔM and the repair loop.
 
@@ -113,4 +119,3 @@ The git history shows where upstream ends: the first Rieux commit on GitLab is `
 
 - Run the gate on llama.cpp and other ggml projects, which use the same build options.
 - Add more floors: GPU drivers, ARM levels and the operating system version.
-- OPEN: keep this list short and true at submission time.
