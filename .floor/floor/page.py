@@ -676,8 +676,7 @@ def render(data: dict, generated: str) -> str:
 <title>Rieux</title><meta name="description" content="Who each whisper.cpp release serves: CPU, memory and offline floors, with proof.">
 <link rel="preload" href="assets/UbuntuMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>{CSS}</style></head><body>
-<header><div class="wrap bar"><div><h1>Rieux</h1>: a hardware-floor report for whisper.cpp</div>
-<span>built {escape(generated)}</span></div></header>
+<header><div class="wrap bar"><div><h1>Rieux</h1>: a hardware-floor report for whisper.cpp</div></div></header>
 <main>
 <section id="top" class="wrap hero"><div class="hero-row"><div class="hero-text">
 <p class="display">{sentence}</p>
