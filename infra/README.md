@@ -2,6 +2,17 @@
 
 `main.tf` makes the Google Cloud part of the deploy (F13.1, D-040). Apply it once. After that, each `main` pipeline that holds the gate and signs the manifest deploys the image with no person in the loop.
 
+## Fast path (gcloud only, about 10 minutes)
+
+`quick-deploy.sh` deploys the image that the gate held for `v1.9.5-rieux.1-floor.1` (main pipeline 2987186947). It needs no OpenTofu and no pipeline. It makes no Workload Identity Federation, so later pipelines do not deploy. In Cloud Shell, in a project with billing:
+
+```bash
+# Upload infra/quick-deploy.sh (Cloud Shell menu > Upload), then:
+bash quick-deploy.sh PROJECT_ID
+```
+
+The script prints the URL and the smoke test result (`/healthz`, the JFK sample, `/floor`).
+
 ## One-time setup (a project owner, about 10 minutes)
 
 1. In the Google Cloud console, make a project and link a billing account. Optional: Billing > Budgets & alerts, a budget of 10 USD with an e-mail alert.
